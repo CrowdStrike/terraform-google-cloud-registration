@@ -32,9 +32,9 @@ resource "google_project_service" "required_apis" {
 # Create Workload Identity Pool
 resource "google_iam_workload_identity_pool" "main" {
   workload_identity_pool_id = var.wif_pool_id
-  display_name             = var.wif_pool_name
-  description              = "CrowdStrike Workload Identity Pool for AWS federation"
-  project                  = var.wif_project_id
+  display_name              = var.wif_pool_name
+  description               = "CrowdStrike Workload Identity Pool for AWS federation"
+  project                   = var.wif_project_id
 
   # Ensure required APIs are enabled before creating the pool
   depends_on = [
