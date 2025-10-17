@@ -1,3 +1,8 @@
+# Data source to get project information
+data "google_project" "wif_project" {
+  project_id = var.wif_project_id
+}
+
 # Enable Service Usage API first (if not already enabled)
 resource "google_project_service" "serviceusage" {
   project = var.wif_project_id
@@ -28,7 +33,7 @@ resource "google_project_service" "required_apis" {
 resource "google_iam_workload_identity_pool" "main" {
   workload_identity_pool_id = var.wif_pool_id
   display_name             = var.wif_pool_name
-  description              = "Workload Identity Pool for AWS federation"
+  description              = "CrowdStrike Workload Identity Pool for AWS federation"
   project                  = var.wif_project_id
 
   # Ensure required APIs are enabled before creating the pool
@@ -42,7 +47,7 @@ resource "google_iam_workload_identity_pool_provider" "aws" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.main.workload_identity_pool_id
   workload_identity_pool_provider_id = var.wif_pool_provider_id
   display_name                       = var.wif_pool_provider_name
-  description                        = "AWS identity provider for federation"
+  description                        = "CrowdStrike AWS identity provider for federation"
   project                            = var.wif_project_id
 
   aws {
