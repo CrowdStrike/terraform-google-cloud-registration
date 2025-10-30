@@ -32,7 +32,7 @@ resource "google_project_service" "required_apis" {
 # Create Workload Identity Pool
 resource "google_iam_workload_identity_pool" "main" {
   workload_identity_pool_id = var.wif_pool_id
-  display_name              = var.wif_pool_name
+  display_name              = "${var.resource_prefix}CrowdStrikeIDPool${var.resource_suffix}"
   description               = "CrowdStrike Workload Identity Pool for AWS federation"
   project                   = var.wif_project_id
 
@@ -46,7 +46,7 @@ resource "google_iam_workload_identity_pool" "main" {
 resource "google_iam_workload_identity_pool_provider" "aws" {
   workload_identity_pool_id          = google_iam_workload_identity_pool.main.workload_identity_pool_id
   workload_identity_pool_provider_id = var.wif_pool_provider_id
-  display_name                       = var.wif_pool_provider_name
+  display_name                       = "${var.resource_prefix}CrowdStrikeProvider${var.resource_suffix}"
   description                        = "CrowdStrike AWS identity provider for federation"
   project                            = var.wif_project_id
 

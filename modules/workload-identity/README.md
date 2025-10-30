@@ -54,7 +54,11 @@ This module creates the following Google Cloud resources:
 
 - **Workload Identity Pool**: Establishes the identity federation boundary
 - **Workload Identity Pool Provider**: Configures trust with CrowdStrike's AWS account
-- **Required APIs**: Enables necessary Google Cloud APIs automatically
+- **Required APIs**: Enables necessary Google Cloud APIs automatically:
+  - `serviceusage.googleapis.com` (Service Usage API)
+  - `iamcredentials.googleapis.com` (IAM Service Account Credentials API)
+  - `iam.googleapis.com` (Identity and Access Management API)
+  - `sts.googleapis.com` (Security Token Service API)
 
 ## Security Considerations
 

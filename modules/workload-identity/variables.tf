@@ -32,12 +32,22 @@ variable "resource_prefix" {
   description = "Prefix to be added to all created resource names for identification"
   default     = ""
   type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20
+    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+  }
 }
 
 variable "resource_suffix" {
   type        = string
   description = "Suffix to be added to all created resource names for identification"
   default     = ""
+
+  validation {
+    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
+    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+  }
 }
 
 variable "aws_account_id" {
@@ -47,25 +57,5 @@ variable "aws_account_id" {
   validation {
     condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
     error_message = "AWS Account ID must be exactly 12 digits."
-  }
-}
-
-variable "wif_pool_name" {
-  type        = string
-  description = "Display name for the CrowdStrike Workload Identity Federation Pool (max 32 characters)"
-
-  validation {
-    condition     = length(var.wif_pool_name) <= 32
-    error_message = "Pool display name must be 32 characters or less."
-  }
-}
-
-variable "wif_pool_provider_name" {
-  type        = string
-  description = "Display name for the CrowdStrike Workload Identity Federation Provider (max 32 characters)"
-
-  validation {
-    condition     = length(var.wif_pool_provider_name) <= 32
-    error_message = "Provider display name must be 32 characters or less."
   }
 }
