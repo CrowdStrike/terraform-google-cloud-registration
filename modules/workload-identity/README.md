@@ -35,12 +35,9 @@ module "workload_identity" {
   wif_pool_id          = "cs-fcs-wif-abcd1234efgh5678"
   wif_pool_provider_id = "cs-provider-abcd1234efgh5678"
 
-  # Required: CrowdStrike's AWS account ID
-  aws_account_id = "123456789012"
-
-  # Required: Display names for the resources
-  wif_pool_name          = "CrowdStrike-WIF-Pool"
-  wif_pool_provider_name = "CrowdStrike-AWS-Provider"
+  # Required: CrowdStrike's AWS account ID and registration ID
+  aws_account_id  = "123456789012"
+  registration_id = "my-registration-id"
 
   # Optional: Resource naming
   resource_prefix = "cs"
@@ -88,18 +85,18 @@ This module creates the following Google Cloud resources:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_aws_account_id"></a> [aws\_account\_id](#input\_aws\_account\_id) | AWS Account ID to add as a trust relationship in the WIF Pool Provider | `string` | n/a | yes |
+| <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool | `string` | n/a | yes |
-| <a name="input_wif_pool_name"></a> [wif\_pool\_name](#input\_wif\_pool\_name) | Display name for the CrowdStrike Workload Identity Federation Pool (max 32 characters) | `string` | n/a | yes |
 | <a name="input_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#input\_wif\_pool\_provider\_id) | Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider | `string` | n/a | yes |
-| <a name="input_wif_pool_provider_name"></a> [wif\_pool\_provider\_name](#input\_wif\_pool\_provider\_name) | Display name for the CrowdStrike Workload Identity Federation Provider (max 32 characters) | `string` | n/a | yes |
-| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed | `string` | n/a | yes |
+| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike Workload Identity Federation Pool resources will be deployed | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_wif_iam_principal"></a> [wif\_iam\_principal](#output\_wif\_iam\_principal) | Google Cloud IAM Principal that identifies the specific CrowdStrike session for this registration |
 | <a name="output_wif_project_number"></a> [wif\_project\_number](#output\_wif\_project\_number) | Project number for the WIF Project ID |
 
 <!-- END_TF_DOCS -->

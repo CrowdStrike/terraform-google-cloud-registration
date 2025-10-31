@@ -50,6 +50,16 @@ variable "resource_suffix" {
   }
 }
 
+variable "registration_id" {
+  type        = string
+  description = "Unique registration ID returned by CrowdStrike Registration API"
+
+  validation {
+    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
 variable "aws_account_id" {
   type        = string
   description = "AWS Account ID to add as a trust relationship in the WIF Pool Provider"
