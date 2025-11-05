@@ -69,3 +69,13 @@ variable "aws_account_id" {
     error_message = "AWS Account ID must be exactly 12 digits."
   }
 }
+
+variable "role_arn" {
+  type        = string
+  description = "AWS Role ARN used by CrowdStrike for authentication"
+
+  validation {
+    condition     = can(regex("^arn:aws:(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}

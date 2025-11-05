@@ -8,6 +8,11 @@ variable "wif_iam_principal" {
   }
 }
 
+variable "discovered_projects" {
+  type        = list(string)
+  description = "List of all discovered projects where APIs will be enabled"
+}
+
 variable "registration_type" {
   type        = string
   description = "The scope of the Google Cloud registration which can be one of the following values: organization, folder, project"
