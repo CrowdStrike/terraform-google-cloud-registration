@@ -81,11 +81,12 @@ variable "registration_type" {
 
 variable "registration_id" {
   type        = string
-  description = "Unique registration ID returned by CrowdStrike Registration API, used for resource naming"
+  description = "Unique registration ID returned by CrowdStrike Registration API, used for resource naming. Will be provided by CrowdStrike Terraform provider in future versions."
+  default     = ""
 
   validation {
-    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
-    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
+    condition     = var.registration_id == "" || can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must contain only lowercase letters, numbers, and hyphens when provided."
   }
 }
 

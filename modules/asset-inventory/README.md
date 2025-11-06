@@ -8,8 +8,8 @@
 This Terraform module configures Google Cloud IAM permissions required for CrowdStrike's Cloud Security Posture Management (CSPM) asset inventory scanning. It grants the necessary viewer roles to CrowdStrike's federated identity at the organization, folder, or project level, and enables required Google Cloud APIs for asset discovery and security assessment.
 
 **Key Features:**
-- **Automatic Project Discovery**: For organization and folder registrations, automatically discovers and includes all active projects
-- **API Enablement**: Enables required APIs across all discovered projects for scanning
+- **IAM Permission Configuration**: Grants viewer roles for asset scanning  
+- **API Enablement**: Enables required APIs across target projects for scanning
 - **Registration Scopes**: Supports organization, folder, or project-level registration
 
 ## Usage
@@ -36,13 +36,12 @@ module "asset_inventory" {
   # Required: Workload Identity Federation principal from workload-identity module
   wif_iam_principal = module.workload_identity.wif_iam_principal
 
-  # Required: Registration scope
-  registration_type = "project"
-
-  # Conditional: Required based on registration_type
-  organization_id = ""           # Required if registration_type = "organization"
-  folder_ids      = ""           # Required if registration_type = "folder" (comma-separated)
-  project_ids     = "my-project" # Required if registration_type = "project" (comma-separated)
+  # Required: Projects discovered by project-discovery module
+  discovered_projects = module.project_discovery.discovered_projects
+  
+  # Required: Registration configuration
+  registration_type = "organization"
+  organization_id   = "123456789012"
 
   # Optional: Customize IAM roles (uses CrowdStrike defaults if not specified)
   # google_iam_roles = [
@@ -53,37 +52,18 @@ module "asset_inventory" {
 }
 ```
 
-## Registration Scopes
+## Project Configuration
 
-This module supports three registration scopes:
+This module configures IAM permissions and API enablement for the specified projects:
 
-### Organization-level Registration
 ```hcl
 module "asset_inventory" {
-  # ... other configuration ...
+  source = "CrowdStrike/cloud-registration/gcp//modules/asset-inventory"
   
-  registration_type = "organization"
-  organization_id   = "123456789012"
-}
-```
-
-### Folder-level Registration
-```hcl
-module "asset_inventory" {
-  # ... other configuration ...
-  
-  registration_type = "folder"
-  folder_ids        = "folder1,folder2,folder3"
-}
-```
-
-### Project-level Registration
-```hcl
-module "asset_inventory" {
-  # ... other configuration ...
-  
-  registration_type = "project"
-  project_ids       = "project1,project2,project3"
+  wif_iam_principal   = module.workload_identity.wif_iam_principal
+  discovered_projects = module.project_discovery.discovered_projects
+  registration_type   = "organization"
+  organization_id     = "123456789012"
 }
 ```
 
@@ -125,12 +105,7 @@ The module automatically enables these Google Cloud APIs across all relevant pro
 - `cloudresourcemanager.googleapis.com` - Cloud Resource Manager API
 - `cloudasset.googleapis.com` - Cloud Asset API
 
-**Project Discovery Behavior:**
-- **Organization registration**: APIs enabled on all active projects within the organization
-- **Folder registration**: APIs enabled on all active projects within specified folders  
-- **Project registration**: APIs enabled on explicitly specified projects only
-
-This ensures CrowdStrike can perform comprehensive asset inventory scanning across your entire GCP infrastructure scope.
+This ensures CrowdStrike can perform asset inventory scanning across your entire GCP infrastructure scope.
 
 ## Security Considerations
 
@@ -150,17 +125,14 @@ This ensures CrowdStrike can perform comprehensive asset inventory scanning acro
 
 | Name | Type |
 |------|------|
-| [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
-| [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_service.asset_inventory_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
-| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
-| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_discovered_projects"></a> [discovered\_projects](#input\_discovered\_projects) | List of all discovered projects where APIs will be enabled | `list(string)` | n/a | yes |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | Comma separated list of the Google Cloud folders being registered | `string` | `""` | no |
 | <a name="input_google_iam_roles"></a> [google\_iam\_roles](#input\_google\_iam\_roles) | List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access | `list(string)` | `[default CrowdStrike roles]` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `""` | no |
@@ -170,8 +142,6 @@ This ensures CrowdStrike can perform comprehensive asset inventory scanning acro
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_target_projects"></a> [target\_projects](#output\_target\_projects) | List of all projects included in this registration (discovered + specified) |
+This module does not define any outputs.
 
 <!-- END_TF_DOCS -->
