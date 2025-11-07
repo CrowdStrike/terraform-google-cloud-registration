@@ -102,26 +102,26 @@ variable "organization_id" {
 }
 
 variable "folder_ids" {
-  type        = string
-  description = "Comma separated list of the Google Cloud folders being registered"
-  default     = ""
+  type        = list(string)
+  description = "List of Google Cloud folders being registered"
+  default     = []
 
   validation {
-    condition = var.registration_type != "folder" || (var.folder_ids != "" && alltrue([
-      for folder_id in split(",", var.folder_ids) : can(regex("^[0-9]{12}$", trimspace(folder_id)))
+    condition = var.registration_type != "folder" || (length(var.folder_ids) > 0 && alltrue([
+      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
     ]))
     error_message = "Folder IDs must be provided and all must be exactly 12 digits when registration_type is 'folder'."
   }
 }
 
 variable "project_ids" {
-  type        = string
-  description = "Comma separated list of the Google Cloud projects being registered"
-  default     = ""
+  type        = list(string)
+  description = "List of Google Cloud projects being registered"
+  default     = []
 
   validation {
-    condition = var.registration_type != "project" || (var.project_ids != "" && alltrue([
-      for project_id in split(",", var.project_ids) : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", trimspace(project_id)))
+    condition = var.registration_type != "project" || (length(var.project_ids) > 0 && alltrue([
+      for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
     ]))
     error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
   }

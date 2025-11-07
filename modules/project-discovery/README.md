@@ -22,8 +22,8 @@ module "project_discovery" {
 |------|-------------|------|:--------:|
 | registration_type | `organization`, `folder`, or `project` | `string` | yes |
 | organization_id | 12-digit organization ID | `string` | if org |
-| folder_ids | Comma-separated 12-digit folder IDs | `string` | if folder |
-| project_ids | Comma-separated project IDs | `string` | if project |
+| folder_ids | List of 12-digit folder IDs | `list(string)` | if folder |
+| project_ids | List of project IDs | `list(string)` | if project |
 
 ## Outputs
 

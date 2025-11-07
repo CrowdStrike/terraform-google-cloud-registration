@@ -133,10 +133,10 @@ This ensures CrowdStrike can perform asset inventory scanning across your entire
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_discovered_projects"></a> [discovered\_projects](#input\_discovered\_projects) | List of all discovered projects where APIs will be enabled | `list(string)` | n/a | yes |
-| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | Comma separated list of the Google Cloud folders being registered | `string` | `""` | no |
+| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_google_iam_roles"></a> [google\_iam\_roles](#input\_google\_iam\_roles) | List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access | `list(string)` | `[default CrowdStrike roles]` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `""` | no |
-| <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | Comma separated list of the Google Cloud projects being registered | `string` | `""` | no |
+| <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | The scope of the Google Cloud registration which can be one of the following values: organization, folder, project | `string` | n/a | yes |
 | <a name="input_wif_iam_principal"></a> [wif\_iam\_principal](#input\_wif\_iam\_principal) | Google Cloud IAM Principal that identifies CrowdStrike resources | `string` | n/a | yes |
 

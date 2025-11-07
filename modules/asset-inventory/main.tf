@@ -1,5 +1,5 @@
 locals {
-  folder_list = var.folder_ids != "" ? [for folder_id in split(",", var.folder_ids) : trimspace(folder_id)] : []
+  folder_list = var.folder_ids
 }
 
 # IAM bindings for organization-level registration

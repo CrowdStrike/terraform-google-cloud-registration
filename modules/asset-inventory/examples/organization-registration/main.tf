@@ -25,9 +25,7 @@ module "asset-inventory" {
   
   registration_type = "organization"
   organization_id   = "123456789012"  # Replace with your 12-digit org ID
-  folder_ids        = ""
-  project_ids       = ""
-  
+
   # Discovered projects list (from project-discovery module output)
   discovered_projects = [
     "my-prod-project",

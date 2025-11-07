@@ -1,6 +1,6 @@
 locals {
-  folder_list  = var.folder_ids != "" ? split(",", var.folder_ids) : []
-  project_list = var.project_ids != "" ? split(",", var.project_ids) : []
+  folder_list  = var.folder_ids
+  project_list = var.project_ids
   
   # Discover projects for organization registration
   discovered_org_projects = var.registration_type == "organization" && var.organization_id != "" ? try([for project in data.google_projects.org_projects[0].projects : project.project_id], []) : []

@@ -24,9 +24,7 @@ module "asset-inventory" {
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789012/locations/global/workloadIdentityPools/crowdstrike-wif-pool/subject/arn:aws:sts::280492971771:assumed-role/crowdstrike-gcp-wif-role/project-123"
   
   registration_type = "project"
-  organization_id   = ""
-  folder_ids        = ""
-  project_ids       = "my-specific-project"  # Replace with your project ID
+  project_ids       = ["my-specific-project"]  # Replace with your project IDs
   
   # Specific all projects list
   discovered_projects = [
