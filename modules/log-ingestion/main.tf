@@ -1,11 +1,10 @@
 locals {
-  # Parse comma-separated strings to lists
-  folder_list  = var.folder_ids != "" ? split(",", var.folder_ids) : []
-  project_list = var.project_ids != "" ? split(",", var.project_ids) : []
+  folder_list  = var.folder_ids
+  project_list = var.project_ids
 
   # Generate resource names with prefix/suffix or use existing names
-  topic_name        = var.existing_topic_name != "" ? var.existing_topic_name : "${var.resource_prefix}CrowdStrikeLogTopic-${var.registration_id}-${var.resource_suffix}"
-  subscription_name = var.existing_subscription_name != "" ? var.existing_subscription_name : "${var.resource_prefix}CrowdStrikeLogSubscription-${var.registration_id}-${var.resource_suffix}"
+  topic_name        = var.existing_topic_name != "" ? var.existing_topic_name : "${var.resource_prefix}CrowdStrikeLogTopic-${var.registration_id}${var.resource_suffix}"
+  subscription_name = var.existing_subscription_name != "" ? var.existing_subscription_name : "${var.resource_prefix}CrowdStrikeLogSubscription-${var.registration_id}${var.resource_suffix}"
   sink_name         = "${var.resource_prefix}CrowdStrikeLogSink${var.resource_suffix}"
 
   # Determine if creating new resources

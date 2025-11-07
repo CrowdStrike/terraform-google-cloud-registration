@@ -40,26 +40,26 @@ variable "organization_id" {
 }
 
 variable "folder_ids" {
-  type        = string
-  description = "Comma separated list of the Google Cloud folders being registered"
-  default     = ""
+  type        = list(string)
+  description = "List of Google Cloud folders being registered"
+  default     = []
 
   validation {
-    condition = var.folder_ids == "" || alltrue([
-      for folder_id in split(",", var.folder_ids) : can(regex("^[0-9]{12}$", trimspace(folder_id)))
+    condition = length(var.folder_ids) == 0 || alltrue([
+      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
     ])
     error_message = "All folder IDs must be exactly 12 digits when provided."
   }
 }
 
 variable "project_ids" {
-  type        = string
-  description = "Comma separated list of the Google Cloud projects being registered"
-  default     = ""
+  type        = list(string)
+  description = "List of Google Cloud projects being registered"
+  default     = []
 
   validation {
-    condition = var.project_ids == "" || alltrue([
-      for project_id in split(",", var.project_ids) : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", trimspace(project_id)))
+    condition = length(var.project_ids) == 0 || alltrue([
+      for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
     ])
     error_message = "All project IDs must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }

@@ -39,9 +39,9 @@ module "log_ingestion" {
   crowdstrike_infra_project_id = "my-security-project"
 
   # Conditional: Required based on registration_type
-  organization_id = ""           # Required if registration_type = "organization"
-  folder_ids      = ""           # Required if registration_type = "folder" (comma-separated)
-  project_ids     = "my-project" # Required if registration_type = "project" (comma-separated)
+  organization_id = ""                    # Required if registration_type = "organization"
+  folder_ids      = ["folder1", "folder2"] # Required if registration_type = "folder"
+  project_ids     = ["my-project"]        # Required if registration_type = "project"
 
   # Optional: Resource naming
   resource_prefix = "cs"
@@ -99,7 +99,7 @@ module "log_ingestion" {
   # ... other configuration ...
   
   registration_type = "folder"
-  folder_ids        = "folder1,folder2,folder3"
+  folder_ids        = ["folder1", "folder2", "folder3"]
 }
 ```
 
@@ -109,7 +109,7 @@ module "log_ingestion" {
   # ... other configuration ...
   
   registration_type = "project"
-  project_ids       = "project1,project2,project3"
+  project_ids       = ["project1", "project2", "project3"]
 }
 ```
 
@@ -236,7 +236,6 @@ The module captures these Google Cloud Audit log types:
 
 ### Regional Optimization
 - Optional region specification for topic storage
-- Optimized for CrowdStrike's processing infrastructure
 
 ## APIs Enabled
 
@@ -306,11 +305,11 @@ Costs depend on:
 | <a name="input_exclusion_filters"></a> [exclusion\_filters](#input\_exclusion\_filters) | List of exclusion filter expressions to exclude specific resources from log collection (e.g., 'resource.labels.project_id="excluded-project"') | `list(string)` | `[]` | no |
 | <a name="input_existing_subscription_name"></a> [existing\_subscription\_name](#input\_existing\_subscription\_name) | Name of existing Pub/Sub subscription to use. If empty, creates new subscription | `string` | `""` | no |
 | <a name="input_existing_topic_name"></a> [existing\_topic\_name](#input\_existing\_topic\_name) | Name of existing Pub/Sub topic to use. If empty, creates new topic | `string` | `""` | no |
-| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | Comma separated list of the Google Cloud folders being registered | `string` | `""` | no |
+| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
 | <a name="input_message_retention_duration"></a> [message\_retention\_duration](#input\_message\_retention\_duration) | Message retention duration for Pub/Sub subscription (e.g., '604800s' for 7 days) | `string` | `"604800s"` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `""` | no |
-| <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | Comma separated list of the Google Cloud projects being registered | `string` | `""` | no |
+| <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
 | <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | The scope of the Google Cloud registration which can be one of the following values: organization, folder, project | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |

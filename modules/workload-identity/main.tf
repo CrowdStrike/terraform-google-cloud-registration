@@ -54,6 +54,10 @@ resource "google_iam_workload_identity_pool_provider" "aws" {
     account_id = var.aws_account_id
   }
 
+  attribute_mapping = {
+    "google.subject" = "assertion.arn"
+  }
+
   depends_on = [
     google_iam_workload_identity_pool.main
   ]
