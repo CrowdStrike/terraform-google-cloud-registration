@@ -65,7 +65,7 @@ variable "role_arn" {
   description = "AWS Role ARN used by CrowdStrike for authentication"
 
   validation {
-    condition     = can(regex("^arn:aws:(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
   }
 }
