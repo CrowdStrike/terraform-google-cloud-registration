@@ -50,6 +50,16 @@ variable "resource_suffix" {
   }
 }
 
+variable "registration_id" {
+  type        = string
+  description = "Unique registration ID returned by CrowdStrike Registration API"
+
+  validation {
+    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
 variable "aws_account_id" {
   type        = string
   description = "AWS Account ID to add as a trust relationship in the WIF Pool Provider"
@@ -57,5 +67,15 @@ variable "aws_account_id" {
   validation {
     condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
     error_message = "AWS Account ID must be exactly 12 digits."
+  }
+}
+
+variable "role_arn" {
+  type        = string
+  description = "AWS Role ARN used by CrowdStrike for authentication"
+
+  validation {
+    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
   }
 }
