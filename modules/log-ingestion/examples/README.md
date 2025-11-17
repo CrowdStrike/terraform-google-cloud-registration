@@ -75,7 +75,7 @@ principal://iam.googleapis.com/projects/{PROJECT_NUMBER}/locations/global/worklo
 
 ### Resource Naming
 The module creates resources with this naming pattern:
-- **Topic**: `{prefix}CrowdStrikeLogTopic{suffix}-{registration_id}{suffix}`
+- **Topic**: `{prefix}CrowdStrikeLogTopic-{registration_id}{suffix}`
 - **Subscription**: `{prefix}CrowdStrikeLogSubscription-{registration_id}{suffix}`  
 - **Log Sink**: `{prefix}CrowdStrikeLogSink{suffix}`
 
