@@ -9,6 +9,27 @@ module "workload-identity" {
   resource_prefix      = var.resource_prefix
   resource_suffix      = var.resource_suffix
 }
+module "project-discovery" {
+  source = "./modules/project-discovery/"
+
+  registration_type = var.registration_type
+  organization_id   = var.organization_id
+  folder_ids        = var.folder_ids
+  project_ids       = var.project_ids
+}
+
+module "asset-inventory" {
+  source = "./modules/asset-inventory/"
+
+  wif_iam_principal   = module.workload-identity.wif_iam_principal
+  registration_type   = var.registration_type
+  organization_id     = var.organization_id
+  folder_ids          = var.folder_ids
+  project_ids         = var.project_ids
+  discovered_projects = module.project-discovery.discovered_projects
+
+  depends_on = [module.workload-identity, module.project-discovery]
+}
 
 module "log-ingestion" {
   count  = var.enable_realtime_visibility ? 1 : 0

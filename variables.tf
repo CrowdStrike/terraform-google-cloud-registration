@@ -65,7 +65,7 @@ variable "role_arn" {
   description = "AWS Role ARN used by CrowdStrike for authentication"
 
   validation {
-    condition     = can(regex("^arn:aws:(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
   }
 }
@@ -125,6 +125,7 @@ variable "project_ids" {
     error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
   }
 }
+
 
 variable "enable_realtime_visibility" {
   type        = bool
