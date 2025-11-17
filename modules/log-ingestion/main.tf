@@ -233,3 +233,9 @@ resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
 
   depends_on = [google_pubsub_topic.crowdstrike_logs, data.google_pubsub_topic.existing_crowdstrike_logs]
 }
+
+resource "google_project_iam_member" "crowdstrike_monitoring_viewer" {
+  project = var.infra_project_id
+  role    = "roles/monitoring.viewer"
+  member  = var.wif_iam_principal
+}
