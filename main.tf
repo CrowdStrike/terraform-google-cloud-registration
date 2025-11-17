@@ -1,13 +1,69 @@
+locals {
+  effective_wif_project_id = var.wif_project_id != "" ? var.wif_project_id : var.infra_project_id
+}
+
+# Creates the initial registration and gets pool_id/provider_id
+module "registration" {
+  source = "./modules/registration/"
+
+  falcon_client_id           = var.falcon_client_id
+  falcon_client_secret       = var.falcon_client_secret
+  falcon_api_host            = var.falcon_api_host
+  falcon_cloud_api_host      = var.falcon_cloud_api_host
+  customer_id                = var.customer_id
+  enable_realtime_visibility = var.enable_realtime_visibility
+  registration_type          = var.registration_type
+  organization_id            = var.organization_id
+  folder_ids                 = var.folder_ids
+  project_ids                = var.project_ids
+  wif_project_id             = local.effective_wif_project_id
+  infra_project_id           = var.infra_project_id
+  resource_prefix            = var.resource_prefix
+  resource_suffix            = var.resource_suffix
+}
+
 module "workload-identity" {
   source               = "./modules/workload-identity/"
-  wif_project_id       = var.wif_project_id
-  wif_pool_id          = var.wif_pool_id
-  wif_pool_provider_id = var.wif_pool_provider_id
+  wif_project_id       = local.effective_wif_project_id
+  wif_pool_id          = module.registration.wif_pool_id
+  wif_pool_provider_id = module.registration.wif_provider_id
   aws_account_id       = var.aws_account_id
   role_arn             = var.role_arn
-  registration_id      = var.registration_id
+  registration_id      = module.registration.registration_id
   resource_prefix      = var.resource_prefix
   resource_suffix      = var.resource_suffix
+
+  depends_on = [module.registration]
+}
+
+module "log-ingestion" {
+  source = "./modules/log-ingestion/"
+
+  count             = var.enable_realtime_visibility ? 1 : 0
+  wif_iam_principal = module.workload-identity.wif_iam_principal
+  infra_project_id  = var.infra_project_id
+  registration_id   = module.registration.registration_id
+  registration_type = var.registration_type
+  organization_id   = var.organization_id
+  folder_ids        = var.folder_ids
+  project_ids       = var.project_ids
+  resource_prefix   = var.resource_prefix
+  resource_suffix   = var.resource_suffix
+  labels            = var.labels
+
+  message_retention_duration       = var.log_ingestion_settings.message_retention_duration
+  ack_deadline_seconds             = var.log_ingestion_settings.ack_deadline_seconds
+  topic_message_retention_duration = var.log_ingestion_settings.topic_message_retention_duration
+  audit_log_types                  = var.log_ingestion_settings.audit_log_types
+  topic_storage_regions            = var.log_ingestion_settings.topic_storage_regions
+  enable_schema_validation         = var.log_ingestion_settings.enable_schema_validation
+  schema_type                      = var.log_ingestion_settings.schema_type
+  schema_definition                = var.log_ingestion_settings.schema_definition
+  existing_topic_name              = var.log_ingestion_settings.existing_topic_name
+  existing_subscription_name       = var.log_ingestion_settings.existing_subscription_name
+  exclusion_filters                = var.log_ingestion_settings.exclusion_filters
+
+  depends_on = [module.workload-identity, module.project-discovery]
 }
 
 module "project-discovery" {
@@ -30,4 +86,30 @@ module "asset-inventory" {
   discovered_projects = module.project-discovery.discovered_projects
 
   depends_on = [module.workload-identity, module.project-discovery]
+}
+
+# Sends the back registration settings to Falcon API
+module "registration-settings" {
+  source = "./modules/registration-settings/"
+
+  falcon_client_id      = var.falcon_client_id
+  falcon_client_secret  = var.falcon_client_secret
+  falcon_api_host       = var.falcon_api_host
+  falcon_cloud_api_host = var.falcon_cloud_api_host
+  customer_id           = var.customer_id
+  registration_id       = module.registration.registration_id
+  wif_pool_id           = module.registration.wif_pool_id
+  wif_project_number    = module.workload-identity.wif_project_number
+  wif_project_id        = local.effective_wif_project_id
+  wif_provider_id       = module.registration.wif_provider_id
+  log_topic_id          = var.enable_realtime_visibility ? module.log-ingestion[0].pubsub_topic_id : ""
+  log_subscription_id   = var.enable_realtime_visibility ? module.log-ingestion[0].subscription_id : ""
+  log_sink_name         = var.enable_realtime_visibility ? values(module.log-ingestion[0].log_sink_names)[0] : ""
+
+  completion_trigger = [
+    module.workload-identity,
+    module.asset-inventory,
+    module.log-ingestion,
+    module.project-discovery
+  ]
 }

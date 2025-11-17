@@ -1,9 +1,59 @@
-variable "wif_project_id" {
+variable "falcon_client_id" {
   type        = string
-  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
+  sensitive   = true
+  description = "Falcon API client ID."
+  validation {
+    condition     = length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id))
+    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "falcon_client_secret" {
+  type        = string
+  sensitive   = true
+  description = "Falcon API client secret."
+  validation {
+    condition     = length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret))
+    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "customer_id" {
+  type        = string
+  sensitive   = true
+  description = "CrowdStrike Customer ID for internal API authentication."
+  default     = null
+}
+
+variable "falcon_api_host" {
+  type        = string
+  description = "CrowdStrike Falcon API host URL for OAuth authentication (required for production environments)"
+  default     = "https://api.crowdstrike.com"
+}
+
+variable "falcon_cloud_api_host" {
+  type        = string
+  description = "CrowdStrike Cloud Registration API host URL"
+  default     = "https://api.crowdstrike.com"
+}
+
+variable "infra_project_id" {
+  type        = string
+  description = "Google Cloud Project ID for CrowdStrike infrastructure resources (Pub/Sub, logging, etc.)"
 
   validation {
-    condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
+    condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
+}
+
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
+  default     = ""
+
+  validation {
+    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
@@ -27,26 +77,6 @@ variable "resource_suffix" {
   validation {
     condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
     error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
-  }
-}
-
-variable "wif_pool_id" {
-  type        = string
-  description = "Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool"
-
-  validation {
-    condition     = length(var.wif_pool_id) >= 4 && length(var.wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_id))
-    error_message = "Pool ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
-variable "wif_pool_provider_id" {
-  type        = string
-  description = "Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider"
-
-  validation {
-    condition     = length(var.wif_pool_provider_id) >= 4 && length(var.wif_pool_provider_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_provider_id))
-    error_message = "Provider ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
   }
 }
 
@@ -76,17 +106,6 @@ variable "registration_type" {
   validation {
     condition     = contains(["organization", "folder", "project"], var.registration_type)
     error_message = "Registration type must be one of: organization, folder, project."
-  }
-}
-
-variable "registration_id" {
-  type        = string
-  description = "Unique registration ID returned by CrowdStrike Registration API, used for resource naming. Will be provided by CrowdStrike Terraform provider in future versions."
-  default     = ""
-
-  validation {
-    condition     = var.registration_id == "" || can(regex("^[a-z0-9-]+$", var.registration_id))
-    error_message = "Registration ID must contain only lowercase letters, numbers, and hyphens when provided."
   }
 }
 
@@ -125,4 +144,53 @@ variable "project_ids" {
     ]))
     error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
   }
+}
+
+variable "enable_realtime_visibility" {
+  type        = bool
+  description = "Enable Real Time Visibility and Detection (RTV&D) features via log ingestion"
+  default     = false
+}
+
+variable "labels" {
+  type        = map(string)
+  description = "Map of labels to be applied to all resources created by this module"
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for key, value in var.labels : can(regex("^[a-z][a-z0-9_-]{0,62}$", key))
+    ])
+    error_message = "Label keys must start with lowercase letter, contain only lowercase letters, numbers, hyphens, and underscores, and be 1-63 characters long."
+  }
+
+  validation {
+    condition = alltrue([
+      for key, value in var.labels : can(regex("^[a-z0-9_-]{0,63}$", value))
+    ])
+    error_message = "Label values must contain only lowercase letters, numbers, hyphens, and underscores, and be 0-63 characters long."
+  }
+
+  validation {
+    condition     = length(var.labels) <= 64
+    error_message = "Maximum of 64 labels allowed per resource."
+  }
+}
+
+variable "log_ingestion_settings" {
+  description = "Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources."
+  type = object({
+    message_retention_duration       = optional(string, "604800s")
+    ack_deadline_seconds             = optional(number, 600)
+    topic_message_retention_duration = optional(string, "604800s")
+    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])
+    topic_storage_regions            = optional(list(string), [])
+    enable_schema_validation         = optional(bool, false)
+    schema_type                      = optional(string, "AVRO")
+    schema_definition                = optional(string, "")
+    existing_topic_name              = optional(string, "")
+    existing_subscription_name       = optional(string, "")
+    exclusion_filters                = optional(list(string), [])
+  })
+  default = {}
 }
