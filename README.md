@@ -122,5 +122,16 @@ No resources.
 | <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `""` | no |
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_discovered_projects"></a> [discovered\_projects](#output\_discovered\_projects) | Detailed information about discovered and registered projects |
+| <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |
+| <a name="output_log_subscription_id"></a> [log\_subscription\_id](#output\_log\_subscription\_id) | The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled) |
+| <a name="output_log_topic_id"></a> [log\_topic\_id](#output\_log\_topic\_id) | The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled) |
+| <a name="output_registration_id"></a> [registration\_id](#output\_registration\_id) | The unique CrowdStrike registration ID for this GCP setup |
+| <a name="output_wif_iam_principal"></a> [wif\_iam\_principal](#output\_wif\_iam\_principal) | The IAM principal that CrowdStrike uses to access GCP resources |
+| <a name="output_wif_pool_id"></a> [wif\_pool\_id](#output\_wif\_pool\_id) | The ID of the created Workload Identity Pool |
+| <a name="output_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#output\_wif\_pool\_provider\_id) | The ID of the created Workload Identity Pool Provider |
+| <a name="output_wif_project_id"></a> [wif\_project\_id](#output\_wif\_project\_id) | The GCP Project ID where Workload Identity resources were created |
+| <a name="output_wif_project_number"></a> [wif\_project\_number](#output\_wif\_project\_number) | The GCP Project Number for the Workload Identity project |
 <!-- END_TF_DOCS -->

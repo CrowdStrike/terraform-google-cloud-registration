@@ -120,15 +120,9 @@ output "deployment_timestamp" {
   value       = timestamp()
 }
 
-output "terraform_version" {
-  description = "Terraform version used for this deployment"
-  value       = terraform.version
-}
-
 output "module_version" {
   description = "Version information for tracking deployments"
   value = {
-    terraform_version = terraform.version
     deployment_date   = timestamp()
     registration_type = "project"
     rtv_enabled       = var.enable_realtime_visibility
