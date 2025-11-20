@@ -48,8 +48,8 @@ resource "google_project_service" "asset_inventory_apis" {
     ) : "${pair[0]}::${pair[1]}"
   ])
 
-  project = split("::", each.key)[0]
-  service = split("::", each.key)[1]
+  project                    = split("::", each.key)[0]
+  service                    = split("::", each.key)[1]
   disable_dependent_services = false
   disable_on_destroy         = false
 }

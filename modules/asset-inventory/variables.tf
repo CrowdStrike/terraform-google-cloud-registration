@@ -1,7 +1,7 @@
 variable "wif_iam_principal" {
   type        = string
   description = "Google Cloud IAM Principal that identifies CrowdStrike resources"
-  
+
   validation {
     condition     = can(regex("^(principal://|principalSet://|serviceAccount:)", var.wif_iam_principal))
     error_message = "IAM principal must be a valid principal, principalSet, or serviceAccount format."
@@ -26,7 +26,7 @@ variable "organization_id" {
   type        = string
   description = "The Google Cloud organization being registered"
   default     = ""
-  
+
   validation {
     condition     = var.registration_type != "organization" || (var.organization_id != "" && can(regex("^[0-9]{12}$", var.organization_id)))
     error_message = "Organization ID must be provided and be exactly 12 digits when registration_type is 'organization'."
@@ -37,7 +37,7 @@ variable "folder_ids" {
   type        = list(string)
   description = "List of Google Cloud folders being registered"
   default     = []
-  
+
   validation {
     condition = var.registration_type != "folder" || (length(var.folder_ids) > 0 && alltrue([
       for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
@@ -50,7 +50,7 @@ variable "project_ids" {
   type        = list(string)
   description = "List of Google Cloud projects being registered"
   default     = []
-  
+
   validation {
     condition = var.registration_type != "project" || (length(var.project_ids) > 0 && alltrue([
       for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
@@ -62,7 +62,7 @@ variable "project_ids" {
 variable "google_iam_roles" {
   type        = list(string)
   description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access"
-  default     = [
+  default = [
     "roles/browser",
     "roles/cloudasset.viewer",
     "roles/aiplatform.viewer",
@@ -84,7 +84,7 @@ variable "google_iam_roles" {
     "roles/securitycenter.adminViewer",
     "roles/cloudfunctions.developer"
   ]
-  
+
   validation {
     condition = alltrue([
       for role in var.google_iam_roles : can(regex("^roles/", role))

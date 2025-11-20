@@ -200,21 +200,21 @@ variable "labels" {
   type        = map(string)
   description = "Map of labels to be applied to all resources created by this module"
   default     = {}
-  
+
   validation {
     condition = alltrue([
       for key, value in var.labels : can(regex("^[a-z][a-z0-9_-]{0,62}$", key))
     ])
     error_message = "Label keys must start with lowercase letter, contain only lowercase letters, numbers, hyphens, and underscores, and be 1-63 characters long."
   }
-  
+
   validation {
     condition = alltrue([
       for key, value in var.labels : can(regex("^[a-z0-9_-]{0,63}$", value))
     ])
     error_message = "Label values must contain only lowercase letters, numbers, hyphens, and underscores, and be 0-63 characters long."
   }
-  
+
   validation {
     condition     = length(var.labels) <= 64
     error_message = "Maximum of 64 labels allowed per resource."
