@@ -1,61 +1,43 @@
 <!-- BEGIN_TF_DOCS -->
-![CrowdStrike Registration terraform module](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)
+## Description
 
-[![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
+This Terraform module provides automated registration and configuration of Google Cloud Platform (GCP) organizations, folders, and projects with CrowdStrike's Cloud Security Posture Management (CSPM) platform.
 
-## Introduction
+The module enables keyless authentication through GCP's Workload Identity Federation and provides security monitoring capabilities including asset inventory and optional real-time log ingestion for threat detection.
 
-This Terraform module enables registration and configuration of Google Cloud Platform (GCP) organizations, folders, and projects with CrowdStrike's Falcon Cloud Security. It provides a solution for integrating GCP environments with CrowdStrike's cloud security services, including Workload Identity Federation setup, asset inventory configuration, and real-time visibility through log ingestion.
+### Key Features
 
-Key features:
-- Workload Identity Federation for secure, keyless authentication
-- Asset Inventory configuration for organization, folder, and project scopes
-- Real-time visibility with log ingestion (Audit Logs via Pub/Sub)
-- Automatic discovery of projects within organizations and folders
+- **Multi-Scope Registration**: Support for organization, folder, and project-level registrations
+- **Workload Identity Federation**: Secure, keyless authentication using GCP's identity federation  
+- **Asset Inventory**: Monitoring of GCP resources for security posture assessment
+- **Real Time Visibility & Detection** (Optional): Real-time log streaming for threat detection
 
-## Pre-requisites
-### Generate API Keys
+### Architecture Overview
 
-CrowdStrike API keys are required to use this module. It is highly recommended that you create a dedicated API client with only the required scopes.
+The module creates the following GCP resources:
+- Workload Identity Pool and Provider for authentication
+- IAM role bindings for CrowdStrike service principals across target scopes
+- Pub/Sub topics and subscriptions for log ingestion (when RTV&D is enabled)
+- Log sinks for audit log streaming (when RTV&D is enabled)
 
-1. In the CrowdStrike console, navigate to **Support and resources** > **API Clients & Keys**. Click **Add new API Client**.
-2. Add the required scopes for your deployment:
+### Prerequisites
 
-<table>
-    <tr>
-        <th>Option</th>
-        <th>Scope Name</th>
-        <th>Permission</th>
-    </tr>
-    <tr>
-        <td rowspan="2">Automated account registration</td>
-        <td>CSPM registration</td>
-        <td><strong>Read</strong> and <strong>Write</strong></td>
-    </tr>
-    <tr>
-        <td>Cloud Security Google Cloud Registration</td>
-        <td><strong>Read</strong> and <strong>Write</strong></td>
-    </tr>
-</table>
+Before using this module, ensure you have:
 
-3. Click **Add** to create the API client. The next screen will display the API **CLIENT ID**, **SECRET**, and **BASE URL**. You will need all three for the next step.
+1. **CrowdStrike Requirements**:
+   - Falcon Console access with CSPM enabled
+   - API credentials with `CSPM registration (Read & Write)` and `Cloud Security Google Cloud Registration (Read & Write)` scopes
 
-    <details><summary>picture</summary>
-    <p>
-
-    ![api-client-keys](https://github.com/CrowdStrike/aws-ssm-distributor/blob/main/official-package/assets/api-client-keys.png)
-
-    </p>
-    </details>
-
-> [!NOTE]
-> This page is only shown once. Make sure you copy **CLIENT ID**, **SECRET**, and **BASE URL** to a secure location.
+2. **GCP Requirements**:
+   - GCP project for CrowdStrike infrastructure resources
+   - Appropriate IAM permissions for the deployment service account
+   - Required GCP APIs enabled
 
 ## Usage
 
 ```hcl
 terraform {
-  required_version = ">= 1.9.0"
+  required_version = ">= 1.5.0"
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -65,31 +47,30 @@ terraform {
 }
 
 provider "google" {
+  project = "your-csmp-infrastructure-project"
 }
 
 module "crowdstrike_gcp_registration" {
   source = "CrowdStrike/terraform-google-cloud-registration"
 
-  # GCP configuration - You can use organizations, folders, projects, or combinations
-  registration_type = "organization"      # or "folder" or "project"
-  organization_id   = "123456789012"      # Required for organization registration
-  # folder_ids      = ["folder1", "folder2"]  # Required for folder registration
-  # project_ids     = ["project-1", "project-2"]  # Required for project registration
-
-  # GCP project that will host CrowdStrike infrastructure
-  infra_project_id = "my-security-project"
-
-  # CrowdStrike API configuration
+  # CrowdStrike API Configuration
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
-
-  # AWS integration (CrowdStrike's identity federation)
+  
+  # GCP Infrastructure Project
+  infra_project_id = "your-csmp-infrastructure-project"
+  
+  # Registration Scope - Organization Level
+  registration_type = "organization"
+  organization_id   = "123456789012"
+  
+  # CrowdStrike Role ARN
   role_arn = "arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector"
-
-  # Optional: Enable Real Time Visibility and Detection
+  
+  # Optional: Enable Real Time Visibility & Detection
   enable_realtime_visibility = true
-
-  # Optional: Configure log ingestion settings
+  
+  # Optional: Log Ingestion Configuration
   log_ingestion_settings = {
     message_retention_duration       = "1209600s"  # 14 days
     ack_deadline_seconds             = 300         # 5 minutes
@@ -100,18 +81,46 @@ module "crowdstrike_gcp_registration" {
       "resource.labels.temporary=\"true\""
     ]
   }
-
-  # Optional: Resource naming customization
+  
+  # Optional: Resource Naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
-
-  # Optional: Custom labels
+  
+  # Optional: Resource Labels
   labels = {
     environment = "production"
-    project     = "crowdstrike-integration"
-    managed-by  = "terraform"
+    project     = "crowdstrike-integration" 
+    cstagvendor = "crowdstrike"
   }
 }
 ```
 
+## Providers
+
+No providers.
+## Resources
+
+No resources.
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility and Detection (RTV&D) features via log ingestion | `bool` | `false` | no |
+| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
+| <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
+| <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
+| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string, "")<br/>    existing_topic_name              = optional(string, "")<br/>    existing_subscription_name       = optional(string, "")<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `""` | no |
+| <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
+| <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API, used for resource naming | `string` | n/a | yes |
+| <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication | `string` | n/a | yes |
+| <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool | `string` | n/a | yes |
+| <a name="input_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#input\_wif\_pool\_provider\_id) | Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider | `string` | n/a | yes |
+| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `""` | no |
+## Outputs
+
+No outputs.
 <!-- END_TF_DOCS -->
