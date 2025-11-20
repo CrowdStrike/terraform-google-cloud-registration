@@ -32,8 +32,10 @@ provider "google" {
 # Main Module - CrowdStrike GCP CSPM Registration
 # =============================================================================
 
-module "crowdstrike_cspm" {
-  source = "git::https://github.com/CrowdStrike/terraform-google-cloud-registration.git?ref=v0.1.0-alpha"
+module "crowdstrike_gcp_registration" {
+  source = "../.."
+  # TODO: Update to tagged version after v0.1.0-alpha release
+  # source = "git::https://github.com/CrowdStrike/terraform-google-cloud-registration.git?ref=v0.1.0-alpha"
 
   # =============================================================================
   # Core Configuration
