@@ -16,7 +16,7 @@ This Terraform module configures Google Cloud IAM permissions required for Crowd
 
 ```hcl
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.9.0"
   required_providers {
     google = {
       source  = "hashicorp/google"

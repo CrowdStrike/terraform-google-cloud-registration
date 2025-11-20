@@ -50,16 +50,6 @@ variable "wif_pool_provider_id" {
   }
 }
 
-variable "aws_account_id" {
-  type        = string
-  description = "AWS Account ID to add as a trust relationship in the WIF Pool Provider"
-
-  validation {
-    condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
-    error_message = "AWS Account ID must be exactly 12 digits."
-  }
-}
-
 variable "role_arn" {
   type        = string
   description = "AWS Role ARN used by CrowdStrike for authentication"

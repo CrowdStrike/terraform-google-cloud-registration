@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.2.0"
+  required_version = ">= 1.9.0"
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -9,28 +9,26 @@ terraform {
 }
 
 provider "google" {
-  project = "my-gcp-project"
+  project = "your-csmp-infrastructure-project"
 }
 
-# Create workload identity federation resources
 module "workload_identity" {
-  source = "CrowdStrike/cloud-registration/gcp//modules/workload-identity"
+  source = "CrowdStrike/terraform-google-cloud-registration//modules/workload-identity"
 
-  # Required: Project where WIF resources will be created
-  wif_project_id = "my-security-project"
-
-  # Required: Pool and provider IDs (supplied by CrowdStrike during registration)
-  wif_pool_id          = "cs-fcs-wif-abcd1234efgh5678"
-  wif_pool_provider_id = "cs-provider-abcd1234efgh5678"
-
-  # Required: CrowdStrike's AWS account ID
-  aws_account_id = "123456789012"
-
-  # Required: Display names for the resources
-  wif_pool_name          = "CrowdStrike-WIF-Pool"
-  wif_pool_provider_name = "CrowdStrike-AWS-Provider"
-
-  # Optional: Resource naming
-  resource_prefix = "cs"
-  resource_suffix = "prod"
+  # GCP Project Configuration
+  wif_project_id = "your-csmp-infrastructure-project"
+  
+  # Workload Identity Pool Configuration
+  wif_pool_id          = "cs-wif-pool-12345"
+  wif_pool_provider_id = "cs-provider-12345"
+  
+  # CrowdStrike Role ARN
+  role_arn = "arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector"
+  
+  # Registration ID
+  registration_id = "unique-registration-id"
+  
+  # Optional: Resource Naming
+  resource_prefix = "cs-"
+  resource_suffix = "-prod"
 }
