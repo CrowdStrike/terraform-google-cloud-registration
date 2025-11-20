@@ -52,12 +52,12 @@ output "discovered_projects" {
 
 output "log_topic_id" {
   description = "The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.log-ingestion[0].log_topic_id : null
+  value       = var.enable_realtime_visibility ? module.log-ingestion[0].pubsub_topic_id : null
 }
 
 output "log_subscription_id" {
   description = "The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.log-ingestion[0].log_subscription_id : null
+  value       = var.enable_realtime_visibility ? module.log-ingestion[0].subscription_id : null
 }
 
 output "log_sink_names" {

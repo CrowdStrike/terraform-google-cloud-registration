@@ -76,5 +76,8 @@ module "workload_identity" {
 | Name | Description |
 |------|-------------|
 | <a name="output_wif_iam_principal"></a> [wif\_iam\_principal](#output\_wif\_iam\_principal) | Google Cloud IAM Principal that identifies the specific CrowdStrike session for this registration |
+| <a name="output_wif_pool_id"></a> [wif\_pool\_id](#output\_wif\_pool\_id) | The ID of the Workload Identity Pool |
+| <a name="output_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#output\_wif\_pool\_provider\_id) | The ID of the Workload Identity Pool Provider |
+| <a name="output_wif_project_id"></a> [wif\_project\_id](#output\_wif\_project\_id) | Project ID for the WIF Project |
 | <a name="output_wif_project_number"></a> [wif\_project\_number](#output\_wif\_project\_number) | Project number for the WIF Project ID |
 <!-- END_TF_DOCS -->
