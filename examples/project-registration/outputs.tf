@@ -11,27 +11,27 @@
 
 output "wif_pool_id" {
   description = "The ID of the created Workload Identity Pool"
-  value       = module.crowdstrike_cspm.wif_pool_id
+  value       = module.crowdstrike_gcp_registration.wif_pool_id
 }
 
 output "wif_pool_provider_id" {
   description = "The ID of the created Workload Identity Pool Provider"
-  value       = module.crowdstrike_cspm.wif_pool_provider_id
+  value       = module.crowdstrike_gcp_registration.wif_pool_provider_id
 }
 
 output "wif_iam_principal" {
   description = "The IAM principal that CrowdStrike uses to access GCP resources"
-  value       = module.crowdstrike_cspm.wif_iam_principal
+  value       = module.crowdstrike_gcp_registration.wif_iam_principal
 }
 
 output "wif_project_id" {
   description = "The GCP Project ID where Workload Identity resources were created"
-  value       = module.crowdstrike_cspm.wif_project_id
+  value       = module.crowdstrike_gcp_registration.wif_project_id
 }
 
 output "wif_project_number" {
   description = "The GCP Project Number for the Workload Identity project"
-  value       = module.crowdstrike_cspm.wif_project_number
+  value       = module.crowdstrike_gcp_registration.wif_project_number
 }
 
 # =============================================================================
@@ -40,7 +40,7 @@ output "wif_project_number" {
 
 output "registration_id" {
   description = "The unique CrowdStrike registration ID for this GCP setup"
-  value       = module.crowdstrike_cspm.registration_id
+  value       = module.crowdstrike_gcp_registration.registration_id
   sensitive   = true
 }
 
@@ -56,7 +56,7 @@ output "registered_project_ids" {
 
 output "discovered_projects" {
   description = "Detailed information about discovered and registered projects"
-  value       = module.crowdstrike_cspm.discovered_projects
+  value       = module.crowdstrike_gcp_registration.discovered_projects
 }
 
 # =============================================================================
@@ -70,17 +70,17 @@ output "log_ingestion_enabled" {
 
 output "pubsub_topic_id" {
   description = "The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_cspm.log_topic_id : null
+  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_topic_id : null
 }
 
 output "pubsub_subscription_id" {
   description = "The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_cspm.log_subscription_id : null
+  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_subscription_id : null
 }
 
 output "log_sink_names" {
   description = "Names of the created log sinks (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_cspm.log_sink_names : null
+  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_sink_names : null
 }
 
 # =============================================================================
