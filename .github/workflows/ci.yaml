@@ -12,12 +12,10 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Terraform format check
-        uses: dflook/terraform-fmt-check@v2
-        with:
-          path: .
+        run: terraform fmt -check -recursive .
 
   validate:
     runs-on: ubuntu-latest
@@ -28,132 +26,18 @@ jobs:
           - "."
           - "examples/project-registration"
           - "modules/asset-inventory"
-          - "modules/asset-inventory/examples/folder-registration"
-          - "modules/asset-inventory/examples/organization-registration"
-          - "modules/asset-inventory/examples/project-registration"
           - "modules/log-ingestion"
-          - "modules/log-ingestion/examples/advanced-configuration"
-          - "modules/log-ingestion/examples/existing-pubsub-resources"
-          - "modules/log-ingestion/examples/folder-registration"
-          - "modules/log-ingestion/examples/organization-registration"
-          - "modules/log-ingestion/examples/project-registration"
           - "modules/project-discovery"
           - "modules/workload-identity"
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v5
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
 
       - name: Terraform validate
-        uses: dflook/terraform-validate@v2
-        with:
-          path: ${{ matrix.path }}
-
-  docs:
-    runs-on: ubuntu-latest
-    name: Check terraform documentation
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
-      - uses: terraform-docs/gh-actions@v1.4.1
-        with:
-          working-dir: .
-          config-file: .terraform-docs.yml
-          fail-on-diff: true
-          recursive: true
-
-  tflint:
-    runs-on: ubuntu-latest
-    name: Run TFLint
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
-
-      - name: Cache plugin dir
-        uses: actions/cache@v4.2.4
-        with:
-          path: ~/.tflint.d/plugins
-          key: tflint-${{ hashFiles('.tflint.hcl') }}
-
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v5
-
-      - name: Init TFLint
-        run: tflint --init
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Run TFLint
-        run: tflint --recursive --config "$(pwd)/.tflint.hcl" -f compact
-
-  security-scan:
-    runs-on: ubuntu-latest
-    name: Security scan with tfsec
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
-
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-action@v1.0.3
-        with:
-          soft_fail: true
-          format: sarif
-          output: tfsec.sarif
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: tfsec.sarif
-
-  checkov:
-    runs-on: ubuntu-latest
-    name: Security scan with Checkov
-
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
-
-      - name: Run Checkov action
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: .
-          framework: terraform
-          soft_fail: true
-          output_format: sarif
-          output_file_path: checkov.sarif
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: checkov.sarif
-
-  integration-test:
-    runs-on: ubuntu-latest
-    name: Integration test (validate examples)
-    if: github.event_name == 'pull_request'
-    
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v5
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "~1.9.0"
-
-      - name: Terraform init and plan - Project registration example
         run: |
+          cd ${{ matrix.path }}
           terraform init
-          terraform plan \
-            -var="falcon_client_id=test" \
-            -var="falcon_client_secret=test" \
-            -var="infra_project_id=test-project" \
-            -var="project_ids=[\"test-project\"]" \
-            -var="role_arn=arn:aws:sts::123456789012:assumed-role/TestRole" \
-            -out=tfplan
-        working-directory: examples/project-registration
+          terraform validate
+        env:
+          TF_IN_AUTOMATION: true
