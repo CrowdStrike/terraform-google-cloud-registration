@@ -3,6 +3,8 @@
 # and shows how to use the asset-inventory module for specific projects
 
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -24,11 +26,10 @@ module "asset-inventory" {
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789012/locations/global/workloadIdentityPools/crowdstrike-wif-pool/subject/arn:aws:sts::280492971771:assumed-role/crowdstrike-gcp-wif-role/project-123"
 
   registration_type = "project"
-  project_ids       = ["my-specific-project"] # Replace with your project IDs
 
-  # Specific all projects list
+  # Projects list used by the module
   discovered_projects = [
-    "my-specific-project"
+    "my-specific-project"  # Replace with your project IDs
   ]
 
   # Optional: Customize IAM roles if needed

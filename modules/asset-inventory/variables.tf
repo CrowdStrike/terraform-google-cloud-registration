@@ -46,18 +46,6 @@ variable "folder_ids" {
   }
 }
 
-variable "project_ids" {
-  type        = list(string)
-  description = "List of Google Cloud projects being registered"
-  default     = []
-
-  validation {
-    condition = alltrue([
-      for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
-    ])
-    error_message = "All project IDs must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
-  }
-}
 
 variable "google_iam_roles" {
   type        = list(string)

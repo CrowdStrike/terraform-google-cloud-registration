@@ -3,6 +3,8 @@
 # and shows how to use the asset-inventory module for organization-wide registration
 
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
