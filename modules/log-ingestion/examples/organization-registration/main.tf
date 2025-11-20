@@ -28,7 +28,7 @@ module "log_ingestion" {
   organization_id   = "123456789012"  # Replace with your 12-digit org ID
 
   # Infrastructure project where Pub/Sub resources will be created
-  crowdstrike_infra_project_id = "my-crowdstrike-project"
+  infra_project_id = "my-crowdstrike-project"
 
   # Log ingestion settings
   audit_log_types = ["activity", "system_event", "policy"]

@@ -91,6 +91,6 @@ The module creates resources with this naming pattern:
    - `wif_iam_principal`: From your workload-identity module output
    - `registration_id`: From CrowdStrike Registration API
    - Project/organization/folder IDs
-   - `crowdstrike_infra_project_id`: Where Pub/Sub resources will be created
+   - `infra_project_id`: Where Pub/Sub resources will be created
 2. Customize optional settings as needed
 3. Run `terraform init && terraform plan && terraform apply`

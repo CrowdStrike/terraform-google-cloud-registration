@@ -1,9 +1,20 @@
-variable "wif_project_id" {
+variable "infra_project_id" {
   type        = string
-  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
+  description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed"
 
   validation {
-    condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
+    condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
+}
+
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
+  default     = ""
+
+  validation {
+    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
@@ -115,7 +126,6 @@ variable "project_ids" {
     error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
   }
 }
-
 
 variable "enable_realtime_visibility" {
   type        = bool

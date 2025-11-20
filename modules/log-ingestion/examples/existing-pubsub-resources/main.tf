@@ -28,7 +28,7 @@ module "log_ingestion" {
   project_ids       = ["my-specific-project"]
   
   # Infrastructure project where existing resources are located
-  crowdstrike_infra_project_id = "my-crowdstrike-project"
+  infra_project_id = "my-crowdstrike-project"
 
   # Use existing Pub/Sub resources instead of creating new ones
   existing_topic_name        = "my-existing-audit-topic"

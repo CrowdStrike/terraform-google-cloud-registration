@@ -28,7 +28,7 @@ module "log_ingestion" {
   folder_ids        = ["987654321098", "876543210987"]  # Multiple folder IDs
 
   # Infrastructure project where Pub/Sub resources will be created
-  crowdstrike_infra_project_id = "my-crowdstrike-project"
+  infra_project_id = "my-crowdstrike-project"
 
   # Custom log types for folder-level monitoring
   audit_log_types = ["activity", "system_event"]

@@ -1,6 +1,10 @@
+locals {
+  effective_wif_project_id = var.wif_project_id != "" ? var.wif_project_id : var.infra_project_id
+}
+
 module "workload-identity" {
   source               = "./modules/workload-identity/"
-  wif_project_id       = var.wif_project_id
+  wif_project_id       = local.effective_wif_project_id
   wif_pool_id          = var.wif_pool_id
   wif_pool_provider_id = var.wif_pool_provider_id
   role_arn             = var.role_arn
@@ -35,16 +39,16 @@ module "log-ingestion" {
   source = "./modules/log-ingestion/"
 
   # Required parameters
-  wif_iam_principal            = module.workload-identity.wif_iam_principal
-  registration_type            = var.registration_type
-  registration_id              = var.registration_id
-  organization_id              = var.organization_id
-  folder_ids                   = var.folder_ids
-  project_ids                  = var.project_ids
-  crowdstrike_infra_project_id = var.wif_project_id
-  resource_prefix              = var.resource_prefix
-  resource_suffix              = var.resource_suffix
-  labels                       = var.labels
+  wif_iam_principal = module.workload-identity.wif_iam_principal
+  registration_type = var.registration_type
+  registration_id   = var.registration_id
+  organization_id   = var.organization_id
+  folder_ids        = var.folder_ids
+  project_ids       = var.project_ids
+  infra_project_id  = local.effective_wif_project_id
+  resource_prefix   = var.resource_prefix
+  resource_suffix   = var.resource_suffix
+  labels            = var.labels
 
   # Optional settings - structured configuration, child module handles defaults
   message_retention_duration       = var.log_ingestion_settings.message_retention_duration

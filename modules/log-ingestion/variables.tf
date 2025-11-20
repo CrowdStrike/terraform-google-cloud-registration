@@ -87,13 +87,13 @@ variable "resource_suffix" {
   }
 }
 
-variable "crowdstrike_infra_project_id" {
+variable "infra_project_id" {
   type        = string
   description = "Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified"
   default     = ""
 
   validation {
-    condition     = var.crowdstrike_infra_project_id == "" || can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.crowdstrike_infra_project_id))
+    condition     = var.infra_project_id == "" || can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.infra_project_id))
     error_message = "Project ID must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }
 }

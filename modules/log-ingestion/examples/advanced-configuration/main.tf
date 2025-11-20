@@ -28,7 +28,7 @@ module "log_ingestion" {
   organization_id   = "123456789012"
 
   # Infrastructure project for Pub/Sub resources
-  crowdstrike_infra_project_id = "my-crowdstrike-project"
+  infra_project_id = "my-crowdstrike-project"
 
   # Comprehensive audit log types including data access
   audit_log_types = ["activity", "system_event", "policy", "data_access"]

@@ -28,7 +28,7 @@ module "log_ingestion" {
   project_ids       = ["my-specific-project"]  # Replace with your project IDs
   
   # Infrastructure project where Pub/Sub resources will be created
-  crowdstrike_infra_project_id = "my-crowdstrike-project"
+  infra_project_id = "my-crowdstrike-project"
 
   # Optional: Basic log retention settings
   message_retention_duration = "604800s"  # 7 days

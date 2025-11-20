@@ -36,7 +36,7 @@ module "log_ingestion" {
   registration_id   = "my-registration-id"  # From CrowdStrike Registration API
 
   # Required: Project for CrowdStrike infrastructure resources
-  crowdstrike_infra_project_id = "my-security-project"
+  infra_project_id = "my-security-project"
 
   # Conditional: Required based on registration_type
   organization_id = ""                    # Required if registration_type = "organization"
@@ -300,7 +300,7 @@ Costs depend on:
 |------|-------------|------|---------|:--------:|
 | <a name="input_ack_deadline_seconds"></a> [ack\_deadline\_seconds](#input\_ack\_deadline\_seconds) | Message acknowledgment deadline in seconds | `number` | `600` | no |
 | <a name="input_audit_log_types"></a> [audit\_log\_types](#input\_audit\_log\_types) | List of audit log types to include in the filter | `list(string)` | `["activity", "system_event", "policy"]` | no |
-| <a name="input_crowdstrike_infra_project_id"></a> [crowdstrike\_infra\_project\_id](#input\_crowdstrike\_infra\_project\_id) | Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified | `string` | `""` | no |
+| <a name="input_infra_project_id"></a> [crowdstrike\_infra\_project\_id](#input\_crowdstrike\_infra\_project\_id) | Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified | `string` | `""` | no |
 | <a name="input_enable_schema_validation"></a> [enable\_schema\_validation](#input\_enable\_schema\_validation) | Enable schema validation for the topic | `bool` | `false` | no |
 | <a name="input_exclusion_filters"></a> [exclusion\_filters](#input\_exclusion\_filters) | List of exclusion filter expressions to exclude specific resources from log collection (e.g., 'resource.labels.project_id="excluded-project"') | `list(string)` | `[]` | no |
 | <a name="input_existing_subscription_name"></a> [existing\_subscription\_name](#input\_existing\_subscription\_name) | Name of existing Pub/Sub subscription to use. If empty, creates new subscription | `string` | `""` | no |

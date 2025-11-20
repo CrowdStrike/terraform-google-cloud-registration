@@ -50,7 +50,7 @@ output "log_sink_writer_identities" {
 
 output "log_ingestion_project_id" {
   description = "Project ID where log ingestion resources are deployed"
-  value       = var.crowdstrike_infra_project_id
+  value       = var.infra_project_id
 }
 
 output "log_filter" {
