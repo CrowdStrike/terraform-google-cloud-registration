@@ -33,7 +33,7 @@ provider "google" {
 # =============================================================================
 
 module "crowdstrike_cspm" {
-  source = "git::https://github.com/CrowdStrike/terraform-google-cloud-registration.git"
+  source = "git::https://github.com/CrowdStrike/terraform-google-cloud-registration.git?ref=v0.1.0-alpha"
 
   # =============================================================================
   # Core Configuration

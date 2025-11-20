@@ -83,17 +83,6 @@ variable "falcon_cloud_api_host" {
   }
 }
 
-variable "falcon_cloud_api_host_timeout" {
-  type        = number
-  description = "Timeout for CrowdStrike Cloud API requests in seconds"
-  default     = 30
-
-  validation {
-    condition     = var.falcon_cloud_api_host_timeout > 0 && var.falcon_cloud_api_host_timeout <= 300
-    error_message = "API timeout must be between 1 and 300 seconds."
-  }
-}
-
 variable "region" {
   type        = string
   description = "GCP region for resource deployment"

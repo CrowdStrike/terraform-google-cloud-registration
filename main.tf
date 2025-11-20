@@ -28,7 +28,6 @@ module "asset-inventory" {
   registration_type   = var.registration_type
   organization_id     = var.organization_id
   folder_ids          = var.folder_ids
-  project_ids         = var.project_ids
   discovered_projects = module.project-discovery.discovered_projects
 
   depends_on = [module.workload-identity, module.project-discovery]

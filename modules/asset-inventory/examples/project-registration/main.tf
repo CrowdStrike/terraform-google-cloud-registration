@@ -29,7 +29,7 @@ module "asset-inventory" {
 
   # Projects list used by the module
   discovered_projects = [
-    "my-specific-project"  # Replace with your project IDs
+    "my-specific-project" # Replace with your project IDs
   ]
 
   # Optional: Customize IAM roles if needed
