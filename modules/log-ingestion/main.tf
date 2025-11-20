@@ -48,7 +48,7 @@ resource "google_project_service" "log_ingestion_apis" {
   project                    = var.infra_project_id
   service                    = each.value
   disable_dependent_services = false
-  disable_on_destroy         = true
+  disable_on_destroy         = false
 }
 
 # Create Pub/Sub Schema (optional)

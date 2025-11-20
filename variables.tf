@@ -96,8 +96,8 @@ variable "organization_id" {
   default     = ""
 
   validation {
-    condition     = var.registration_type != "organization" || (var.organization_id != "" && can(regex("^[0-9]{12}$", var.organization_id)))
-    error_message = "Organization ID must be provided and be exactly 12 digits when registration_type is 'organization'."
+    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
 
@@ -107,10 +107,10 @@ variable "folder_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "folder" || (length(var.folder_ids) > 0 && alltrue([
+    condition = alltrue([
       for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
-    ]))
-    error_message = "Folder IDs must be provided and all must be exactly 12 digits when registration_type is 'folder'."
+    ])
+    error_message = "All folder IDs must be exactly 12 digits."
   }
 }
 
@@ -120,10 +120,10 @@ variable "project_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "project" || (length(var.project_ids) > 0 && alltrue([
+    condition = alltrue([
       for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
-    ]))
-    error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
+    ])
+    error_message = "All project IDs must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }
 }
 

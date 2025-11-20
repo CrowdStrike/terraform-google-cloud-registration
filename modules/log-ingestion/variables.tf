@@ -168,8 +168,8 @@ variable "schema_definition" {
   default     = ""
 
   validation {
-    condition     = !var.enable_schema_validation || var.schema_definition != ""
-    error_message = "Schema definition is required when schema validation is enabled."
+    condition     = var.schema_definition == "" || length(var.schema_definition) > 0
+    error_message = "Schema definition must be valid when provided."
   }
 }
 
