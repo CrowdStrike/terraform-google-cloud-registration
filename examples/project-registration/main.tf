@@ -41,21 +41,22 @@ module "crowdstrike_gcp_registration" {
   # Core Configuration
   # =============================================================================
 
-  # CrowdStrike API Configuration
-  falcon_client_id     = var.falcon_client_id
-  falcon_client_secret = var.falcon_client_secret
-
   # GCP Infrastructure Project
   infra_project_id = var.infra_project_id
 
   # AWS Integration (CrowdStrike Role ARN)
   role_arn = var.role_arn
 
+  # Workload Identity Federation Configuration
+  wif_pool_id          = var.wif_pool_id
+  wif_pool_provider_id = var.wif_pool_provider_id
+
   # =============================================================================
   # Registration Scope - Project Level
   # =============================================================================
 
   registration_type = "project"
+  registration_id   = var.registration_id
   project_ids       = var.project_ids
 
   # =============================================================================
@@ -65,8 +66,8 @@ module "crowdstrike_gcp_registration" {
   # Real Time Visibility & Detection
   enable_realtime_visibility = var.enable_realtime_visibility
 
-  # Log ingestion configuration (only used if enable_realtime_visibility = true)
-  log_ingestion_settings = var.enable_realtime_visibility ? {
+  # Log ingestion configuration
+  log_ingestion_settings = {
     message_retention_duration       = var.log_retention_duration
     ack_deadline_seconds             = var.log_ack_deadline
     topic_message_retention_duration = var.topic_retention_duration
@@ -74,7 +75,7 @@ module "crowdstrike_gcp_registration" {
     enable_schema_validation         = false
     schema_type                      = "AVRO"
     exclusion_filters                = var.log_exclusion_filters
-  } : null
+  }
 
   # =============================================================================
   # Resource Naming
@@ -89,7 +90,7 @@ module "crowdstrike_gcp_registration" {
 
   labels = merge(var.labels, {
     managed-by  = "infrastructure-manager"
-    module      = "crowdstrike-cspm"
+    module      = "crowdstrike-csmp"
     environment = var.environment
   })
 }

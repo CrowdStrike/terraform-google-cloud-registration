@@ -9,28 +9,6 @@
 # REQUIRED VARIABLES
 # =============================================================================
 
-variable "falcon_client_id" {
-  type        = string
-  description = "CrowdStrike Falcon API Client ID"
-  sensitive   = true
-
-  validation {
-    condition     = length(var.falcon_client_id) > 0
-    error_message = "Falcon Client ID must not be empty."
-  }
-}
-
-variable "falcon_client_secret" {
-  type        = string
-  description = "CrowdStrike Falcon API Client Secret"
-  sensitive   = true
-
-  validation {
-    condition     = length(var.falcon_client_secret) > 0
-    error_message = "Falcon Client Secret must not be empty."
-  }
-}
-
 variable "infra_project_id" {
   type        = string
   description = "GCP Project ID where CrowdStrike infrastructure will be created (WIF pools, Pub/Sub topics, etc.)"
@@ -65,6 +43,36 @@ variable "role_arn" {
   validation {
     condition     = can(regex("^arn:aws:sts::[0-9]{12}:assumed-role/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS STS assumed role ARN format."
+  }
+}
+
+variable "wif_pool_id" {
+  type        = string
+  description = "Workload Identity Federation Pool ID"
+
+  validation {
+    condition     = length(var.wif_pool_id) >= 4 && length(var.wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_id))
+    error_message = "Pool ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "wif_pool_provider_id" {
+  type        = string
+  description = "Workload Identity Federation Provider ID"
+
+  validation {
+    condition     = length(var.wif_pool_provider_id) >= 4 && length(var.wif_pool_provider_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_provider_id))
+    error_message = "Provider ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "registration_id" {
+  type        = string
+  description = "Unique registration ID for resource naming"
+
+  validation {
+    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
   }
 }
 
