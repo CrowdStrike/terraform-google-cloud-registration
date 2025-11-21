@@ -45,13 +45,13 @@ module "project_discovery" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
-| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
+| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
+| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

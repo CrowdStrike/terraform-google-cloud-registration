@@ -50,16 +50,16 @@ module "workload_identity" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool) | resource |
-| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool_provider) | resource |
-| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
-| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
-| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool) | resource |
+| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool_provider) | resource |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
+| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
+| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
