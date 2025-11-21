@@ -1,9 +1,20 @@
-variable "wif_project_id" {
+variable "infra_project_id" {
   type        = string
-  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
+  description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed"
 
   validation {
-    condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
+    condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
+}
+
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
+  default     = ""
+
+  validation {
+    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
@@ -50,16 +61,6 @@ variable "wif_pool_provider_id" {
   }
 }
 
-variable "aws_account_id" {
-  type        = string
-  description = "AWS Account ID to add as a trust relationship in the WIF Pool Provider"
-
-  validation {
-    condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
-    error_message = "AWS Account ID must be exactly 12 digits."
-  }
-}
-
 variable "role_arn" {
   type        = string
   description = "AWS Role ARN used by CrowdStrike for authentication"
@@ -95,8 +96,8 @@ variable "organization_id" {
   default     = ""
 
   validation {
-    condition     = var.registration_type != "organization" || (var.organization_id != "" && can(regex("^[0-9]{12}$", var.organization_id)))
-    error_message = "Organization ID must be provided and be exactly 12 digits when registration_type is 'organization'."
+    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
 
@@ -106,10 +107,10 @@ variable "folder_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "folder" || (length(var.folder_ids) > 0 && alltrue([
+    condition = alltrue([
       for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
-    ]))
-    error_message = "Folder IDs must be provided and all must be exactly 12 digits when registration_type is 'folder'."
+    ])
+    error_message = "All folder IDs must be exactly 12 digits."
   }
 }
 
@@ -119,13 +120,12 @@ variable "project_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "project" || (length(var.project_ids) > 0 && alltrue([
+    condition = alltrue([
       for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
-    ]))
-    error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
+    ])
+    error_message = "All project IDs must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }
 }
-
 
 variable "enable_realtime_visibility" {
   type        = bool

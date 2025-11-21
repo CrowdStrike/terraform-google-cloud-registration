@@ -1,0 +1,30 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        args: ["--markdown-linebreak-ext=md"]
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.0
+    hooks:
+      - id: terraform_fmt
+        args:
+          - "--args=-recursive"
+      - id: terraform_docs
+        args:
+          - "--args=--lockfile=false"
+      - id: terraform_tflint
+        args:
+          - "--args=--recursive"
+      - id: terraform_validate
+      - id: terraform_tfsec
+        args:
+          - "--args=--soft-fail"
+      - id: terraform_checkov
+        args:
+          - "--args=--soft-fail"

@@ -20,7 +20,7 @@ locals {
   inclusion_filter = var.registration_type == "organization" ? "resource.labels.organization_id=\"${var.organization_id}\"" : (
     var.registration_type == "folder" ? "protoPayload.resourceName=~\"(${join("|", [
       for folder_id in local.folder_list : "folders/${trimspace(folder_id)}"
-    ])})/\"" : join(" OR ", [
+      ])})/\"" : join(" OR ", [
       for project_id in local.project_list : "resource.labels.project_id=\"${trimspace(project_id)}\""
     ])
   )
@@ -45,10 +45,10 @@ resource "google_project_service" "log_ingestion_apis" {
     "serviceusage.googleapis.com"
   ])
 
-  project                    = var.crowdstrike_infra_project_id
+  project                    = var.infra_project_id
   service                    = each.value
   disable_dependent_services = false
-  disable_on_destroy         = true
+  disable_on_destroy         = false
 }
 
 # Create Pub/Sub Schema (optional)
@@ -56,7 +56,7 @@ resource "google_pubsub_schema" "crowdstrike_logs" {
   count = var.enable_schema_validation && local.create_topic ? 1 : 0
 
   name       = "${var.resource_prefix}CrowdStrikeLogSchema${var.resource_suffix}"
-  project    = var.crowdstrike_infra_project_id
+  project    = var.infra_project_id
   type       = var.schema_type
   definition = var.schema_definition
 
@@ -68,7 +68,7 @@ resource "google_pubsub_topic" "crowdstrike_logs" {
   count = local.create_topic ? 1 : 0
 
   name    = local.topic_name
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
 
   # Configure message retention
   message_retention_duration = var.topic_message_retention_duration
@@ -100,7 +100,7 @@ data "google_pubsub_topic" "existing_crowdstrike_logs" {
   count = local.create_topic ? 0 : 1
 
   name    = local.topic_name
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
 }
 
 # Create Pub/Sub Subscription (only if not using existing)
@@ -109,7 +109,7 @@ resource "google_pubsub_subscription" "crowdstrike_logs" {
 
   name    = local.subscription_name
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
 
   message_retention_duration = var.message_retention_duration
   ack_deadline_seconds       = var.ack_deadline_seconds
@@ -135,7 +135,7 @@ data "google_pubsub_subscription" "existing_crowdstrike_logs" {
   count = local.create_subscription ? 0 : 1
 
   name    = local.subscription_name
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
 }
 
 # Create log router sink for organization-level registration
@@ -183,7 +183,7 @@ resource "google_logging_project_sink" "crowdstrike_logs" {
 resource "google_pubsub_topic_iam_member" "log_writer_org" {
   count = var.registration_type == "organization" ? 1 : 0
 
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
   role    = "roles/pubsub.publisher"
   member  = google_logging_organization_sink.crowdstrike_logs[0].writer_identity
@@ -195,7 +195,7 @@ resource "google_pubsub_topic_iam_member" "log_writer_org" {
 resource "google_pubsub_topic_iam_member" "log_writer_folder" {
   for_each = var.registration_type == "folder" ? toset(local.folder_list) : []
 
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
   role    = "roles/pubsub.publisher"
   member  = google_logging_folder_sink.crowdstrike_logs[each.key].writer_identity
@@ -207,7 +207,7 @@ resource "google_pubsub_topic_iam_member" "log_writer_folder" {
 resource "google_pubsub_topic_iam_member" "log_writer_project" {
   for_each = var.registration_type == "project" ? toset(local.project_list) : []
 
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
   role    = "roles/pubsub.publisher"
   member  = google_logging_project_sink.crowdstrike_logs[each.key].writer_identity
@@ -218,7 +218,7 @@ resource "google_pubsub_topic_iam_member" "log_writer_project" {
 # Grant CrowdStrike principal access to Pub/Sub
 resource "google_pubsub_subscription_iam_member" "crowdstrike_subscriber" {
   subscription = local.create_subscription ? google_pubsub_subscription.crowdstrike_logs[0].name : data.google_pubsub_subscription.existing_crowdstrike_logs[0].name
-  project      = var.crowdstrike_infra_project_id
+  project      = var.infra_project_id
   role         = "roles/pubsub.subscriber"
   member       = var.wif_iam_principal
 
@@ -227,7 +227,7 @@ resource "google_pubsub_subscription_iam_member" "crowdstrike_subscriber" {
 
 resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
   role    = "roles/pubsub.viewer"
   member  = var.wif_iam_principal
 
@@ -235,7 +235,7 @@ resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
 }
 
 resource "google_project_iam_member" "crowdstrike_monitoring_viewer" {
-  project = var.crowdstrike_infra_project_id
+  project = var.infra_project_id
   role    = "roles/monitoring.viewer"
   member  = var.wif_iam_principal
 }
