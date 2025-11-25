@@ -89,7 +89,7 @@ variable "resource_suffix" {
 
 variable "infra_project_id" {
   type        = string
-  description = "Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components)"
+  description = "Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified"
   default     = ""
 
   validation {
@@ -168,8 +168,8 @@ variable "schema_definition" {
   default     = ""
 
   validation {
-    condition     = !var.enable_schema_validation || var.schema_definition != ""
-    error_message = "Schema definition is required when schema validation is enabled."
+    condition     = var.schema_definition == "" || length(var.schema_definition) > 0
+    error_message = "Schema definition must be valid when provided."
   }
 }
 
@@ -200,21 +200,21 @@ variable "labels" {
   type        = map(string)
   description = "Map of labels to be applied to all resources created by this module"
   default     = {}
-  
+
   validation {
     condition = alltrue([
       for key, value in var.labels : can(regex("^[a-z][a-z0-9_-]{0,62}$", key))
     ])
     error_message = "Label keys must start with lowercase letter, contain only lowercase letters, numbers, hyphens, and underscores, and be 1-63 characters long."
   }
-  
+
   validation {
     condition = alltrue([
       for key, value in var.labels : can(regex("^[a-z0-9_-]{0,63}$", value))
     ])
     error_message = "Label values must contain only lowercase letters, numbers, hyphens, and underscores, and be 0-63 characters long."
   }
-  
+
   validation {
     condition     = length(var.labels) <= 64
     error_message = "Maximum of 64 labels allowed per resource."

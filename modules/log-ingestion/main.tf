@@ -20,7 +20,7 @@ locals {
   inclusion_filter = var.registration_type == "organization" ? "resource.labels.organization_id=\"${var.organization_id}\"" : (
     var.registration_type == "folder" ? "protoPayload.resourceName=~\"(${join("|", [
       for folder_id in local.folder_list : "folders/${trimspace(folder_id)}"
-    ])})/\"" : join(" OR ", [
+      ])})/\"" : join(" OR ", [
       for project_id in local.project_list : "resource.labels.project_id=\"${trimspace(project_id)}\""
     ])
   )

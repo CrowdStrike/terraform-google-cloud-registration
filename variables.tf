@@ -18,28 +18,9 @@ variable "falcon_client_secret" {
   }
 }
 
-variable "customer_id" {
-  type        = string
-  sensitive   = true
-  description = "CrowdStrike Customer ID for internal API authentication."
-  default     = null
-}
-
-variable "falcon_api_host" {
-  type        = string
-  description = "CrowdStrike Falcon API host URL for OAuth authentication (required for production environments)"
-  default     = "https://api.crowdstrike.com"
-}
-
-variable "falcon_cloud_api_host" {
-  type        = string
-  description = "CrowdStrike Cloud Registration API host URL"
-  default     = "https://api.crowdstrike.com"
-}
-
 variable "infra_project_id" {
   type        = string
-  description = "Google Cloud Project ID for CrowdStrike infrastructure resources (Pub/Sub, logging, etc.)"
+  description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed"
 
   validation {
     condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
@@ -80,16 +61,6 @@ variable "resource_suffix" {
   }
 }
 
-variable "aws_account_id" {
-  type        = string
-  description = "AWS Account ID to add as a trust relationship in the WIF Pool Provider"
-
-  validation {
-    condition     = can(regex("^[0-9]{12}$", var.aws_account_id))
-    error_message = "AWS Account ID must be exactly 12 digits."
-  }
-}
-
 variable "role_arn" {
   type        = string
   description = "AWS Role ARN used by CrowdStrike for authentication"
@@ -115,8 +86,8 @@ variable "organization_id" {
   default     = ""
 
   validation {
-    condition     = var.registration_type != "organization" || (var.organization_id != "" && can(regex("^[0-9]{12}$", var.organization_id)))
-    error_message = "Organization ID must be provided and be exactly 12 digits when registration_type is 'organization'."
+    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
 
@@ -126,10 +97,10 @@ variable "folder_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "folder" || (length(var.folder_ids) > 0 && alltrue([
+    condition = alltrue([
       for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
-    ]))
-    error_message = "Folder IDs must be provided and all must be exactly 12 digits when registration_type is 'folder'."
+    ])
+    error_message = "All folder IDs must be exactly 12 digits."
   }
 }
 
@@ -139,10 +110,10 @@ variable "project_ids" {
   default     = []
 
   validation {
-    condition = var.registration_type != "project" || (length(var.project_ids) > 0 && alltrue([
+    condition = alltrue([
       for project_id in var.project_ids : can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", project_id))
-    ]))
-    error_message = "Project IDs must be provided and all must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen when registration_type is 'project'."
+    ])
+    error_message = "All project IDs must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }
 }
 

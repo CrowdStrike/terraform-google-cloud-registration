@@ -3,6 +3,8 @@
 # and shows how to use the asset-inventory module for folder registration
 
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -12,7 +14,7 @@ terraform {
 }
 
 provider "google" {
-  project = "my-crowdstrike-project"  # Replace with your actual project ID
+  project = "my-crowdstrike-project" # Replace with your actual project ID
   region  = "us-central1"
 }
 
@@ -22,9 +24,9 @@ module "asset-inventory" {
 
   # WIF principal
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789012/locations/global/workloadIdentityPools/crowdstrike-wif-pool/subject/arn:aws:sts::280492971771:assumed-role/crowdstrike-gcp-wif-role/folder-123"
-  
+
   registration_type = "folder"
-  folder_ids        = ["111111111111"]  # Replace with your folder IDs
+  folder_ids        = ["111111111111"] # Replace with your folder IDs
 
   # Discovered projects list (from project-discovery module output)
   discovered_projects = [

@@ -3,6 +3,8 @@
 # Pub/Sub topic and subscription resources
 
 terraform {
+  required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -12,7 +14,7 @@ terraform {
 }
 
 provider "google" {
-  project = "my-crowdstrike-project"  # Replace with your actual project ID
+  project = "my-crowdstrike-project" # Replace with your actual project ID
   region  = "us-central1"
 }
 
@@ -22,11 +24,11 @@ module "log_ingestion" {
 
   # WIF principal from your workload-identity module output
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789012/locations/global/workloadIdentityPools/crowdstrike-wif-pool/subject/arn:aws:sts::280492971771:assumed-role/crowdstrike-gcp-wif-role/existing-123"
-  
+
   registration_type = "project"
   registration_id   = "existing-123"
   project_ids       = ["my-specific-project"]
-  
+
   # Infrastructure project where existing resources are located
   infra_project_id = "my-crowdstrike-project"
 
@@ -36,7 +38,7 @@ module "log_ingestion" {
 
   # Log filtering settings (still applies even with existing resources)
   audit_log_types = ["activity", "policy"]
-  
+
   exclusion_filters = [
     "resource.labels.skip_logging=\"true\""
   ]

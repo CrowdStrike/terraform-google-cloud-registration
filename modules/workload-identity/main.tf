@@ -3,6 +3,10 @@ data "google_project" "wif_project" {
   project_id = var.wif_project_id
 }
 
+locals {
+  aws_account_id = split(":", var.role_arn)[4]
+}
+
 # Enable Service Usage API first (if not already enabled)
 resource "google_project_service" "serviceusage" {
   project = var.wif_project_id
@@ -51,7 +55,7 @@ resource "google_iam_workload_identity_pool_provider" "aws" {
   project                            = var.wif_project_id
 
   aws {
-    account_id = var.aws_account_id
+    account_id = local.aws_account_id
   }
 
   attribute_mapping = {
@@ -62,4 +66,3 @@ resource "google_iam_workload_identity_pool_provider" "aws" {
     google_iam_workload_identity_pool.main
   ]
 }
-

@@ -29,7 +29,7 @@ resource "google_folder_iam_member" "crowdstrike_folder" {
 resource "google_project_iam_member" "crowdstrike_project" {
   for_each = toset([
     for pair in setproduct(
-      var.discovered_projects,
+      var.registration_type == "project" ? var.discovered_projects : [],
       var.google_iam_roles
     ) : "${pair[0]}::${pair[1]}"
   ])
@@ -48,8 +48,8 @@ resource "google_project_service" "asset_inventory_apis" {
     ) : "${pair[0]}::${pair[1]}"
   ])
 
-  project = split("::", each.key)[0]
-  service = split("::", each.key)[1]
+  project                    = split("::", each.key)[0]
+  service                    = split("::", each.key)[1]
   disable_dependent_services = false
   disable_on_destroy         = false
 }
