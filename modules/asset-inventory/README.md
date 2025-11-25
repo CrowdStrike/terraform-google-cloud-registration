@@ -55,15 +55,15 @@ module "asset_inventory" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
-| [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
-| [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
-| [google_project_service.asset_inventory_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/folder_iam_member) | resource |
+| [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/organization_iam_member) | resource |
+| [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_iam_member) | resource |
+| [google_project_service.asset_inventory_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

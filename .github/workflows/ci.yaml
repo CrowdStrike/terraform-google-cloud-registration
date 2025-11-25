@@ -5,10 +5,15 @@ on:
       - main
   pull_request:
 
+permissions: read-all
+
 jobs:
   format-check:
     runs-on: ubuntu-latest
     name: Check Terraform formatting
+    permissions:
+      contents: read
+    timeout-minutes: 15
 
     steps:
       - name: Checkout source code
@@ -22,6 +27,9 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     name: Validate
+    permissions:
+      contents: read
+    timeout-minutes: 20
 
     strategy:
       matrix:
@@ -45,6 +53,9 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     name: Check terraform documentation
+    permissions:
+      contents: read
+    timeout-minutes: 15
 
     steps:
       - name: Checkout source code
@@ -58,6 +69,10 @@ jobs:
 
   tflint:
     runs-on: ubuntu-latest
+    name: TFLint
+    permissions:
+      contents: read
+    timeout-minutes: 15
 
     steps:
       - name: Checkout source code
