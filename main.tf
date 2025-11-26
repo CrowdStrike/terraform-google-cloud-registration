@@ -1,5 +1,5 @@
 locals {
-  effective_wif_project_id = var.wif_project_id != "" ? var.wif_project_id : var.infra_project_id
+  effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
 }
 
 # CrowdStrike GCP registration resource
