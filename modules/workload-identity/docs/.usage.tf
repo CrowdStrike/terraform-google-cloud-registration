@@ -23,7 +23,7 @@ module "workload_identity" {
   wif_pool_provider_id = "cs-provider-12345"
   
   # CrowdStrike Role ARN
-  role_arn = "arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector"
+  role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
   
   # Registration ID
   registration_id = "unique-registration-id"

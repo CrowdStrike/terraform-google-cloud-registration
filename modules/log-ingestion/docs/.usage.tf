@@ -16,7 +16,7 @@ module "log_ingestion" {
   source = "CrowdStrike/terraform-google-cloud-registration//modules/log-ingestion"
 
   # CrowdStrike IAM Principal (from workload-identity module output)
-  wif_iam_principal = "principal://iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/cs-wif-pool-12345/subject/arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector/unique-registration-id"
+  wif_iam_principal = "principal://iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/cs-wif-pool-12345/subject/arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName/unique-registration-id"
   
   # CrowdStrike Infrastructure Project
   infra_project_id = "your-csmp-infrastructure-project"
