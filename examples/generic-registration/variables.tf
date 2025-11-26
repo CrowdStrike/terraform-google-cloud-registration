@@ -32,10 +32,10 @@ variable "falcon_client_secret" {
 variable "wif_project_id" {
   type        = string
   description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
+    condition     = var.wif_project_id == null || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
@@ -62,10 +62,10 @@ variable "registration_type" {
 variable "organization_id" {
   type        = string
   description = "GCP Organization ID for organization-level registration"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
     error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
@@ -190,10 +190,10 @@ variable "log_exclusion_filters" {
 variable "resource_prefix" {
   type        = string
   description = "Prefix for resource names (helps with organization and identification)"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20
+    condition     = var.resource_prefix == null || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20)
     error_message = "Resource prefix must contain only lowercase letters, numbers, hyphens, and be 20 characters or less."
   }
 }
@@ -201,10 +201,10 @@ variable "resource_prefix" {
 variable "resource_suffix" {
   type        = string
   description = "Suffix for resource names (helps with organization and identification)"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
+    condition     = var.resource_suffix == null || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20)
     error_message = "Resource suffix must contain only lowercase letters, numbers, hyphens, and be 20 characters or less."
   }
 }

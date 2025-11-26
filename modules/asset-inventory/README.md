@@ -12,6 +12,7 @@ This Terraform module configures Google Cloud IAM permissions required for Crowd
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -29,23 +30,23 @@ module "asset_inventory" {
 
   # CrowdStrike IAM Principal (from workload-identity module output)
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/cs-wif-pool-12345/subject/arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector/unique-registration-id"
-  
+
   # Registration Scope - Organization Level
   registration_type = "organization"
   organization_id   = "123456789012"
-  
+
   # Projects discovered by project-discovery module
   discovered_projects = [
     "project-1",
-    "project-2", 
+    "project-2",
     "project-3"
   ]
-  
+
   # Optional: Folder registration (alternative to organization)
   # registration_type = "folder"
   # folder_ids = ["123456789", "987654321"]
-  
-  # Optional: Project registration (alternative to organization/folder)  
+
+  # Optional: Project registration (alternative to organization/folder)
   # registration_type = "project"
   # project_ids = ["project-1", "project-2"]
 }
@@ -55,15 +56,15 @@ module "asset_inventory" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/folder_iam_member) | resource |
-| [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/organization_iam_member) | resource |
-| [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_iam_member) | resource |
-| [google_project_service.asset_inventory_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
+| [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
+| [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
+| [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_service.asset_inventory_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

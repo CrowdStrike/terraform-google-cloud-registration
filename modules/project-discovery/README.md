@@ -12,6 +12,7 @@ This Terraform module discovers Google Cloud projects for CrowdStrike's Cloud Se
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -30,11 +31,11 @@ module "project_discovery" {
   # Registration Scope - Organization Level
   registration_type = "organization"
   organization_id   = "123456789012"
-  
+
   # Optional: Folder registration (alternative to organization)
   # registration_type = "folder"
   # folder_ids = ["123456789", "987654321"]
-  
+
   # Optional: Project registration (alternative to organization/folder)
   # registration_type = "project"
   # project_ids = ["project-1", "project-2", "project-3"]
@@ -45,13 +46,13 @@ module "project_discovery" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
-| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
+| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
+| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

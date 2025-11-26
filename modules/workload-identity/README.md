@@ -12,6 +12,7 @@ This Terraform module creates and configures Google Cloud Workload Identity Fede
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -29,17 +30,17 @@ module "workload_identity" {
 
   # GCP Project Configuration
   wif_project_id = "your-csmp-infrastructure-project"
-  
+
   # Workload Identity Pool Configuration
   wif_pool_id          = "cs-wif-pool-12345"
   wif_pool_provider_id = "cs-provider-12345"
-  
+
   # CrowdStrike Role ARN
   role_arn = "arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector"
-  
+
   # Registration ID
   registration_id = "unique-registration-id"
-  
+
   # Optional: Resource Naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
@@ -50,16 +51,16 @@ module "workload_identity" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool) | resource |
-| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool_provider) | resource |
-| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
-| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
-| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/project) | data source |
+| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool) | resource |
+| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool_provider) | resource |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
