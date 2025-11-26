@@ -28,7 +28,7 @@ module "crowdstrike_gcp_registration" {
   organization_id   = "123456789012"
 
   # CrowdStrike Role ARN
-  role_arn = "arn:aws:sts::532730071073:assumed-role/CrowdStrikeCSPMConnector"
+  role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
 
   # Optional: Enable Real Time Visibility & Detection
   enable_realtime_visibility = true
