@@ -1,24 +1,66 @@
+# =============================================================================
+# CrowdStrike GCP CSPM Universal Registration Example
+# =============================================================================
+# This example demonstrates universal registration using the CrowdStrike
+# GCP CSPM Terraform module. Works for project, folder, and organization
+# level registration. Designed for deployment via GCP Infrastructure Manager.
+#
+# Infrastructure Manager will provide variables via URL parameters or 
+# deployment configuration.
+# =============================================================================
+
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+    crowdstrike = {
+      source = "crowdstrike/crowdstrike"
+    }
+  }
+}
+
+# =============================================================================
+# Provider Configuration
+# =============================================================================
+
+provider "google" {
+  project = var.infra_project_id
+  region  = var.region
+}
+
+provider "crowdstrike" {
+  client_id     = var.falcon_client_id
+  client_secret = var.falcon_client_secret
+}
+
+# =============================================================================
+# Locals for configuration
+# =============================================================================
+
 locals {
   effective_wif_project_id = var.wif_project_id != "" ? var.wif_project_id : var.infra_project_id
 }
 
-# CrowdStrike GCP registration resource
+# =============================================================================
+# CrowdStrike GCP Registration
+# =============================================================================
+
 resource "crowdstrike_cloud_google_registration" "main" {
   name              = "${var.resource_prefix}gcp-registration${var.resource_suffix}"
+  projects          = var.registration_type == "project" ? var.project_ids : null
+  folders           = var.registration_type == "folder" ? var.folder_ids : null
+  organization      = var.registration_type == "organization" ? var.organization_id : null
   infra_project     = var.infra_project_id
   wif_project       = local.effective_wif_project_id
   deployment_method = "terraform-native"
 
-  # Set the appropriate registration scope
-  projects     = var.registration_type == "project" ? var.project_ids : null
-  folders      = var.registration_type == "folder" ? var.folder_ids : null
-  organization = var.registration_type == "organization" ? var.organization_id : null
-
-  # Resource naming
   resource_name_prefix = var.resource_prefix != "" ? var.resource_prefix : null
   resource_name_suffix = var.resource_suffix != "" ? var.resource_suffix : null
 
-  # Labels from variables
   labels = var.labels
 
   # Enable realtime visibility if requested
@@ -27,8 +69,12 @@ resource "crowdstrike_cloud_google_registration" "main" {
   } : null
 }
 
+# =============================================================================
+# Workload Identity, Asset Inventory, Log Ingestion
+# =============================================================================
+
 module "workload-identity" {
-  source               = "./modules/workload-identity/"
+  source               = "../../modules/workload-identity/"
   wif_project_id       = local.effective_wif_project_id
   wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
   wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
@@ -37,8 +83,9 @@ module "workload-identity" {
   resource_prefix      = var.resource_prefix
   resource_suffix      = var.resource_suffix
 }
+
 module "project-discovery" {
-  source = "./modules/project-discovery/"
+  source = "../../modules/project-discovery/"
 
   registration_type = var.registration_type
   organization_id   = var.organization_id
@@ -47,7 +94,7 @@ module "project-discovery" {
 }
 
 module "asset-inventory" {
-  source = "./modules/asset-inventory/"
+  source = "../../modules/asset-inventory/"
 
   wif_iam_principal   = module.workload-identity.wif_iam_principal
   registration_type   = var.registration_type
@@ -60,9 +107,8 @@ module "asset-inventory" {
 
 module "log-ingestion" {
   count  = var.enable_realtime_visibility ? 1 : 0
-  source = "./modules/log-ingestion/"
+  source = "../../modules/log-ingestion/"
 
-  # Required parameters
   wif_iam_principal = module.workload-identity.wif_iam_principal
   registration_type = var.registration_type
   registration_id   = crowdstrike_cloud_google_registration.main.id
@@ -74,23 +120,21 @@ module "log-ingestion" {
   resource_suffix   = var.resource_suffix
   labels            = var.labels
 
-  # Optional settings - structured configuration, child module handles defaults
-  message_retention_duration       = var.log_ingestion_settings.message_retention_duration
-  ack_deadline_seconds             = var.log_ingestion_settings.ack_deadline_seconds
-  topic_message_retention_duration = var.log_ingestion_settings.topic_message_retention_duration
-  audit_log_types                  = var.log_ingestion_settings.audit_log_types
-  topic_storage_regions            = var.log_ingestion_settings.topic_storage_regions
-  enable_schema_validation         = var.log_ingestion_settings.enable_schema_validation
-  schema_type                      = var.log_ingestion_settings.schema_type
-  schema_definition                = var.log_ingestion_settings.schema_definition
-  existing_topic_name              = var.log_ingestion_settings.existing_topic_name
-  existing_subscription_name       = var.log_ingestion_settings.existing_subscription_name
-  exclusion_filters                = var.log_ingestion_settings.exclusion_filters
+  message_retention_duration       = var.log_retention_duration
+  ack_deadline_seconds             = var.log_ack_deadline
+  topic_message_retention_duration = var.topic_retention_duration
+  audit_log_types                  = var.audit_log_types
+  enable_schema_validation         = false
+  schema_type                      = "AVRO"
+  exclusion_filters                = var.log_exclusion_filters
 
   depends_on = [module.workload-identity]
 }
 
-# CrowdStrike logging settings for realtime visibility
+# =============================================================================
+# CrowdStrike Registration Settings
+# =============================================================================
+
 resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
   wif_project                     = local.effective_wif_project_id
@@ -103,7 +147,6 @@ resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
     crowdstrike_cloud_google_registration.main,
     module.workload-identity,
     module.asset-inventory,
-    module.log-ingestion,
-    module.project-discovery
+    module.log-ingestion
   ]
 }

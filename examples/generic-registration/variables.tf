@@ -1,5 +1,5 @@
 # =============================================================================
-# Variables for CrowdStrike GCP CSPM Project Registration
+# Variables for CrowdStrike GCP CSPM Generic Registration
 # =============================================================================
 # These variables can be provided via GCP Infrastructure Manager URL parameters
 # or deployment configuration.
@@ -8,6 +8,37 @@
 # =============================================================================
 # REQUIRED VARIABLES
 # =============================================================================
+
+variable "falcon_client_id" {
+  type        = string
+  sensitive   = true
+  description = "Falcon API client ID."
+  validation {
+    condition     = length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id))
+    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "falcon_client_secret" {
+  type        = string
+  sensitive   = true
+  description = "Falcon API client secret."
+  validation {
+    condition     = length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret))
+    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
+  default     = ""
+
+  validation {
+    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
+}
 
 variable "infra_project_id" {
   type        = string
@@ -19,14 +50,43 @@ variable "infra_project_id" {
   }
 }
 
+variable "registration_type" {
+  type        = string
+  description = "Type of registration: organization, folder, or project"
+  validation {
+    condition     = contains(["organization", "folder", "project"], var.registration_type)
+    error_message = "Registration type must be one of: organization, folder, project."
+  }
+}
+
+variable "organization_id" {
+  type        = string
+  description = "GCP Organization ID for organization-level registration"
+  default     = ""
+
+  validation {
+    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    error_message = "Organization ID must be exactly 12 digits when provided."
+  }
+}
+
+variable "folder_ids" {
+  type        = list(string)
+  description = "List of Google Cloud folders being registered"
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
+    ])
+    error_message = "All folder IDs must be exactly 12 digits."
+  }
+}
+
 variable "project_ids" {
   type        = list(string)
   description = "List of GCP Project IDs to register with CrowdStrike CSPM"
-
-  validation {
-    condition     = length(var.project_ids) > 0
-    error_message = "At least one project ID must be provided."
-  }
+  default     = []
 
   validation {
     condition = alltrue([
@@ -46,66 +106,10 @@ variable "role_arn" {
   }
 }
 
-variable "wif_pool_id" {
-  type        = string
-  description = "Workload Identity Federation Pool ID"
-
-  validation {
-    condition     = length(var.wif_pool_id) >= 4 && length(var.wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_id))
-    error_message = "Pool ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
-variable "wif_pool_provider_id" {
-  type        = string
-  description = "Workload Identity Federation Provider ID"
-
-  validation {
-    condition     = length(var.wif_pool_provider_id) >= 4 && length(var.wif_pool_provider_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_provider_id))
-    error_message = "Provider ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
-variable "registration_id" {
-  type        = string
-  description = "Unique registration ID for resource naming"
-
-  validation {
-    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
-    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
-# =============================================================================
-# ENVIRONMENT CONFIGURATION
-# =============================================================================
-
-variable "falcon_cloud_api_host" {
-  type        = string
-  description = "CrowdStrike Cloud API Host URL (varies by environment and region)"
-  default     = "https://api.crowdstrike.com"
-
-  validation {
-    condition     = can(regex("^https://", var.falcon_cloud_api_host))
-    error_message = "Falcon Cloud API Host must be a valid HTTPS URL."
-  }
-}
-
 variable "region" {
   type        = string
   description = "GCP region for resource deployment"
   default     = "us-central1"
-}
-
-variable "environment" {
-  type        = string
-  description = "Environment name (e.g., 'production', 'staging', 'development')"
-  default     = "production"
-
-  validation {
-    condition     = contains(["production", "staging", "development", "test"], var.environment)
-    error_message = "Environment must be one of: production, staging, development, test."
-  }
 }
 
 # =============================================================================

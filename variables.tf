@@ -1,23 +1,3 @@
-variable "falcon_client_id" {
-  type        = string
-  sensitive   = true
-  description = "Falcon API client ID."
-  validation {
-    condition     = length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id))
-    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
-  }
-}
-
-variable "falcon_client_secret" {
-  type        = string
-  sensitive   = true
-  description = "Falcon API client secret."
-  validation {
-    condition     = length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret))
-    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
-  }
-}
-
 variable "infra_project_id" {
   type        = string
   description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed"
