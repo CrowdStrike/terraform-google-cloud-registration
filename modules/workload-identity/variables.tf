@@ -34,8 +34,8 @@ variable "resource_prefix" {
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20
-    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13
+    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less. Combined with suffix, total length must not exceed 13 characters."
   }
 }
 
@@ -45,8 +45,8 @@ variable "resource_suffix" {
   default     = ""
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
-    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 13
+    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less. Combined with prefix, total length must not exceed 13 characters."
   }
 }
 
