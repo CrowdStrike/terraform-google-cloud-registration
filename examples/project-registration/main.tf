@@ -4,7 +4,7 @@
 # This example demonstrates project-level registration using the CrowdStrike
 # GCP CSPM Terraform module. Designed for deployment via GCP Infrastructure Manager.
 #
-# Infrastructure Manager will provide variables via URL parameters or 
+# Infrastructure Manager will provide variables via URL parameters or
 # deployment configuration.
 # =============================================================================
 
