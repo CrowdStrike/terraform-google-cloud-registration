@@ -29,39 +29,39 @@ module "log_ingestion" {
 
   # CrowdStrike IAM Principal (from workload-identity module output)
   wif_iam_principal = "principal://iam.googleapis.com/projects/123456789/locations/global/workloadIdentityPools/cs-wif-pool-12345/subject/arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName/unique-registration-id"
-  
+
   # CrowdStrike Infrastructure Project
   infra_project_id = "your-csmp-infrastructure-project"
-  
+
   # Registration Configuration
   registration_type = "organization"
   registration_id   = "unique-registration-id"
   organization_id   = "123456789012"
-  
+
   # Optional: Folder registration (alternative to organization)
   # registration_type = "folder"
   # folder_ids = ["123456789", "987654321"]
-  
+
   # Optional: Project registration (alternative to organization/folder)
-  # registration_type = "project"  
+  # registration_type = "project"
   # project_ids = ["project-1", "project-2"]
-  
+
   # Optional: Log Ingestion Settings
   audit_log_types                  = ["activity", "system_event", "policy"]
   message_retention_duration       = "1209600s"  # 14 days
   ack_deadline_seconds             = 300         # 5 minutes
   topic_message_retention_duration = "2592000s"  # 30 days
-  
+
   # Optional: Exclusion Filters
   exclusion_filters = [
     "resource.labels.environment=\"test\"",
     "resource.labels.temporary=\"true\""
   ]
-  
+
   # Optional: Resource Naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
-  
+
   # Optional: Resource Labels
   labels = {
     environment = "production"
@@ -75,26 +75,26 @@ module "log_ingestion" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_logging_folder_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/logging_folder_sink) | resource |
-| [google_logging_organization_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/logging_organization_sink) | resource |
-| [google_logging_project_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/logging_project_sink) | resource |
-| [google_project_iam_member.crowdstrike_monitoring_viewer](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_iam_member) | resource |
-| [google_project_service.log_ingestion_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
-| [google_pubsub_schema.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_schema) | resource |
-| [google_pubsub_subscription.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_subscription) | resource |
-| [google_pubsub_subscription_iam_member.crowdstrike_subscriber](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_subscription_iam_member) | resource |
-| [google_pubsub_topic.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_topic) | resource |
-| [google_pubsub_topic_iam_member.crowdstrike_viewer](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_topic_iam_member) | resource |
-| [google_pubsub_topic_iam_member.log_writer_folder](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_topic_iam_member) | resource |
-| [google_pubsub_topic_iam_member.log_writer_org](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_topic_iam_member) | resource |
-| [google_pubsub_topic_iam_member.log_writer_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/pubsub_topic_iam_member) | resource |
-| [google_pubsub_subscription.existing_crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/pubsub_subscription) | data source |
-| [google_pubsub_topic.existing_crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/pubsub_topic) | data source |
+| [google_logging_folder_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_folder_sink) | resource |
+| [google_logging_organization_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_organization_sink) | resource |
+| [google_logging_project_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_project_sink) | resource |
+| [google_project_iam_member.crowdstrike_monitoring_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_service.log_ingestion_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_pubsub_schema.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_schema) | resource |
+| [google_pubsub_subscription.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription) | resource |
+| [google_pubsub_subscription_iam_member.crowdstrike_subscriber](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription_iam_member) | resource |
+| [google_pubsub_topic.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic) | resource |
+| [google_pubsub_topic_iam_member.crowdstrike_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam_member) | resource |
+| [google_pubsub_topic_iam_member.log_writer_folder](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam_member) | resource |
+| [google_pubsub_topic_iam_member.log_writer_org](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam_member) | resource |
+| [google_pubsub_topic_iam_member.log_writer_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam_member) | resource |
+| [google_pubsub_subscription.existing_crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/pubsub_subscription) | data source |
+| [google_pubsub_topic.existing_crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/pubsub_topic) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
