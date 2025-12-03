@@ -12,6 +12,7 @@ This Terraform module creates and configures Google Cloud Workload Identity Fede
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -29,17 +30,17 @@ module "workload_identity" {
 
   # GCP Project Configuration
   wif_project_id = "your-csmp-infrastructure-project"
-  
+
   # Workload Identity Pool Configuration
   wif_pool_id          = "cs-wif-pool-12345"
   wif_pool_provider_id = "cs-provider-12345"
-  
+
   # CrowdStrike Role ARN
   role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
-  
+
   # Registration ID
   registration_id = "unique-registration-id"
-  
+
   # Optional: Resource Naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
@@ -50,23 +51,23 @@ module "workload_identity" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool) | resource |
-| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/iam_workload_identity_pool_provider) | resource |
-| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
-| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/resources/project_service) | resource |
-| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/project) | data source |
+| [google_iam_workload_identity_pool.main](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool) | resource |
+| [google_iam_workload_identity_pool_provider.aws](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/iam_workload_identity_pool_provider) | resource |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `null` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `null` | no |
 | <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication | `string` | n/a | yes |
 | <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool | `string` | n/a | yes |
 | <a name="input_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#input\_wif\_pool\_provider\_id) | Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider | `string` | n/a | yes |

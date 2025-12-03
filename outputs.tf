@@ -8,12 +8,12 @@
 
 output "wif_pool_id" {
   description = "The ID of the created Workload Identity Pool"
-  value       = module.workload-identity.wif_pool_id
+  value       = crowdstrike_cloud_google_registration.main.wif_pool_id
 }
 
 output "wif_pool_provider_id" {
   description = "The ID of the created Workload Identity Pool Provider"
-  value       = module.workload-identity.wif_pool_provider_id
+  value       = crowdstrike_cloud_google_registration.main.wif_provider_id
 }
 
 output "wif_iam_principal" {
@@ -37,7 +37,7 @@ output "wif_project_number" {
 
 output "registration_id" {
   description = "The unique CrowdStrike registration ID for this GCP setup"
-  value       = var.registration_id
+  value       = crowdstrike_cloud_google_registration.main.id
   sensitive   = true
 }
 

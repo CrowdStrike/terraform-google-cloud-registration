@@ -12,7 +12,7 @@ falcon_client_secret = "YOUR_CLIENT_SECRET_HERE"
 infra_project_id = "your-csmp-infrastructure-project"
 
 # REQUIRED: AWS Role ARN for Identity Federation
-# Contains the CrowdStrike AWS account ID and role name  
+# Contains the CrowdStrike AWS account ID and role name
 role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
 
 # =============================================================================

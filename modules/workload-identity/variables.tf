@@ -30,7 +30,7 @@ variable "wif_pool_provider_id" {
 
 variable "resource_prefix" {
   description = "Prefix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
   type        = string
 
   validation {
@@ -42,7 +42,7 @@ variable "resource_prefix" {
 variable "resource_suffix" {
   type        = string
   description = "Suffix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
 
   validation {
     condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20

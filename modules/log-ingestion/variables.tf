@@ -31,10 +31,10 @@ variable "registration_id" {
 variable "organization_id" {
   type        = string
   description = "The Google Cloud organization being registered"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
     error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
@@ -68,7 +68,7 @@ variable "project_ids" {
 variable "resource_prefix" {
   type        = string
   description = "Prefix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
 
   validation {
     condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20
@@ -79,7 +79,7 @@ variable "resource_prefix" {
 variable "resource_suffix" {
   type        = string
   description = "Suffix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
 
   validation {
     condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
@@ -90,10 +90,10 @@ variable "resource_suffix" {
 variable "infra_project_id" {
   type        = string
   description = "Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.infra_project_id == "" || can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.infra_project_id))
+    condition     = var.infra_project_id == null || can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.infra_project_id))
     error_message = "Project ID must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
   }
 }
@@ -165,10 +165,10 @@ variable "enable_schema_validation" {
 variable "schema_definition" {
   type        = string
   description = "Avro or Protocol Buffer schema definition (required if enable_schema_validation is true)"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.schema_definition == "" || length(var.schema_definition) > 0
+    condition     = var.schema_definition == null || length(var.schema_definition) > 0
     error_message = "Schema definition must be valid when provided."
   }
 }
@@ -187,13 +187,13 @@ variable "schema_type" {
 variable "existing_topic_name" {
   type        = string
   description = "Name of existing Pub/Sub topic to use. If empty, creates new topic"
-  default     = ""
+  default     = null
 }
 
 variable "existing_subscription_name" {
   type        = string
   description = "Name of existing Pub/Sub subscription to use. If empty, creates new subscription"
-  default     = ""
+  default     = null
 }
 
 variable "labels" {

@@ -38,6 +38,7 @@ Before using this module, ensure you have:
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -56,20 +57,20 @@ module "crowdstrike_gcp_registration" {
   # CrowdStrike API Configuration
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
-  
+
   # GCP Infrastructure Project
   infra_project_id = "your-csmp-infrastructure-project"
-  
+
   # Registration Scope - Organization Level
   registration_type = "organization"
   organization_id   = "123456789012"
-  
+
   # CrowdStrike Role ARN
   role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
-  
+
   # Optional: Enable Real Time Visibility & Detection
   enable_realtime_visibility = true
-  
+
   # Optional: Log Ingestion Configuration
   log_ingestion_settings = {
     message_retention_duration       = "1209600s"  # 14 days
@@ -81,15 +82,15 @@ module "crowdstrike_gcp_registration" {
       "resource.labels.temporary=\"true\""
     ]
   }
-  
+
   # Optional: Resource Naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
-  
+
   # Optional: Resource Labels
   labels = {
     environment = "production"
-    project     = "crowdstrike-integration" 
+    project     = "crowdstrike-integration"
     cstagvendor = "crowdstrike"
   }
 }
@@ -97,10 +98,15 @@ module "crowdstrike_gcp_registration" {
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.49 |
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
+| [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_logging_settings) | resource |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -109,17 +115,14 @@ No resources.
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
-| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string, "")<br/>    existing_topic_name              = optional(string, "")<br/>    existing_subscription_name       = optional(string, "")<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `""` | no |
+| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string)<br/>    existing_topic_name              = optional(string)<br/>    existing_subscription_name       = optional(string)<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
-| <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API, used for resource naming | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `null` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `null` | no |
 | <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication | `string` | n/a | yes |
-| <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool | `string` | n/a | yes |
-| <a name="input_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#input\_wif\_pool\_provider\_id) | Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider | `string` | n/a | yes |
-| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `""` | no |
+| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `null` | no |
 ## Outputs
 
 | Name | Description |

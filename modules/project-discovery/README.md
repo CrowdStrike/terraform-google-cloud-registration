@@ -12,6 +12,7 @@ This Terraform module discovers Google Cloud projects for CrowdStrike's Cloud Se
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -30,11 +31,11 @@ module "project_discovery" {
   # Registration Scope - Organization Level
   registration_type = "organization"
   organization_id   = "123456789012"
-  
+
   # Optional: Folder registration (alternative to organization)
   # registration_type = "folder"
   # folder_ids = ["123456789", "987654321"]
-  
+
   # Optional: Project registration (alternative to organization/folder)
   # registration_type = "project"
   # project_ids = ["project-1", "project-2", "project-3"]
@@ -45,19 +46,19 @@ module "project_discovery" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 5.45.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
-| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/5.45.0/docs/data-sources/projects) | data source |
+| [google_projects.folder_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
+| [google_projects.org_projects](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/projects) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `""` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
 ## Outputs
