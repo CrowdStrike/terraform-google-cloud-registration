@@ -1,10 +1,12 @@
 locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
+  effective_prefix         = coalesce(var.resource_prefix, "")
+  effective_suffix         = coalesce(var.resource_suffix, "")
 }
 
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name              = "${var.resource_prefix}gcp-registration${var.resource_suffix}"
+  name              = "${local.effective_prefix}gcp-registration${local.effective_suffix}"
   infra_project     = var.infra_project_id
   wif_project       = local.effective_wif_project_id
   deployment_method = "terraform-native"
@@ -34,8 +36,8 @@ module "workload-identity" {
   wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
   role_arn             = var.role_arn
   registration_id      = crowdstrike_cloud_google_registration.main.id
-  resource_prefix      = var.resource_prefix
-  resource_suffix      = var.resource_suffix
+  resource_prefix      = local.effective_prefix
+  resource_suffix      = local.effective_suffix
 }
 module "project-discovery" {
   source = "./modules/project-discovery/"
@@ -70,8 +72,8 @@ module "log-ingestion" {
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
   infra_project_id  = local.effective_wif_project_id
-  resource_prefix   = var.resource_prefix
-  resource_suffix   = var.resource_suffix
+  resource_prefix   = local.effective_prefix
+  resource_suffix   = local.effective_suffix
   labels            = var.labels
 
   # Optional settings - structured configuration, child module handles defaults
