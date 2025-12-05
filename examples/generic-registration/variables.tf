@@ -50,6 +50,11 @@ variable "infra_project_id" {
   }
 }
 
+variable "registration_name" {
+  type        = string
+  description = "Name for the CrowdStrike GCP registration"
+}
+
 variable "registration_type" {
   type        = string
   description = "Type of registration: organization, folder, or project"
@@ -120,67 +125,6 @@ variable "enable_realtime_visibility" {
   type        = bool
   description = "Enable Real Time Visibility & Detection features (requires log ingestion setup)"
   default     = false
-}
-
-# =============================================================================
-# LOG INGESTION SETTINGS (RTV&D)
-# =============================================================================
-
-variable "log_retention_duration" {
-  type        = string
-  description = "Message retention duration for Pub/Sub subscription (e.g., '1209600s' for 14 days)"
-  default     = "1209600s"
-
-  validation {
-    condition     = can(regex("^[0-9]+s$", var.log_retention_duration))
-    error_message = "Retention duration must be in seconds format (e.g., '604800s')."
-  }
-}
-
-variable "log_ack_deadline" {
-  type        = number
-  description = "Message acknowledgment deadline in seconds for Pub/Sub subscription"
-  default     = 300
-
-  validation {
-    condition     = var.log_ack_deadline >= 10 && var.log_ack_deadline <= 600
-    error_message = "Ack deadline must be between 10 and 600 seconds."
-  }
-}
-
-variable "topic_retention_duration" {
-  type        = string
-  description = "Message retention duration for Pub/Sub topic (e.g., '2592000s' for 30 days)"
-  default     = "2592000s"
-
-  validation {
-    condition     = can(regex("^[0-9]+s$", var.topic_retention_duration))
-    error_message = "Topic retention duration must be in seconds format (e.g., '2592000s')."
-  }
-}
-
-variable "audit_log_types" {
-  type        = list(string)
-  description = "List of audit log types to collect (activity, system_event, policy, data_access)"
-  default     = ["activity", "system_event", "policy"]
-
-  validation {
-    condition = alltrue([
-      for log_type in var.audit_log_types : contains(["activity", "system_event", "policy", "data_access"], log_type)
-    ])
-    error_message = "Audit log types must be from: activity, system_event, policy, data_access."
-  }
-}
-
-variable "log_exclusion_filters" {
-  type        = list(string)
-  description = "List of exclusion filter expressions to exclude specific resources from log collection"
-  default     = []
-
-  validation {
-    condition     = length(var.log_exclusion_filters) <= 50
-    error_message = "Maximum of 50 exclusion filters allowed."
-  }
 }
 
 # =============================================================================
