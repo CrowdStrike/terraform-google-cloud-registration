@@ -301,4 +301,4 @@ fi
 
 echo
 echo "=== Setup Complete ==="
-echo "Service Account: $SERVICE_ACCOUNT_EMAIL"
+echo "Service Account: projects/${INFRA_PROJECT_ID}/serviceAccounts/${SERVICE_ACCOUNT_EMAIL}"
