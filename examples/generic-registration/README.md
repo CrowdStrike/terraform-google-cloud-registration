@@ -1,16 +1,17 @@
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
-| <a name="requirement_crowdstrike"></a> [crowdstrike](#requirement\_crowdstrike) | >=0.0.49 |
+| <a name="requirement_crowdstrike"></a> [crowdstrike](#requirement\_crowdstrike) | ~> 0.0.50 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.49 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.50 |
 
 ## Modules
 
@@ -25,32 +26,28 @@
 
 | Name | Type |
 |------|------|
-| [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/0.0.49/docs/resources/cloud_google_registration) | resource |
-| [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/0.0.49/docs/resources/cloud_google_registration_logging_settings) | resource |
+| [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
+| [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_logging_settings) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_audit_log_types"></a> [audit\_log\_types](#input\_audit\_log\_types) | List of audit log types to collect (activity, system\_event, policy, data\_access) | `list(string)` | <pre>[<br/>  "activity",<br/>  "system_event",<br/>  "policy"<br/>]</pre> | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility & Detection features (requires log ingestion setup) | `bool` | `false` | no |
 | <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. | `string` | n/a | yes |
 | <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. | `string` | n/a | yes |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | GCP Project ID where CrowdStrike infrastructure will be created (WIF pools, Pub/Sub topics, etc.) | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | Labels to apply to all created resources | `map(string)` | `{}` | no |
-| <a name="input_log_ack_deadline"></a> [log\_ack\_deadline](#input\_log\_ack\_deadline) | Message acknowledgment deadline in seconds for Pub/Sub subscription | `number` | `300` | no |
-| <a name="input_log_exclusion_filters"></a> [log\_exclusion\_filters](#input\_log\_exclusion\_filters) | List of exclusion filter expressions to exclude specific resources from log collection | `list(string)` | `[]` | no |
-| <a name="input_log_retention_duration"></a> [log\_retention\_duration](#input\_log\_retention\_duration) | Message retention duration for Pub/Sub subscription (e.g., '1209600s' for 14 days) | `string` | `"1209600s"` | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `""` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of GCP Project IDs to register with CrowdStrike CSPM | `list(string)` | `[]` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region for resource deployment | `string` | `"us-central1"` | no |
+| <a name="input_registration_name"></a> [registration\_name](#input\_registration\_name) | Name for the CrowdStrike GCP registration | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix for resource names (helps with organization and identification) | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix for resource names (helps with organization and identification) | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix for resource names (helps with organization and identification) | `string` | `null` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix for resource names (helps with organization and identification) | `string` | `null` | no |
 | <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS IAM Role ARN for CrowdStrike identity federation | `string` | n/a | yes |
-| <a name="input_topic_retention_duration"></a> [topic\_retention\_duration](#input\_topic\_retention\_duration) | Message retention duration for Pub/Sub topic (e.g., '2592000s' for 30 days) | `string` | `"2592000s"` | no |
-| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `""` | no |
+| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `null` | no |
 
 ## Outputs
 
@@ -75,3 +72,4 @@
 | <a name="output_wif_pool_provider_id"></a> [wif\_pool\_provider\_id](#output\_wif\_pool\_provider\_id) | The ID of the created Workload Identity Pool Provider |
 | <a name="output_wif_project_id"></a> [wif\_project\_id](#output\_wif\_project\_id) | The GCP Project ID where Workload Identity resources were created |
 | <a name="output_wif_project_number"></a> [wif\_project\_number](#output\_wif\_project\_number) | The GCP Project Number for the Workload Identity project |
+<!-- END_TF_DOCS -->
