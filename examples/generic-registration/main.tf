@@ -15,7 +15,6 @@
 
 provider "google" {
   project = var.infra_project_id
-  region  = var.region
 }
 
 provider "crowdstrike" {
@@ -36,7 +35,7 @@ locals {
 # =============================================================================
 
 resource "crowdstrike_cloud_google_registration" "main" {
-  name              = "${var.resource_prefix}gcp-registration${var.resource_suffix}"
+  name              = var.registration_name
   projects          = var.registration_type == "project" ? var.project_ids : null
   folders           = var.registration_type == "folder" ? var.folder_ids : null
   organization      = var.registration_type == "organization" ? var.organization_id : null
@@ -106,14 +105,6 @@ module "log-ingestion" {
   resource_suffix   = var.resource_suffix
   labels            = var.labels
 
-  message_retention_duration       = var.log_retention_duration
-  ack_deadline_seconds             = var.log_ack_deadline
-  topic_message_retention_duration = var.topic_retention_duration
-  audit_log_types                  = var.audit_log_types
-  enable_schema_validation         = false
-  schema_type                      = "AVRO"
-  exclusion_filters                = var.log_exclusion_filters
-
   depends_on = [module.workload-identity]
 }
 
@@ -125,9 +116,9 @@ resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
   wif_project                     = local.effective_wif_project_id
   wif_project_number              = module.workload-identity.wif_project_number
-  log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_id, "")
-  log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_id, "")
-  log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], "")
+  log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
+  log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
+  log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
 
   depends_on = [
     crowdstrike_cloud_google_registration.main,

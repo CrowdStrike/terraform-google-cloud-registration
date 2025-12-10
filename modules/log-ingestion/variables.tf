@@ -71,7 +71,7 @@ variable "resource_prefix" {
   default     = null
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20
+    condition     = var.resource_prefix == null || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20)
     error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
   }
 }
@@ -82,7 +82,7 @@ variable "resource_suffix" {
   default     = null
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20
+    condition     = var.resource_suffix == null || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20)
     error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
   }
 }
@@ -168,7 +168,7 @@ variable "schema_definition" {
   default     = null
 
   validation {
-    condition     = var.schema_definition == null || length(var.schema_definition) > 0
+    condition     = var.schema_definition == null || try(length(var.schema_definition), 0) > 0
     error_message = "Schema definition must be valid when provided."
   }
 }
