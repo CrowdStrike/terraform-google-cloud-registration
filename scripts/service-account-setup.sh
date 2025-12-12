@@ -181,24 +181,14 @@ PROJECT_ROLES=(
     "roles/iam.workloadIdentityPoolAdmin"
 )
 
-# Add registration-type specific project roles
-case $REGISTRATION_TYPE in
-    "project")
-        PROJECT_ROLES+=(
-            "roles/browser"
-            "roles/resourcemanager.projectIamAdmin"
-            "roles/serviceusage.serviceUsageAdmin"
-        )
-        ;;
-    "folder")
-        PROJECT_ROLES+=(
-            "roles/serviceusage.serviceUsageAdmin"
-        )
-        ;;
-    "organization")
-        # No additional project roles for org registration
-        ;;
-esac
+# Add project-specific roles for project registration
+if [[ "$REGISTRATION_TYPE" == "project" ]]; then
+    PROJECT_ROLES+=(
+        "roles/browser"
+        "roles/resourcemanager.projectIamAdmin"
+        "roles/serviceusage.serviceUsageAdmin"
+    )
+fi
 
 # Add RTV&D project roles if enabled
 if [[ "$ENABLE_RTVD" == true ]]; then
@@ -236,6 +226,7 @@ if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
     FOLDER_ROLES=(
         "roles/browser"
         "roles/resourcemanager.folderIamAdmin"
+        "roles/serviceusage.serviceUsageAdmin"
     )
 
     # Add RTV&D folder roles
