@@ -17,6 +17,11 @@ provider "google" {
   project = var.infra_project_id
 }
 
+provider "google" {
+  alias   = "wif"
+  project = local.effective_wif_project_id
+}
+
 provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = var.falcon_client_secret
@@ -67,6 +72,10 @@ module "workload-identity" {
   registration_id      = crowdstrike_cloud_google_registration.main.id
   resource_prefix      = var.resource_prefix
   resource_suffix      = var.resource_suffix
+
+  providers = {
+    google = google.wif
+  }
 }
 
 module "project-discovery" {
@@ -100,7 +109,7 @@ module "log-ingestion" {
   organization_id   = var.organization_id
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
-  infra_project_id  = local.effective_wif_project_id
+  infra_project_id  = var.infra_project_id
   resource_prefix   = var.resource_prefix
   resource_suffix   = var.resource_suffix
   labels            = var.labels
