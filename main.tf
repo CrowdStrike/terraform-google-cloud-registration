@@ -1,7 +1,7 @@
 locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
-  effective_prefix         = coalesce(var.resource_prefix, "")
-  effective_suffix         = coalesce(var.resource_suffix, "")
+  effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
+  effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
 }
 
 # CrowdStrike GCP registration resource
