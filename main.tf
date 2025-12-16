@@ -1,7 +1,7 @@
 locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
-  effective_prefix         = coalesce(var.resource_prefix, "")
-  effective_suffix         = coalesce(var.resource_suffix, "")
+  effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
+  effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
 }
 
 # CrowdStrike GCP registration resource
@@ -71,7 +71,7 @@ module "log-ingestion" {
   organization_id   = var.organization_id
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
-  infra_project_id  = local.effective_wif_project_id
+  infra_project_id  = var.infra_project_id
   resource_prefix   = local.effective_prefix
   resource_suffix   = local.effective_suffix
   labels            = var.labels
