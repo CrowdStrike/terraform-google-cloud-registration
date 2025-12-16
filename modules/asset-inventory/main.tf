@@ -29,7 +29,7 @@ resource "google_folder_iam_member" "crowdstrike_folder" {
 resource "google_project_iam_member" "crowdstrike_project" {
   for_each = toset([
     for pair in setproduct(
-      var.discovered_projects,
+      var.registration_type == "project" ? var.discovered_projects : [],
       var.google_iam_roles
     ) : "${pair[0]}::${pair[1]}"
   ])

@@ -12,6 +12,7 @@ This Terraform module discovers Google Cloud projects for CrowdStrike's Cloud Se
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -57,7 +58,7 @@ module "project_discovery" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `""` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
 ## Outputs

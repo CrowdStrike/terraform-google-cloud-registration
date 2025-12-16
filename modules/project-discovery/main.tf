@@ -3,7 +3,7 @@ locals {
   project_list = var.project_ids
 
   # Discover projects for organization registration
-  discovered_org_projects = var.registration_type == "organization" && var.organization_id != "" ? try([for project in data.google_projects.org_projects[0].projects : project.project_id], []) : []
+  discovered_org_projects = var.registration_type == "organization" && var.organization_id != null ? try([for project in data.google_projects.org_projects[0].projects : project.project_id], []) : []
 
   # Discover projects for folder registration
   discovered_folder_projects = var.registration_type == "folder" ? flatten([
@@ -20,7 +20,7 @@ locals {
 
 # Discover all projects in organization
 data "google_projects" "org_projects" {
-  count  = var.registration_type == "organization" && var.organization_id != "" ? 1 : 0
+  count  = var.registration_type == "organization" && var.organization_id != null ? 1 : 0
   filter = "parent.id:${var.organization_id} parent.type:organization lifecycleState:ACTIVE"
 }
 

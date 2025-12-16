@@ -25,10 +25,10 @@ variable "registration_type" {
 variable "organization_id" {
   type        = string
   description = "The Google Cloud organization being registered"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
     error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }

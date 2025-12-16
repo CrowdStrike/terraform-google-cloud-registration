@@ -11,53 +11,33 @@ variable "infra_project_id" {
 variable "wif_project_id" {
   type        = string
   description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.wif_project_id == "" || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
+    condition     = var.wif_project_id == null || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
 
 variable "resource_prefix" {
   description = "Prefix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
   type        = string
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13
-    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less. Combined with suffix, total length must not exceed 13 characters."
+    condition     = var.resource_prefix == null || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13)
+    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less."
   }
 }
 
 variable "resource_suffix" {
   type        = string
   description = "Suffix to be added to all created resource names for identification"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 13
-    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less. Combined with prefix, total length must not exceed 13 characters."
-  }
-}
-
-variable "wif_pool_id" {
-  type        = string
-  description = "Google Cloud Workload Identity Federation Pool ID that is used to identify a CrowdStrike identity pool"
-
-  validation {
-    condition     = length(var.wif_pool_id) >= 4 && length(var.wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_id))
-    error_message = "Pool ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
-variable "wif_pool_provider_id" {
-  type        = string
-  description = "Google Cloud Workload Identity Federation Provider ID that is used to identify the CrowdStrike provider"
-
-  validation {
-    condition     = length(var.wif_pool_provider_id) >= 4 && length(var.wif_pool_provider_id) <= 32 && can(regex("^[a-z0-9-]+$", var.wif_pool_provider_id))
-    error_message = "Provider ID must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
+    condition     = var.resource_suffix == null || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 13)
+    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 13 characters or less."
   }
 }
 
@@ -80,23 +60,13 @@ variable "registration_type" {
   }
 }
 
-variable "registration_id" {
-  type        = string
-  description = "Unique registration ID returned by CrowdStrike Registration API, used for resource naming"
-
-  validation {
-    condition     = length(var.registration_id) > 0 && can(regex("^[a-z0-9-]+$", var.registration_id))
-    error_message = "Registration ID must be non-empty and contain only lowercase letters, numbers, and hyphens."
-  }
-}
-
 variable "organization_id" {
   type        = string
   description = "GCP Organization ID for organization-level registration"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.organization_id == "" || can(regex("^[0-9]{12}$", var.organization_id))
+    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
     error_message = "Organization ID must be exactly 12 digits when provided."
   }
 }
@@ -168,9 +138,9 @@ variable "log_ingestion_settings" {
     topic_storage_regions            = optional(list(string), [])
     enable_schema_validation         = optional(bool, false)
     schema_type                      = optional(string, "AVRO")
-    schema_definition                = optional(string, "")
-    existing_topic_name              = optional(string, "")
-    existing_subscription_name       = optional(string, "")
+    schema_definition                = optional(string)
+    existing_topic_name              = optional(string)
+    existing_subscription_name       = optional(string)
     exclusion_filters                = optional(list(string), [])
   })
   default = {}

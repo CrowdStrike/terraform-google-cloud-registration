@@ -1,5 +1,5 @@
 # =============================================================================
-# Outputs for CrowdStrike GCP CSPM Project Registration
+# Outputs for CrowdStrike GCP CSPM Generic Registration
 # =============================================================================
 # These outputs provide important information about the created resources
 # and can be used by GCP Infrastructure Manager for monitoring and integration.
@@ -11,27 +11,27 @@
 
 output "wif_pool_id" {
   description = "The ID of the created Workload Identity Pool"
-  value       = module.crowdstrike_gcp_registration.wif_pool_id
+  value       = crowdstrike_cloud_google_registration.main.wif_pool_id
 }
 
 output "wif_pool_provider_id" {
   description = "The ID of the created Workload Identity Pool Provider"
-  value       = module.crowdstrike_gcp_registration.wif_pool_provider_id
+  value       = crowdstrike_cloud_google_registration.main.wif_provider_id
 }
 
 output "wif_iam_principal" {
   description = "The IAM principal that CrowdStrike uses to access GCP resources"
-  value       = module.crowdstrike_gcp_registration.wif_iam_principal
+  value       = module.workload-identity.wif_iam_principal
 }
 
 output "wif_project_id" {
   description = "The GCP Project ID where Workload Identity resources were created"
-  value       = module.crowdstrike_gcp_registration.wif_project_id
+  value       = module.workload-identity.wif_project_id
 }
 
 output "wif_project_number" {
   description = "The GCP Project Number for the Workload Identity project"
-  value       = module.crowdstrike_gcp_registration.wif_project_number
+  value       = module.workload-identity.wif_project_number
 }
 
 # =============================================================================
@@ -40,13 +40,13 @@ output "wif_project_number" {
 
 output "registration_id" {
   description = "The unique CrowdStrike registration ID for this GCP setup"
-  value       = module.crowdstrike_gcp_registration.registration_id
+  value       = crowdstrike_cloud_google_registration.main.id
   sensitive   = true
 }
 
 output "registration_type" {
   description = "The type of registration (project, folder, or organization)"
-  value       = "project"
+  value       = var.registration_type
 }
 
 output "registered_project_ids" {
@@ -56,7 +56,7 @@ output "registered_project_ids" {
 
 output "discovered_projects" {
   description = "Detailed information about discovered and registered projects"
-  value       = module.crowdstrike_gcp_registration.discovered_projects
+  value       = module.project-discovery.discovered_projects
 }
 
 # =============================================================================
@@ -70,17 +70,17 @@ output "log_ingestion_enabled" {
 
 output "pubsub_topic_id" {
   description = "The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_topic_id : null
+  value       = var.enable_realtime_visibility ? module.log-ingestion[0].pubsub_topic_id : null
 }
 
 output "pubsub_subscription_id" {
   description = "The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_subscription_id : null
+  value       = var.enable_realtime_visibility ? module.log-ingestion[0].subscription_id : null
 }
 
 output "log_sink_names" {
   description = "Names of the created log sinks (if RTV&D enabled)"
-  value       = var.enable_realtime_visibility ? module.crowdstrike_gcp_registration.log_sink_names : null
+  value       = var.enable_realtime_visibility ? module.log-ingestion[0].log_sink_names : null
 }
 
 # =============================================================================
@@ -97,18 +97,9 @@ output "region" {
   value       = var.region
 }
 
-output "environment" {
-  description = "The environment name for this deployment"
-  value       = var.environment
-}
-
 output "resource_labels" {
   description = "Labels applied to all created resources"
-  value = merge(var.labels, {
-    managed-by  = "infrastructure-manager"
-    module      = "crowdstrike-cspm"
-    environment = var.environment
-  })
+  value       = var.labels
 }
 
 # =============================================================================
@@ -124,7 +115,7 @@ output "module_version" {
   description = "Version information for tracking deployments"
   value = {
     deployment_date   = timestamp()
-    registration_type = "project"
+    registration_type = var.registration_type
     rtv_enabled       = var.enable_realtime_visibility
   }
 }
@@ -132,11 +123,6 @@ output "module_version" {
 # =============================================================================
 # INTEGRATION OUTPUTS
 # =============================================================================
-
-output "falcon_api_host" {
-  description = "The CrowdStrike Falcon API host used for this deployment"
-  value       = var.falcon_cloud_api_host
-}
 
 output "aws_integration" {
   description = "AWS integration details for CrowdStrike identity federation"
