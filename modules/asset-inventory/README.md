@@ -12,6 +12,7 @@ This Terraform module configures Google Cloud IAM permissions required for Crowd
 ```hcl
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -71,7 +72,7 @@ module "asset_inventory" {
 | <a name="input_discovered_projects"></a> [discovered\_projects](#input\_discovered\_projects) | List of all discovered projects where APIs will be enabled | `list(string)` | n/a | yes |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_google_iam_roles"></a> [google\_iam\_roles](#input\_google\_iam\_roles) | List of Google Cloud IAM roles that will be granted to the wif\_iam\_principal identity for asset inventory access | `list(string)` | <pre>[<br/>  "roles/browser",<br/>  "roles/cloudasset.viewer",<br/>  "roles/aiplatform.viewer",<br/>  "roles/alloydb.viewer",<br/>  "roles/apigee.readOnlyAdmin",<br/>  "roles/appengine.appViewer",<br/>  "roles/cloudtasks.viewer",<br/>  "roles/compute.viewer",<br/>  "roles/dataplex.viewer",<br/>  "roles/essentialcontacts.viewer",<br/>  "roles/firebaseappcheck.viewer",<br/>  "roles/firebaseauth.viewer",<br/>  "roles/firebasedatabase.viewer",<br/>  "roles/firebasehosting.viewer",<br/>  "roles/firebasestorage.viewer",<br/>  "roles/notebooks.viewer",<br/>  "roles/recommender.iampolicychangeriskViewer",<br/>  "roles/recommender.iamViewer",<br/>  "roles/securitycenter.adminViewer",<br/>  "roles/cloudfunctions.developer"<br/>]</pre> | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `""` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `null` | no |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | The scope of the Google Cloud registration which can be one of the following values: organization, folder, project | `string` | n/a | yes |
 | <a name="input_wif_iam_principal"></a> [wif\_iam\_principal](#input\_wif\_iam\_principal) | Google Cloud IAM Principal that identifies CrowdStrike resources | `string` | n/a | yes |
 ## Outputs

@@ -3,13 +3,13 @@ locals {
   project_list = var.project_ids
 
   # Generate resource names with prefix/suffix or use existing names
-  topic_name        = var.existing_topic_name != "" ? var.existing_topic_name : "${var.resource_prefix}CrowdStrikeLogTopic-${var.registration_id}${var.resource_suffix}"
-  subscription_name = var.existing_subscription_name != "" ? var.existing_subscription_name : "${var.resource_prefix}CrowdStrikeLogSubscription-${var.registration_id}${var.resource_suffix}"
+  topic_name        = var.existing_topic_name != null ? var.existing_topic_name : "${var.resource_prefix}CrowdStrikeLogTopic-${var.registration_id}${var.resource_suffix}"
+  subscription_name = var.existing_subscription_name != null ? var.existing_subscription_name : "${var.resource_prefix}CrowdStrikeLogSubscription-${var.registration_id}${var.resource_suffix}"
   sink_name         = "${var.resource_prefix}CrowdStrikeLogSink${var.resource_suffix}"
 
   # Determine if creating new resources
-  create_topic        = var.existing_topic_name == ""
-  create_subscription = var.existing_subscription_name == ""
+  create_topic        = var.existing_topic_name == null
+  create_subscription = var.existing_subscription_name == null
 
   # Build log filter for specific audit log types
   log_filter = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" AND (${join(" OR ", [

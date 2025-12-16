@@ -35,7 +35,7 @@ jobs:
       matrix:
         path:
           - "."
-          - "examples/project-registration"
+          - "examples/generic-registration"
           - "modules/asset-inventory"
           - "modules/log-ingestion"
           - "modules/project-discovery"

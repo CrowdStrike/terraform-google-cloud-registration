@@ -10,10 +10,10 @@ variable "registration_type" {
 variable "organization_id" {
   type        = string
   description = "GCP Organization ID for organization-level registration"
-  default     = ""
+  default     = null
 
   validation {
-    condition     = var.organization_id == "" || can(regex("^[1-9][0-9]*$", var.organization_id))
+    condition     = var.organization_id == null || can(regex("^[1-9][0-9]*$", var.organization_id))
     error_message = "Organization ID must be a numeric string without leading zeros when provided."
   }
 }
