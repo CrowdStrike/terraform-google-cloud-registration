@@ -1,5 +1,8 @@
 # =============================================================================
-# CrowdStrike GCP CSPM Module Registration Example
+# CrowdStrike GCP CSPM Native Terraform Example
+# =============================================================================
+# This example demonstrates how to deploy the CrowdStrike GCP CSPM Terraform
+# module using standard Terraform CLI.
 # =============================================================================
 
 # =============================================================================

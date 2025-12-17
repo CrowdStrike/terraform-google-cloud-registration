@@ -1,12 +1,8 @@
 # =============================================================================
-# CrowdStrike GCP CSPM Universal Registration Example
+# CrowdStrike GCP CSPM Infrastructure Manager Example
 # =============================================================================
-# This example demonstrates universal registration using the CrowdStrike
-# GCP CSPM Terraform module. Works for project, folder, and organization
-# level registration. Designed for deployment via GCP Infrastructure Manager.
-#
-# Infrastructure Manager will provide variables via URL parameters or
-# deployment configuration.
+# This example demonstrates how to deploy the CrowdStrike GCP CSPM Terraform
+# module using GCP Infrastructure Manager.
 # =============================================================================
 
 # =============================================================================
