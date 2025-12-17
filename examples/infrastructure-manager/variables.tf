@@ -149,7 +149,7 @@ variable "resource_prefix" {
   default     = null
 
   validation {
-    condition     = var.resource_prefix == null || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20)
+    condition     = var.resource_prefix == null || var.resource_prefix == "" || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20)
     error_message = "Resource prefix must contain only lowercase letters, numbers, hyphens, and be 20 characters or less."
   }
 }
@@ -160,7 +160,7 @@ variable "resource_suffix" {
   default     = null
 
   validation {
-    condition     = var.resource_suffix == null || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20)
+    condition     = var.resource_suffix == null || var.resource_suffix == "" || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20)
     error_message = "Resource suffix must contain only lowercase letters, numbers, hyphens, and be 20 characters or less."
   }
 }

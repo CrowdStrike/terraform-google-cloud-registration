@@ -35,18 +35,25 @@ locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
 }
 
+# Data source to get WIF project information
+data "google_project" "wif_project" {
+  provider   = google.wif
+  project_id = local.effective_wif_project_id
+}
+
 # =============================================================================
 # CrowdStrike GCP Registration
 # =============================================================================
 
 resource "crowdstrike_cloud_google_registration" "main" {
-  name              = var.registration_name
-  projects          = var.registration_type == "project" ? var.project_ids : null
-  folders           = var.registration_type == "folder" ? var.folder_ids : null
-  organization      = var.registration_type == "organization" ? var.organization_id : null
-  infra_project     = var.infra_project_id
-  wif_project       = local.effective_wif_project_id
-  deployment_method = "terraform-native"
+  name               = var.registration_name
+  projects           = var.registration_type == "project" ? var.project_ids : null
+  folders            = var.registration_type == "folder" ? var.folder_ids : null
+  organization       = var.registration_type == "organization" ? var.organization_id : null
+  infra_project      = var.infra_project_id
+  wif_project        = local.effective_wif_project_id
+  wif_project_number = data.google_project.wif_project.number
+  deployment_method  = "terraform-native"
 
   resource_name_prefix = var.resource_prefix != "" ? var.resource_prefix : null
   resource_name_suffix = var.resource_suffix != "" ? var.resource_suffix : null
@@ -123,8 +130,6 @@ module "log-ingestion" {
 
 resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
-  wif_project                     = local.effective_wif_project_id
-  wif_project_number              = module.workload-identity.wif_project_number
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
