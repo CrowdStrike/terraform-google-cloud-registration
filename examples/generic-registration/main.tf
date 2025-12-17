@@ -24,7 +24,18 @@ provider "google" {
 
 provider "crowdstrike" {
   client_id     = var.falcon_client_id
-  client_secret = var.falcon_client_secret
+  client_secret = local.falcon_client_secret
+}
+
+# =============================================================================
+# Data Sources for Secret Management
+# =============================================================================
+
+# Retrieve the Falcon client secret from Secret Manager if not provided directly
+data "google_secret_manager_secret_version" "falcon_client_secret" {
+  count   = var.falcon_client_secret == null ? 1 : 0
+  secret  = var.falcon_client_secret_name
+  project = var.infra_project_id
 }
 
 # =============================================================================
@@ -33,6 +44,7 @@ provider "crowdstrike" {
 
 locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
+  falcon_client_secret     = var.falcon_client_secret != null ? var.falcon_client_secret : data.google_secret_manager_secret_version.falcon_client_secret[0].secret_data
 }
 
 # =============================================================================

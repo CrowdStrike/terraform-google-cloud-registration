@@ -22,11 +22,18 @@ variable "falcon_client_id" {
 variable "falcon_client_secret" {
   type        = string
   sensitive   = true
-  description = "Falcon API client secret."
+  description = "Falcon API client secret. If not provided, will be retrieved from Secret Manager."
+  default     = null
   validation {
-    condition     = length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret))
+    condition     = var.falcon_client_secret == null ? true : (can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)) && length(var.falcon_client_secret) == 40)
     error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
+}
+
+variable "falcon_client_secret_name" {
+  type        = string
+  description = "Name of the Secret Manager secret containing the Falcon API client secret"
+  default     = "crowdstrike-falcon-client-secret"
 }
 
 variable "wif_project_id" {
