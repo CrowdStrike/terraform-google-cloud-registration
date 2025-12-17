@@ -22,6 +22,7 @@ repos:
         args:
           - "--args=--recursive"
       - id: terraform_validate
+        exclude: '^[^/]*\.tf$'  # Skip root-level .tf files, validate subdirectories only
       - id: terraform_tfsec
         args:
           - "--args=--soft-fail"

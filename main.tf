@@ -4,12 +4,18 @@ locals {
   effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
 }
 
+# Data source to get WIF project information
+data "google_project" "wif_project" {
+  provider   = google.wif
+  project_id = local.effective_wif_project_id
+}
+
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name              = "${local.effective_prefix}gcp-registration${local.effective_suffix}"
+  name              = var.registration_name
   infra_project     = var.infra_project_id
   wif_project       = local.effective_wif_project_id
-  deployment_method = "terraform-native"
+  deployment_method = var.deployment_method
 
   # Set the appropriate registration scope
   projects     = var.registration_type == "project" ? var.project_ids : null
@@ -24,9 +30,9 @@ resource "crowdstrike_cloud_google_registration" "main" {
   labels = var.labels
 
   # Enable realtime visibility if requested
-  realtime_visibility = var.enable_realtime_visibility ? {
-    enabled = true
-  } : null
+  realtime_visibility = {
+    enabled = var.enable_realtime_visibility
+  }
 }
 
 module "workload-identity" {
@@ -38,6 +44,10 @@ module "workload-identity" {
   registration_id      = crowdstrike_cloud_google_registration.main.id
   resource_prefix      = local.effective_prefix
   resource_suffix      = local.effective_suffix
+
+  providers = {
+    google = google.wif
+  }
 }
 module "project-discovery" {
   source = "./modules/project-discovery/"
@@ -96,10 +106,10 @@ module "log-ingestion" {
 resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
   wif_project                     = local.effective_wif_project_id
-  wif_project_number              = module.workload-identity.wif_project_number
-  log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_id, "")
-  log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_id, "")
-  log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], "")
+  wif_project_number              = data.google_project.wif_project.number
+  log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
+  log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
+  log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
 
   depends_on = [
     crowdstrike_cloud_google_registration.main,
