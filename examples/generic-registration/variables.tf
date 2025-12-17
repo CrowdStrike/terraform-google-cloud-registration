@@ -64,6 +64,17 @@ variable "registration_type" {
   }
 }
 
+variable "deployment_method" {
+  type        = string
+  description = "Deployment method for the CrowdStrike GCP registration"
+  default     = "terraform-native"
+
+  validation {
+    condition     = contains(["terraform-native", "infrastructure-manager"], var.deployment_method)
+    error_message = "Deployment method must be one of: terraform-native, infrastructure-manager."
+  }
+}
+
 variable "organization_id" {
   type        = string
   description = "GCP Organization ID for organization-level registration"

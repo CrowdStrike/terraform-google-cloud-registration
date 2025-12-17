@@ -51,12 +51,28 @@ variable "role_arn" {
   }
 }
 
+variable "registration_name" {
+  type        = string
+  description = "Name for the CrowdStrike GCP registration"
+}
+
 variable "registration_type" {
   type        = string
   description = "Type of registration: organization, folder, or project"
   validation {
     condition     = contains(["organization", "folder", "project"], var.registration_type)
     error_message = "Registration type must be one of: organization, folder, project."
+  }
+}
+
+variable "deployment_method" {
+  type        = string
+  description = "Deployment method for the CrowdStrike GCP registration"
+  default     = "terraform-native"
+
+  validation {
+    condition     = contains(["terraform-native", "infrastructure-manager"], var.deployment_method)
+    error_message = "Deployment method must be one of: terraform-native, infrastructure-manager."
   }
 }
 

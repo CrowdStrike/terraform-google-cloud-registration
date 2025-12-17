@@ -111,6 +111,7 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility and Detection (RTV&D) features via log ingestion | `bool` | `false` | no |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
@@ -118,6 +119,7 @@ module "crowdstrike_gcp_registration" {
 | <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string)<br/>    existing_topic_name              = optional(string)<br/>    existing_subscription_name       = optional(string)<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
+| <a name="input_registration_name"></a> [registration\_name](#input\_registration\_name) | Name for the CrowdStrike GCP registration | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `null` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `null` | no |

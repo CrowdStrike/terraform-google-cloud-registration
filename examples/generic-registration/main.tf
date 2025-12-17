@@ -46,7 +46,7 @@ resource "crowdstrike_cloud_google_registration" "main" {
   organization      = var.registration_type == "organization" ? var.organization_id : null
   infra_project     = var.infra_project_id
   wif_project       = local.effective_wif_project_id
-  deployment_method = "terraform-native"
+  deployment_method = var.deployment_method
 
   resource_name_prefix = var.resource_prefix != "" ? var.resource_prefix : null
   resource_name_suffix = var.resource_suffix != "" ? var.resource_suffix : null
