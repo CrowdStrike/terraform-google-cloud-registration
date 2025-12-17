@@ -100,7 +100,7 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.49 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.50 |
 ## Resources
 
 | Name | Type |

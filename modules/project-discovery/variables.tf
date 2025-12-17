@@ -13,8 +13,8 @@ variable "organization_id" {
   default     = null
 
   validation {
-    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
-    error_message = "Organization ID must be exactly 12 digits when provided."
+    condition     = var.organization_id == null || can(regex("^[1-9][0-9]*$", var.organization_id))
+    error_message = "Organization ID must be a numeric string without leading zeros when provided."
   }
 }
 
@@ -25,9 +25,9 @@ variable "folder_ids" {
 
   validation {
     condition = alltrue([
-      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
+      for folder_id in var.folder_ids : can(regex("^[1-9][0-9]*$", folder_id))
     ])
-    error_message = "All folder IDs must be exactly 12 digits."
+    error_message = "All folder IDs must be numeric strings without leading zeros."
   }
 }
 

@@ -34,8 +34,8 @@ variable "organization_id" {
   default     = null
 
   validation {
-    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
-    error_message = "Organization ID must be exactly 12 digits when provided."
+    condition     = var.organization_id == null || can(regex("^[1-9][0-9]*$", var.organization_id))
+    error_message = "Organization ID must be a numeric string without leading zeros when provided."
   }
 }
 
@@ -46,9 +46,9 @@ variable "folder_ids" {
 
   validation {
     condition = length(var.folder_ids) == 0 || alltrue([
-      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
+      for folder_id in var.folder_ids : can(regex("^[1-9][0-9]*$", folder_id))
     ])
-    error_message = "All folder IDs must be exactly 12 digits when provided."
+    error_message = "All folder IDs must be numeric strings without leading zeros."
   }
 }
 
@@ -71,8 +71,8 @@ variable "resource_prefix" {
   default     = null
 
   validation {
-    condition     = var.resource_prefix == null || (can(regex("^[a-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 20)
-    error_message = "Resource prefix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+    condition     = var.resource_prefix == null || (can(regex("^[A-Za-z0-9][A-Za-z0-9_.-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13)
+    error_message = "Resource prefix must start with alphanumeric character and contain only letters, numbers, underscores, hyphens, and periods, and be 13 characters or less."
   }
 }
 
@@ -82,8 +82,8 @@ variable "resource_suffix" {
   default     = null
 
   validation {
-    condition     = var.resource_suffix == null || (can(regex("^[a-z0-9-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 20)
-    error_message = "Resource suffix must contain only lowercase letters, numbers, and hyphens, and be 20 characters or less."
+    condition     = var.resource_suffix == null || (can(regex("^[A-Za-z0-9_.-]*$", var.resource_suffix)) && length(var.resource_suffix) <= 13)
+    error_message = "Resource suffix must contain only letters, numbers, underscores, hyphens, and periods, and be 13 characters or less."
   }
 }
 

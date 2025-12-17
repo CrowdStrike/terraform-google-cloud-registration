@@ -8,7 +8,7 @@ terraform {
     }
     crowdstrike = {
       source  = "crowdstrike/crowdstrike"
-      version = "~> 0.0.49"
+      version = "~> 0.0.50"
     }
   }
 }

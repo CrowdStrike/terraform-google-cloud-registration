@@ -21,7 +21,7 @@ Before using these examples, ensure you have:
 Basic log ingestion setup for a single GCP project.
 
 **Use case**: Small organizations or single-project deployments
-**Features**: 
+**Features**:
 - Minimal configuration
 - Project-level audit log collection
 - Basic retention settings
