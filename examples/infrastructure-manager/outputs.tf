@@ -5,6 +5,7 @@
 output "registration_id" {
   description = "The unique CrowdStrike registration ID for this GCP setup"
   value       = module.crowdstrike_gcp_registration.registration_id
+  sensitive   = true
 }
 
 output "wif_project_id" {
