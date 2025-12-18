@@ -13,7 +13,7 @@ locals {
 
   # Build log filter for specific audit log types
   log_filter = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" AND (${join(" OR ", [
-    for log_type in var.audit_log_types : "logName:\"cloudaudit.googleapis.com/${log_type}\""
+    for log_type in var.audit_log_types : "logName=~\"cloudaudit.googleapis.com%2F${log_type}\""
   ])})"
 
   # Build inclusion filter based on registration type
