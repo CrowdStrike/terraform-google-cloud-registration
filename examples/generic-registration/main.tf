@@ -80,7 +80,7 @@ module "workload-identity" {
   resource_suffix      = var.resource_suffix
 
   providers = {
-    google.wif = google.wif
+    google = google.wif
   }
 }
 
