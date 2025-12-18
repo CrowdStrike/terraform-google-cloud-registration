@@ -107,7 +107,7 @@ module "crowdstrike_gcp_registration" {
 | Name | Type |
 |------|------|
 | [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
-| [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_logging_settings) | resource |
+| [crowdstrike_cloud_google_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_settings) | resource |
 | [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
