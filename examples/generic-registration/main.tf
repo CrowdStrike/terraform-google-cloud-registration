@@ -59,6 +59,8 @@ resource "crowdstrike_cloud_google_registration" "main" {
 
   labels = var.labels
 
+  excluded_project_patterns = var.excluded_project_patterns
+
   # Enable realtime visibility if requested
   realtime_visibility = var.enable_realtime_visibility ? {
     enabled = true
@@ -119,6 +121,12 @@ module "log-ingestion" {
   resource_prefix   = var.resource_prefix
   resource_suffix   = var.resource_suffix
   labels            = var.labels
+
+  # Exclusion filters - combine log ingestion settings with project patterns
+  exclusion_filters = concat(
+    var.log_ingestion_settings.exclusion_filters,
+    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"${pattern}\""]
+  )
 
   depends_on = [module.workload-identity]
 }
