@@ -12,11 +12,10 @@ data "google_project" "wif_project" {
 
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name               = var.registration_name
-  infra_project      = var.infra_project_id
-  wif_project        = local.effective_wif_project_id
-  wif_project_number = data.google_project.wif_project.number
-  deployment_method  = var.deployment_method
+  name              = var.registration_name
+  infra_project     = var.infra_project_id
+  wif_project       = local.effective_wif_project_id
+  deployment_method = var.deployment_method
 
   # Set the appropriate registration scope
   projects     = var.registration_type == "project" ? var.project_ids : null
@@ -106,6 +105,8 @@ module "log-ingestion" {
 # CrowdStrike logging settings for realtime visibility
 resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
+  wif_project                     = local.effective_wif_project_id
+  wif_project_number              = data.google_project.wif_project.number
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
