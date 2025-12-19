@@ -125,7 +125,7 @@ module "log-ingestion" {
   # Exclusion filters - combine log ingestion settings with project patterns
   exclusion_filters = concat(
     var.log_ingestion_settings.exclusion_filters,
-    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"${pattern}\""]
+    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${pattern}\""]
   )
 
   depends_on = [module.workload-identity]

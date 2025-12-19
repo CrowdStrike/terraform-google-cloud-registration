@@ -102,7 +102,7 @@ module "log-ingestion" {
   existing_subscription_name       = var.log_ingestion_settings.existing_subscription_name
   exclusion_filters = concat(
     var.log_ingestion_settings.exclusion_filters,
-    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"${pattern}\""]
+    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${pattern}\""]
   )
 
   depends_on = [module.workload-identity]
