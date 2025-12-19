@@ -204,9 +204,3 @@ variable "log_ingestion_settings" {
   })
   default = {}
 }
-
-variable "excluded_project_patterns" {
-  type        = list(string)
-  description = "List of regex patterns for projects to exclude from CrowdStrike registration"
-  default     = []
-}
