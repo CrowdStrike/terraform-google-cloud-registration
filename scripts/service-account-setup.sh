@@ -148,6 +148,7 @@ BASE_APIS=(
     "sts.googleapis.com"
     "cloudresourcemanager.googleapis.com"
     "cloudasset.googleapis.com"
+    "secretmanager.googleapis.com"
 )
 
 for api in "${BASE_APIS[@]}"; do

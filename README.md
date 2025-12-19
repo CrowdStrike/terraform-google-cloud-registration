@@ -101,12 +101,14 @@ module "crowdstrike_gcp_registration" {
 | Name | Version |
 |------|---------|
 | <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.50 |
+| <a name="provider_google.wif"></a> [google.wif](#provider\_google.wif) | ~> 5.0 |
 ## Resources
 
 | Name | Type |
 |------|------|
 | [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
 | [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_logging_settings) | resource |
+| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |

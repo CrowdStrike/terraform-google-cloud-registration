@@ -22,11 +22,18 @@ variable "falcon_client_id" {
 variable "falcon_client_secret" {
   type        = string
   sensitive   = true
-  description = "Falcon API client secret."
+  description = "Falcon API client secret. If not provided, will be retrieved from Secret Manager."
+  default     = null
   validation {
-    condition     = length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret))
+    condition     = var.falcon_client_secret == null ? true : (can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)) && length(var.falcon_client_secret) == 40)
     error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
+}
+
+variable "falcon_client_secret_name" {
+  type        = string
+  description = "Name of the Secret Manager secret containing the Falcon API client secret"
+  default     = "crowdstrike-falcon-client-secret"
 }
 
 variable "wif_project_id" {
@@ -81,8 +88,8 @@ variable "organization_id" {
   default     = null
 
   validation {
-    condition     = var.organization_id == null || can(regex("^[0-9]{12}$", var.organization_id))
-    error_message = "Organization ID must be exactly 12 digits when provided."
+    condition     = var.organization_id == null || can(regex("^[1-9][0-9]*$", var.organization_id))
+    error_message = "Organization ID must be a numeric string without leading zeros when provided."
   }
 }
 
@@ -93,9 +100,9 @@ variable "folder_ids" {
 
   validation {
     condition = alltrue([
-      for folder_id in var.folder_ids : can(regex("^[0-9]{12}$", folder_id))
+      for folder_id in var.folder_ids : can(regex("^[1-9][0-9]*$", folder_id))
     ])
-    error_message = "All folder IDs must be exactly 12 digits."
+    error_message = "All folder IDs must be numeric strings without leading zeros."
   }
 }
 
@@ -122,12 +129,6 @@ variable "role_arn" {
   }
 }
 
-variable "region" {
-  type        = string
-  description = "GCP region for resource deployment"
-  default     = "us-central1"
-}
-
 # =============================================================================
 # OPTIONAL FEATURES
 # =============================================================================
@@ -143,9 +144,9 @@ variable "enable_realtime_visibility" {
 # =============================================================================
 
 variable "resource_prefix" {
-  type        = string
-  description = "Prefix for resource names (helps with organization and identification)"
+  description = "Prefix to be added to all created resource names for identification"
   default     = null
+  type        = string
 
   validation {
     condition     = var.resource_prefix == null || var.resource_prefix == "" || (can(regex("^[A-Za-z0-9][A-Za-z0-9_.-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13)
@@ -155,7 +156,7 @@ variable "resource_prefix" {
 
 variable "resource_suffix" {
   type        = string
-  description = "Suffix for resource names (helps with organization and identification)"
+  description = "Suffix to be added to all created resource names for identification"
   default     = null
 
   validation {
@@ -187,4 +188,26 @@ variable "labels" {
     condition     = length(var.labels) <= 60
     error_message = "Maximum of 60 custom labels allowed (system labels will be added automatically)."
   }
+}
+
+# =============================================================================
+# LOG INGESTION SETTINGS
+# =============================================================================
+
+variable "log_ingestion_settings" {
+  description = "Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources."
+  type = object({
+    message_retention_duration       = optional(string, "604800s")
+    ack_deadline_seconds             = optional(number, 600)
+    topic_message_retention_duration = optional(string, "604800s")
+    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])
+    topic_storage_regions            = optional(list(string), [])
+    enable_schema_validation         = optional(bool, false)
+    schema_type                      = optional(string, "AVRO")
+    schema_definition                = optional(string)
+    existing_topic_name              = optional(string)
+    existing_subscription_name       = optional(string)
+    exclusion_filters                = optional(list(string), [])
+  })
+  default = {}
 }
