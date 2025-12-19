@@ -100,9 +100,11 @@ module "log-ingestion" {
   schema_definition                = var.log_ingestion_settings.schema_definition
   existing_topic_name              = var.log_ingestion_settings.existing_topic_name
   existing_subscription_name       = var.log_ingestion_settings.existing_subscription_name
+  # Convert shell-style wildcards to regex patterns for project exclusion
+  # Examples: "sys-*" -> "^sys-.*$", "dev-?" -> "^dev-.$"
   exclusion_filters = concat(
     var.log_ingestion_settings.exclusion_filters,
-    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${pattern}\""]
+    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${replace(replace(pattern, "*", ".*"), "?", ".")}$\""]
   )
 
   depends_on = [module.workload-identity]
