@@ -185,14 +185,14 @@ variable "labels" {
 
 variable "excluded_project_patterns" {
   type        = list(string)
-  description = "List of regex patterns to exclude specific projects from CSPM registration. Projects matching these patterns will be excluded from asset inventory and log ingestion."
+  description = "List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'."
   default     = []
 
   validation {
     condition = alltrue([
-      for pattern in var.excluded_project_patterns : can(regex("^.+$", pattern))
+      for pattern in var.excluded_project_patterns : length(pattern) > 0
     ])
-    error_message = "All excluded project patterns must be valid regex patterns."
+    error_message = "All excluded project patterns must be non-empty strings."
   }
 }
 
