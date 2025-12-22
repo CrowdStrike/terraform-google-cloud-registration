@@ -22,3 +22,13 @@ output "wif_iam_principal" {
   value       = "principal://iam.googleapis.com/projects/${data.google_project.wif_project.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.main.workload_identity_pool_id}/subject/${var.role_arn}/${var.registration_id}"
   description = "Google Cloud IAM Principal that identifies the specific CrowdStrike session for this registration"
 }
+
+output "wif_pool_name" {
+  value       = google_iam_workload_identity_pool.main.name
+  description = "Name of the Workload Identity Pool"
+}
+
+output "wif_provider_name" {
+  value       = google_iam_workload_identity_pool_provider.aws.name
+  description = "Name of the Workload Identity Pool Provider"
+}

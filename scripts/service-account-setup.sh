@@ -180,6 +180,8 @@ echo "Applying IAM roles for $REGISTRATION_TYPE registration..."
 PROJECT_ROLES=(
     "roles/config.agent"
     "roles/iam.workloadIdentityPoolAdmin"
+    "roles/secretmanager.secretAccessor"
+    "roles/secretmanager.viewer"
 )
 
 # Add project-specific roles for project registration

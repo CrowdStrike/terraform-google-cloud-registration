@@ -47,9 +47,6 @@ module "crowdstrike_gcp_registration" {
   # Required: AWS integration
   role_arn = var.role_arn
 
-  # Optional: Project exclusion patterns
-  excluded_project_patterns = var.excluded_project_patterns
-
   # Optional: Real-time visibility and detection
   enable_realtime_visibility = var.enable_realtime_visibility
 
@@ -62,6 +59,9 @@ module "crowdstrike_gcp_registration" {
 
   # Optional: Log ingestion settings
   log_ingestion_settings = var.log_ingestion_settings
+
+  # Optional: Project exclusion patterns
+  excluded_project_patterns = var.excluded_project_patterns
 
   providers = {
     google.wif = google.wif
