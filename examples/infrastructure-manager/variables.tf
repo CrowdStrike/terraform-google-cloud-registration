@@ -190,6 +190,19 @@ variable "labels" {
   }
 }
 
+variable "excluded_project_patterns" {
+  type        = list(string)
+  description = "List of regex patterns to exclude specific projects from CSPM registration. Projects matching these patterns will be excluded from asset inventory and log ingestion."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for pattern in var.excluded_project_patterns : can(regex("^.+$", pattern))
+    ])
+    error_message = "All excluded project patterns must be valid regex patterns."
+  }
+}
+
 # =============================================================================
 # LOG INGESTION SETTINGS
 # =============================================================================
@@ -210,10 +223,4 @@ variable "log_ingestion_settings" {
     exclusion_filters                = optional(list(string), [])
   })
   default = {}
-}
-
-variable "excluded_project_patterns" {
-  type        = list(string)
-  description = "List of regex patterns for projects to exclude from CrowdStrike registration"
-  default     = []
 }

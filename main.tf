@@ -12,10 +12,11 @@ data "google_project" "wif_project" {
 
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name              = var.registration_name
-  infra_project     = var.infra_project_id
-  wif_project       = local.effective_wif_project_id
-  deployment_method = var.deployment_method
+  name               = var.registration_name
+  infra_project      = var.infra_project_id
+  wif_project        = local.effective_wif_project_id
+  wif_project_number = data.google_project.wif_project.number
+  deployment_method  = var.deployment_method
 
   # Set the appropriate registration scope
   projects     = var.registration_type == "project" ? var.project_ids : null
@@ -100,19 +101,21 @@ module "log-ingestion" {
   schema_definition                = var.log_ingestion_settings.schema_definition
   existing_topic_name              = var.log_ingestion_settings.existing_topic_name
   existing_subscription_name       = var.log_ingestion_settings.existing_subscription_name
+  # Convert shell-style wildcards to regex patterns for project exclusion
+  # Examples: "sys-*" -> "^sys-.*$", "dev-?" -> "^dev-.$"
   exclusion_filters = concat(
     var.log_ingestion_settings.exclusion_filters,
-    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${pattern}\""]
+    [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${replace(replace(pattern, "*", ".*"), "?", ".")}$\""]
   )
 
   depends_on = [module.workload-identity]
 }
 
-# CrowdStrike logging settings for realtime visibility
-resource "crowdstrike_cloud_google_registration_logging_settings" "main" {
+# CrowdStrike registration settings
+resource "crowdstrike_cloud_google_registration_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
-  wif_project                     = local.effective_wif_project_id
-  wif_project_number              = data.google_project.wif_project.number
+  wif_pool_name                   = module.workload-identity.wif_pool_name
+  wif_provider_name               = module.workload-identity.wif_provider_name
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
