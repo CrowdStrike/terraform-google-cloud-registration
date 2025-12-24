@@ -184,8 +184,8 @@ variable "labels" {
   }
 
   validation {
-    condition     = length(var.labels) <= 60
-    error_message = "Maximum of 60 custom labels allowed (system labels will be added automatically)."
+    condition     = length(var.labels) <= 64
+    error_message = "Maximum of 64 custom labels allowed."
   }
 }
 
