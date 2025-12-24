@@ -188,3 +188,34 @@ variable "labels" {
     error_message = "Maximum of 60 custom labels allowed (system labels will be added automatically)."
   }
 }
+
+variable "excluded_project_patterns" {
+  type        = list(string)
+  description = "List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for pattern in var.excluded_project_patterns : length(pattern) > 0
+    ])
+    error_message = "All excluded project patterns must be non-empty strings."
+  }
+}
+
+variable "log_ingestion_settings" {
+  description = "Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources."
+  type = object({
+    message_retention_duration       = optional(string, "604800s")
+    ack_deadline_seconds             = optional(number, 600)
+    topic_message_retention_duration = optional(string, "604800s")
+    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])
+    topic_storage_regions            = optional(list(string), [])
+    enable_schema_validation         = optional(bool, false)
+    schema_type                      = optional(string, "AVRO")
+    schema_definition                = optional(string)
+    existing_topic_name              = optional(string)
+    existing_subscription_name       = optional(string)
+    exclusion_filters                = optional(list(string), [])
+  })
+  default = {}
+}

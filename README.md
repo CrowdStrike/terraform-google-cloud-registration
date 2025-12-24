@@ -100,7 +100,7 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.50 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.53 |
 | <a name="provider_google.wif"></a> [google.wif](#provider\_google.wif) | ~> 5.0 |
 ## Resources
 
@@ -115,6 +115,7 @@ module "crowdstrike_gcp_registration" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility and Detection (RTV&D) features via log ingestion | `bool` | `false` | no |
+| <a name="input_excluded_project_patterns"></a> [excluded\_project\_patterns](#input\_excluded\_project\_patterns) | List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'. | `list(string)` | `[]` | no |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |

@@ -60,6 +60,9 @@ module "crowdstrike_gcp_registration" {
   # Optional: Log ingestion settings
   log_ingestion_settings = var.log_ingestion_settings
 
+  # Optional: Project exclusion patterns
+  excluded_project_patterns = var.excluded_project_patterns
+
   providers = {
     google.wif = google.wif
   }
