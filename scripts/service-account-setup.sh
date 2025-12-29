@@ -19,6 +19,7 @@ usage() {
     echo "  --project-ids         Comma-separated list of target project IDs (for project registration)"
     echo ""
     echo "Optional parameters:"
+    echo "  --wif-project-id      GCP project ID for Workload Identity Federation (default: same as infra-project-id)"
     echo "  --enable-rtvd         Enable Real Time Visibility & Detection (default: false)"
     echo "  --location            Infrastructure Manager location (default: us-central1)"
     echo "  --help                Show this help message"
@@ -42,6 +43,7 @@ ORGANIZATION_ID=""
 FOLDER_IDS=""
 TARGET_PROJECTS=""
 SERVICE_ACCOUNT_NAME=""
+WIF_PROJECT_ID=""
 LOCATION="us-central1"
 
 # Parse command line arguments
@@ -49,6 +51,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --infra-project-id)
             INFRA_PROJECT_ID="$2"
+            shift 2
+            ;;
+        --wif-project-id)
+            WIF_PROJECT_ID="$2"
             shift 2
             ;;
         --enable-rtvd)
@@ -100,6 +106,11 @@ if [[ -z "$INFRA_PROJECT_ID" ]]; then
     exit 1
 fi
 
+# Set WIF project ID to infra project ID if not specified
+if [[ -z "$WIF_PROJECT_ID" ]]; then
+    WIF_PROJECT_ID="$INFRA_PROJECT_ID"
+fi
+
 # Determine registration type based on provided scope parameters
 SCOPE_PARAMS=0
 [[ -n "$ORGANIZATION_ID" ]] && SCOPE_PARAMS=$((SCOPE_PARAMS + 1))
@@ -143,9 +154,6 @@ echo "Enabling base Infrastructure Manager APIs..."
 BASE_APIS=(
     "config.googleapis.com"
     "serviceusage.googleapis.com"
-    "iam.googleapis.com"
-    "iamcredentials.googleapis.com"
-    "sts.googleapis.com"
     "cloudresourcemanager.googleapis.com"
     "cloudasset.googleapis.com"
     "secretmanager.googleapis.com"
@@ -154,6 +162,20 @@ BASE_APIS=(
 for api in "${BASE_APIS[@]}"; do
     echo "  Enabling $api..."
     gcloud services enable "$api" --project=$INFRA_PROJECT_ID
+done
+
+# Enable WIF-specific APIs in WIF project
+echo "Enabling Workload Identity APIs in WIF project: $WIF_PROJECT_ID..."
+WIF_APIS=(
+    "serviceusage.googleapis.com"
+    "iam.googleapis.com"
+    "iamcredentials.googleapis.com"
+    "sts.googleapis.com"
+)
+
+for api in "${WIF_APIS[@]}"; do
+    echo "  Enabling $api..."
+    gcloud services enable "$api" --project=$WIF_PROJECT_ID
 done
 
 # Enable RTV&D APIs if requested
@@ -179,7 +201,6 @@ echo "Applying IAM roles for $REGISTRATION_TYPE registration..."
 # Project-level roles (common to all registration types)
 PROJECT_ROLES=(
     "roles/config.agent"
-    "roles/iam.workloadIdentityPoolAdmin"
     "roles/secretmanager.secretAccessor"
     "roles/secretmanager.viewer"
 )
@@ -222,6 +243,13 @@ for role in "${PROJECT_ROLES[@]}"; do
         --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
         --role="$role"
 done
+
+# Apply WIF project roles
+echo "Applying WIF project roles..."
+echo "  Binding roles/iam.workloadIdentityPoolAdmin to WIF project: $WIF_PROJECT_ID..."
+gcloud projects add-iam-policy-binding $WIF_PROJECT_ID \
+    --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+    --role="roles/iam.workloadIdentityPoolAdmin"
 
 # Apply folder-level roles (for multiple folders)
 if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
