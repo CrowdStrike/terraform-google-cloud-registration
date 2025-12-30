@@ -16,14 +16,6 @@ locals {
     for log_type in var.audit_log_types : "logName=~\"cloudaudit.googleapis.com%2F${log_type}\""
   ])})"
 
-  # Build inclusion filter based on registration type
-  inclusion_filter = var.registration_type == "organization" ? "resource.labels.organization_id=\"${var.organization_id}\"" : (
-    var.registration_type == "folder" ? "protoPayload.resourceName=~\"(${join("|", [
-      for folder_id in local.folder_list : "folders/${trimspace(folder_id)}"
-      ])})/\"" : join(" OR ", [
-      for project_id in local.project_list : "resource.labels.project_id=\"${trimspace(project_id)}\""
-    ])
-  )
 
   # Build exclusion filter if provided
   exclusion_filter = length(var.exclusion_filters) > 0 ? join(" AND ", [
@@ -31,7 +23,7 @@ locals {
   ]) : ""
 
   # Combined filter with optional exclusions
-  combined_filter = length(var.exclusion_filters) > 0 ? "(${local.log_filter}) AND (${local.inclusion_filter}) AND (${local.exclusion_filter})" : "(${local.log_filter}) AND (${local.inclusion_filter})"
+  combined_filter = length(var.exclusion_filters) > 0 ? "(${local.log_filter}) AND (${local.exclusion_filter})" : local.log_filter
 }
 
 # Enable required APIs for log ingestion
