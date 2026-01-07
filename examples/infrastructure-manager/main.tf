@@ -51,9 +51,10 @@ module "crowdstrike_gcp_registration" {
   source = "../../"
 
   # Required: Registration configuration
-  registration_name = var.registration_name
-  registration_type = var.registration_type
-  deployment_method = var.deployment_method
+  registration_name             = var.registration_name
+  registration_type             = var.registration_type
+  deployment_method             = var.deployment_method
+  infrastructure_manager_region = var.infrastructure_manager_region
 
   # Required: GCP project configuration
   infra_project_id = var.infra_project_id
