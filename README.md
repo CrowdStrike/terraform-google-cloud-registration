@@ -100,7 +100,7 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.53 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | ~> 0.0.55 |
 | <a name="provider_google.wif"></a> [google.wif](#provider\_google.wif) | ~> 5.0 |
 ## Resources
 
@@ -118,6 +118,7 @@ module "crowdstrike_gcp_registration" {
 | <a name="input_excluded_project_patterns"></a> [excluded\_project\_patterns](#input\_excluded\_project\_patterns) | List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'. | `list(string)` | `[]` | no |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
+| <a name="input_infrastructure_manager_region"></a> [infrastructure\_manager\_region](#input\_infrastructure\_manager\_region) | The Google Cloud region for Infrastructure Manager. Required when deployment\_method is infrastructure-manager | `string` | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
 | <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string)<br/>    existing_topic_name              = optional(string)<br/>    existing_subscription_name       = optional(string)<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |

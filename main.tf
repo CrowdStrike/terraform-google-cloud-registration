@@ -12,11 +12,12 @@ data "google_project" "wif_project" {
 
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name               = var.registration_name
-  infra_project      = var.infra_project_id
-  wif_project        = local.effective_wif_project_id
-  wif_project_number = data.google_project.wif_project.number
-  deployment_method  = var.deployment_method
+  name                          = var.registration_name
+  infra_project                 = var.infra_project_id
+  wif_project                   = local.effective_wif_project_id
+  wif_project_number            = data.google_project.wif_project.number
+  deployment_method             = var.deployment_method
+  infrastructure_manager_region = var.infrastructure_manager_region
 
   # Set the appropriate registration scope
   projects     = var.registration_type == "project" ? var.project_ids : null

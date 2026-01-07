@@ -76,6 +76,17 @@ variable "deployment_method" {
   }
 }
 
+variable "infrastructure_manager_region" {
+  type        = string
+  description = "The Google Cloud region for Infrastructure Manager. Required when deployment_method is infrastructure-manager"
+  default     = null
+
+  validation {
+    condition     = var.infrastructure_manager_region == null || can(regex("^[a-z]+(-[a-z]+)*[0-9]+$", var.infrastructure_manager_region))
+    error_message = "Infrastructure Manager region must be a valid Google Cloud region name (e.g., us-central1, europe-west1, asia-southeast2)."
+  }
+}
+
 variable "organization_id" {
   type        = string
   description = "GCP Organization ID for organization-level registration"
