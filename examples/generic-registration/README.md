@@ -11,7 +11,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.50 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.55  |
 
 ## Modules
 
