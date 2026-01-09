@@ -68,13 +68,12 @@ variable "google_iam_roles" {
     "roles/firebasedatabase.viewer",
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
-    "roles/iam.securityReviewer.organizations",
-    "roles/iam.securityReviewer.projects",
+    "roles/iam.securityReviewer",
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/securitycenter.adminViewer",
-    "roles/translate.viewer"
+    "roles/cloudtranslate.viewer"
   ]
 
   validation {
