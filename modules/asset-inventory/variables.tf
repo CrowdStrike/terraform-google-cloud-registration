@@ -51,12 +51,14 @@ variable "google_iam_roles" {
   type        = list(string)
   description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access"
   default = [
-    "roles/browser",
-    "roles/cloudasset.viewer",
     "roles/aiplatform.viewer",
     "roles/alloydb.viewer",
     "roles/apigee.readOnlyAdmin",
     "roles/appengine.appViewer",
+    "roles/artifactregistry.reader",
+    "roles/browser",
+    "roles/cloudasset.viewer",
+    "roles/cloudfunctions.developer",
     "roles/cloudtasks.viewer",
     "roles/compute.viewer",
     "roles/dataplex.viewer",
@@ -66,11 +68,12 @@ variable "google_iam_roles" {
     "roles/firebasedatabase.viewer",
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
+    "roles/iam.securityReviewer",
     "roles/notebooks.viewer",
-    "roles/recommender.iampolicychangeriskViewer",
     "roles/recommender.iamViewer",
+    "roles/recommender.iampolicychangeriskViewer",
     "roles/securitycenter.adminViewer",
-    "roles/cloudfunctions.developer"
+    "roles/cloudtranslate.viewer"
   ]
 
   validation {
