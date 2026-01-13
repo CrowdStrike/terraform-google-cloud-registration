@@ -21,8 +21,7 @@ data "google_secret_manager_secret_version" "falcon_client_secret" {
 # =============================================================================
 
 locals {
-  effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
-  falcon_client_secret     = var.falcon_client_secret != null ? var.falcon_client_secret : data.google_secret_manager_secret_version.falcon_client_secret[0].secret_data
+  falcon_client_secret = var.falcon_client_secret != null ? var.falcon_client_secret : data.google_secret_manager_secret_version.falcon_client_secret[0].secret_data
 }
 
 # =============================================================================
@@ -31,11 +30,6 @@ locals {
 
 provider "google" {
   project = var.infra_project_id
-}
-
-provider "google" {
-  alias   = "wif"
-  project = local.effective_wif_project_id
 }
 
 provider "crowdstrike" {
@@ -83,8 +77,4 @@ module "crowdstrike_gcp_registration" {
 
   # Optional: Project exclusion patterns
   excluded_project_patterns = var.excluded_project_patterns
-
-  providers = {
-    google.wif = google.wif
-  }
 }

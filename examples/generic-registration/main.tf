@@ -17,11 +17,6 @@ provider "google" {
   project = var.infra_project_id
 }
 
-provider "google" {
-  alias   = "wif"
-  project = local.effective_wif_project_id
-}
-
 provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = var.falcon_client_secret
@@ -37,7 +32,6 @@ locals {
 
 # Data source to get WIF project information
 data "google_project" "wif_project" {
-  provider   = google.wif
   project_id = local.effective_wif_project_id
 }
 
@@ -81,10 +75,6 @@ module "workload-identity" {
   registration_id      = crowdstrike_cloud_google_registration.main.id
   resource_prefix      = var.resource_prefix
   resource_suffix      = var.resource_suffix
-
-  providers = {
-    google = google.wif
-  }
 }
 
 module "project-discovery" {

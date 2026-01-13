@@ -13,11 +13,6 @@ provider "google" {
   project = var.infra_project_id
 }
 
-provider "google" {
-  alias   = "wif"
-  project = var.wif_project_id
-}
-
 provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = var.falcon_client_secret
@@ -62,8 +57,4 @@ module "crowdstrike_gcp_registration" {
 
   # Optional: Project exclusion patterns
   excluded_project_patterns = var.excluded_project_patterns
-
-  providers = {
-    google.wif = google.wif
-  }
 }
