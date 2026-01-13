@@ -6,7 +6,6 @@ locals {
 
 # Data source to get WIF project information
 data "google_project" "wif_project" {
-  provider   = google.wif
   project_id = local.effective_wif_project_id
 }
 
@@ -49,10 +48,6 @@ module "workload-identity" {
   registration_id      = crowdstrike_cloud_google_registration.main.id
   resource_prefix      = local.effective_prefix
   resource_suffix      = local.effective_suffix
-
-  providers = {
-    google = google.wif
-  }
 }
 module "project-discovery" {
   source = "./modules/project-discovery/"
