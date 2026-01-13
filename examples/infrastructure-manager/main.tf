@@ -13,7 +13,6 @@
 data "google_secret_manager_secret_version" "falcon_client_secret" {
   count   = var.falcon_client_secret == null ? 1 : 0
   secret  = var.falcon_client_secret_name
-  version = "latest"
   project = var.infra_project_id
 }
 
