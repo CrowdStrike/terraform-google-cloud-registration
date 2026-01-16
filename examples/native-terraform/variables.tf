@@ -218,8 +218,15 @@ variable "log_ingestion_settings" {
   default = {}
 }
 
-variable "is_gov_cloud" {
-  type        = bool
-  description = "Set to true when deploying to gov cloud environment"
-  default     = false
+variable "falcon_cloud" {
+  type        = string
+  description = "CrowdStrike cloud environment. Set to 'us-gov-1' or 'us-gov-2' for government cloud deployments. Defaults to commercial cloud when null."
+  default     = null
+
+  validation {
+    condition = var.falcon_cloud == null || contains([
+      "us-gov-1", "us-gov-2"
+    ], var.falcon_cloud)
+    error_message = "Falcon cloud must be null (for commercial) or one of: us-gov-1, us-gov-2."
+  }
 }
