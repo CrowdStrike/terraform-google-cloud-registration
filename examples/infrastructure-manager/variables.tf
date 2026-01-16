@@ -235,3 +235,9 @@ variable "log_ingestion_settings" {
   })
   default = {}
 }
+
+variable "is_gov_cloud" {
+  type        = bool
+  description = "Set to true when deploying to gov cloud environment"
+  default     = false
+}

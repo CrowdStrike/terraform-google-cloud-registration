@@ -16,6 +16,7 @@ provider "google" {
 provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = var.falcon_client_secret
+  cloud         = var.is_gov_cloud ? "us-gov-1" : null
 }
 
 # =============================================================================
