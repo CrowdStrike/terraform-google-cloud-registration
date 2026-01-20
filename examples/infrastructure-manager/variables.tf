@@ -135,7 +135,7 @@ variable "role_arn" {
   description = "AWS IAM Role ARN for CrowdStrike identity federation"
 
   validation {
-    condition     = can(regex("^arn:aws:sts::[0-9]{12}:assumed-role/.+", var.role_arn))
+    condition     = can(regex("^arn:(aws|aws-us-gov):sts::[0-9]{12}:assumed-role/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS STS assumed role ARN format."
   }
 }
@@ -234,4 +234,17 @@ variable "log_ingestion_settings" {
     exclusion_filters                = optional(list(string), [])
   })
   default = {}
+}
+
+variable "falcon_cloud" {
+  type        = string
+  description = "CrowdStrike cloud environment. Set to 'us-gov-1' or 'us-gov-2' for government cloud deployments. Defaults to commercial cloud when null."
+  default     = null
+
+  validation {
+    condition = var.falcon_cloud == null || contains([
+      "us-gov-1", "us-gov-2"
+    ], var.falcon_cloud)
+    error_message = "Falcon cloud must be null (for commercial) or one of: us-gov-1, us-gov-2."
+  }
 }
