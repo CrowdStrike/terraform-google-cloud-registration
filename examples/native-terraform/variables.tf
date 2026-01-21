@@ -224,7 +224,7 @@ variable "falcon_cloud" {
   default     = null
 
   validation {
-    condition = var.falcon_cloud == null || contains([
+    condition = var.falcon_cloud == null ? true : contains([
       "us-gov-1", "us-gov-2"
     ], var.falcon_cloud)
     error_message = "Falcon cloud must be null (for commercial) or one of: us-gov-1, us-gov-2."
