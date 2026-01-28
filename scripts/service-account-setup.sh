@@ -141,12 +141,18 @@ SERVICE_ACCOUNT_EMAIL="${SERVICE_ACCOUNT_NAME}@${INFRA_PROJECT_ID}.iam.gservicea
 
 # Create service account
 echo "Creating Infrastructure Manager service account..."
-gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
+if create_output=$(gcloud iam service-accounts create $SERVICE_ACCOUNT_NAME \
     --display-name="Infrastructure Manager Service Account" \
-    --project=$INFRA_PROJECT_ID || echo "Service account may already exist"
-
-echo "Waiting for service account propagation..."
-sleep 5
+    --project=$INFRA_PROJECT_ID 2>&1); then
+    echo "Service account '$SERVICE_ACCOUNT_NAME' created successfully"
+    echo "Waiting for service account propagation..."
+    sleep 5
+elif echo "$create_output" | grep -q "Service account.*already exists"; then
+    echo "Service account '$SERVICE_ACCOUNT_NAME' already exists in project '$INFRA_PROJECT_ID'"
+else
+    echo "$create_output"
+    exit 1
+fi
 echo
 
 # Enable base APIs
