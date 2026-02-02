@@ -186,6 +186,7 @@ import_crowdstrike_resources() {
             echo "Successfully imported CrowdStrike registration"
         else
             echo "Failed to import CrowdStrike registration"
+            terraform import "$registration_resource" "$REGISTRATION_ID" || true
         fi
         cd - > /dev/null
     fi
@@ -200,6 +201,7 @@ import_crowdstrike_resources() {
             echo "Successfully imported CrowdStrike registration settings"
         else
             echo "Failed to import CrowdStrike registration settings"
+            terraform import "$settings_resource" "$REGISTRATION_ID" || true
         fi
         cd - > /dev/null
     fi
@@ -227,6 +229,7 @@ import_wif_resources() {
                 echo "Successfully imported WIF pool: $pool_id"
             else
                 echo "Failed to import WIF pool: $pool_id"
+                terraform import "$pool_resource" "$pool_name" || true
             fi
             cd - > /dev/null
         fi
@@ -247,6 +250,7 @@ import_wif_resources() {
                         echo "Successfully imported WIF provider: $provider_id"
                     else
                         echo "Failed to import WIF provider: $provider_id"
+                        terraform import "$provider_resource" "$provider_import_name" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -329,6 +333,7 @@ import_asset_inventory_resources() {
                             echo "Successfully imported IAM binding: $role"
                         else
                             echo "Failed to import IAM binding: $role"
+                            terraform import "$resource_name" "$import_id" || true
                         fi
                         cd - > /dev/null
                     fi
@@ -372,6 +377,7 @@ import_log_ingestion_resources() {
                 echo "Successfully imported Pub/Sub schema: $schema_name"
             else
                 echo "Failed to import Pub/Sub schema: $schema_name"
+                terraform import "$schema_resource" "projects/$INFRA_PROJECT_ID/schemas/$schema_name" || true
             fi
             cd - > /dev/null
         fi
@@ -390,6 +396,7 @@ import_log_ingestion_resources() {
                 echo "Successfully imported Pub/Sub topic: $topic_name"
             else
                 echo "Failed to import Pub/Sub topic: $topic_name"
+                terraform import "$topic_resource" "projects/$INFRA_PROJECT_ID/topics/$topic_name" || true
             fi
             cd - > /dev/null
         fi
@@ -408,6 +415,7 @@ import_log_ingestion_resources() {
                 echo "Successfully imported Pub/Sub subscription: $subscription_name"
             else
                 echo "Failed to import Pub/Sub subscription: $subscription_name"
+                terraform import "$subscription_resource" "projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name" || true
             fi
             cd - > /dev/null
         fi
@@ -432,6 +440,7 @@ import_log_ingestion_resources() {
                         echo "Successfully imported organization log sink: $sink_name"
                     else
                         echo "Failed to import organization log sink: $sink_name"
+                        terraform import "$sink_resource" "organizations/$ORGANIZATION_ID/sinks/$sink_name" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -452,6 +461,7 @@ import_log_ingestion_resources() {
                         echo "Successfully imported folder log sink: $sink_name_with_folder"
                     else
                         echo "Failed to import folder log sink: $sink_name_with_folder"
+                        terraform import "$sink_resource" "folders/$folder_id/sinks/$sink_name_with_folder" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -472,6 +482,7 @@ import_log_ingestion_resources() {
                         echo "Successfully imported project log sink: $sink_name_with_project"
                     else
                         echo "Failed to import project log sink: $sink_name_with_project"
+                        terraform import "$sink_resource" "projects/$project_id/sinks/$sink_name_with_project" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -540,6 +551,7 @@ import_log_ingestion_resources() {
                         echo "Successfully imported Pub/Sub topic IAM binding: $role"
                     else
                         echo "Failed to import Pub/Sub topic IAM binding: $role"
+                        terraform import "$resource_name" "$import_id" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -566,6 +578,7 @@ import_log_ingestion_resources() {
                         echo "Successfully imported Pub/Sub subscription IAM binding: $role"
                     else
                         echo "Failed to import Pub/Sub subscription IAM binding: $role"
+                        terraform import "$resource_name" "$import_id" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -591,6 +604,7 @@ import_log_ingestion_resources() {
                     echo "Successfully imported monitoring.viewer IAM binding"
                 else
                     echo "Failed to import monitoring.viewer IAM binding"
+                    terraform import "$resource_name" "$import_id" || true
                 fi
                 cd - > /dev/null
             fi
