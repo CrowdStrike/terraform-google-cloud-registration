@@ -28,7 +28,7 @@ output "log_sink_names" {
       for folder_id in local.folder_list : folder_id => google_logging_folder_sink.crowdstrike_logs[folder_id].name
     } : {},
     var.registration_type == "project" ? {
-      for project_id in local.project_list : project_id => google_logging_project_sink.crowdstrike_logs[project_id].name
+      for project_id in keys(google_logging_project_sink.crowdstrike_logs) : project_id => google_logging_project_sink.crowdstrike_logs[project_id].name
     } : {}
   )
 }
@@ -43,7 +43,7 @@ output "log_sink_writer_identities" {
       for folder_id in local.folder_list : folder_id => google_logging_folder_sink.crowdstrike_logs[folder_id].writer_identity
     } : {},
     var.registration_type == "project" ? {
-      for project_id in local.project_list : project_id => google_logging_project_sink.crowdstrike_logs[project_id].writer_identity
+      for project_id in keys(google_logging_project_sink.crowdstrike_logs) : project_id => google_logging_project_sink.crowdstrike_logs[project_id].writer_identity
     } : {}
   )
 }
