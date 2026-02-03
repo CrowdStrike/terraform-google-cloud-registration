@@ -47,6 +47,9 @@ while [[ $# -gt 0 ]]; do
             echo "  --dry-run                  Show import commands without executing them"
             echo "  -h, --help                 Show this help message"
             echo ""
+            echo "Note: GCP API enablement resources are not imported and will appear as new"
+            echo "resources in terraform plan. This is expected and safe to apply."
+            echo ""
             echo "Examples:"
             echo "  $0 --terraform-dir ./terraform --registration-id abc123 --dry-run"
             echo "  $0 --terraform-dir ./examples/native-terraform --registration-id abc123"
@@ -282,6 +285,8 @@ import_asset_inventory_resources() {
         scope_id="$2"
         cmd_prefix=""
 
+        local log_ingestion_roles="roles/monitoring.viewer"
+
         case $scope_type in
             "organization")
                 cmd_prefix="gcloud organizations"
@@ -306,6 +311,12 @@ import_asset_inventory_resources() {
             if [[ -n "$binding" ]]; then
                 role=$(echo "$binding" | cut -d'|' -f1)
                 member=$(echo "$binding" | cut -d'|' -f5-)
+
+                if [[ " $log_ingestion_roles " =~ " $role " ]]; then
+                    echo "Skipping $role (managed by log-ingestion module)"
+                    continue
+                fi
+
                 if [[ -n "$role" && -n "$member" ]]; then
                     # Construct terraform resource address and import ID based on scope type
                     case $scope_type in
