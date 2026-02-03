@@ -9,24 +9,8 @@ data "google_project" "wif_project" {
   project_id = local.effective_wif_project_id
 }
 
-module "project-discovery" {
-  source = "./modules/project-discovery/"
-
-  registration_type = var.registration_type
-  organization_id   = var.organization_id
-  folder_ids        = var.folder_ids
-  project_ids       = var.project_ids
-}
-
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  lifecycle {
-    precondition {
-      condition     = contains(module.project-discovery.discovered_projects, var.infra_project_id)
-      error_message = "The infra_project_id '${var.infra_project_id}' must be within the registration scope. Discovered projects: ${join(", ", module.project-discovery.discovered_projects)}"
-    }
-  }
-
   name                          = var.registration_name
   infra_project                 = var.infra_project_id
   wif_project                   = local.effective_wif_project_id
@@ -53,8 +37,6 @@ resource "crowdstrike_cloud_google_registration" "main" {
 
   # Project exclusion patterns
   excluded_project_patterns = var.excluded_project_patterns
-
-  depends_on = [module.project-discovery]
 }
 
 module "workload-identity" {
@@ -66,6 +48,14 @@ module "workload-identity" {
   registration_id      = crowdstrike_cloud_google_registration.main.id
   resource_prefix      = local.effective_prefix
   resource_suffix      = local.effective_suffix
+}
+module "project-discovery" {
+  source = "./modules/project-discovery/"
+
+  registration_type = var.registration_type
+  organization_id   = var.organization_id
+  folder_ids        = var.folder_ids
+  project_ids       = var.project_ids
 }
 
 module "asset-inventory" {
