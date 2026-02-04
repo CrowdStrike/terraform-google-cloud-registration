@@ -92,6 +92,13 @@ if ! type terraform >/dev/null 2>&1; then
     exit 1
 fi
 
+# Check required environment variable for CrowdStrike provider
+if [[ -z "$TF_VAR_falcon_client_secret" ]]; then
+    echo "Error: TF_VAR_falcon_client_secret environment variable is not set"
+    echo "Please set: export TF_VAR_falcon_client_secret=<your_client_secret>"
+    exit 1
+fi
+
 # Validate terraform directory
 if [[ ! -d "$TERRAFORM_DIR" ]]; then
     echo "Error: Terraform directory not found: $TERRAFORM_DIR"
@@ -182,14 +189,14 @@ import_crowdstrike_resources() {
     # Import CrowdStrike registration
     local registration_resource="module.crowdstrike_gcp_registration.crowdstrike_cloud_google_registration.main"
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would execute: terraform import \"$registration_resource\" \"$REGISTRATION_ID\""
+        echo "[DRY RUN] Would execute: terraform import -input=false \"$registration_resource\" \"$REGISTRATION_ID\""
     else
         cd "$TERRAFORM_DIR"
-        if terraform import "$registration_resource" "$REGISTRATION_ID" >/dev/null 2>&1; then
+        if terraform import -input=false "$registration_resource" "$REGISTRATION_ID" >/dev/null 2>&1; then
             echo "Successfully imported CrowdStrike registration"
         else
             echo "Failed to import CrowdStrike registration"
-            terraform import "$registration_resource" "$REGISTRATION_ID" || true
+            terraform import -input=false "$registration_resource" "$REGISTRATION_ID" || true
         fi
         cd - > /dev/null
     fi
@@ -197,14 +204,14 @@ import_crowdstrike_resources() {
     # Import CrowdStrike registration settings (if they exist)
     local settings_resource="module.crowdstrike_gcp_registration.crowdstrike_cloud_google_registration_settings.main"
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would execute: terraform import \"$settings_resource\" \"$REGISTRATION_ID\""
+        echo "[DRY RUN] Would execute: terraform import -input=false \"$settings_resource\" \"$REGISTRATION_ID\""
     else
         cd "$TERRAFORM_DIR"
-        if terraform import "$settings_resource" "$REGISTRATION_ID" >/dev/null 2>&1; then
+        if terraform import -input=false "$settings_resource" "$REGISTRATION_ID" >/dev/null 2>&1; then
             echo "Successfully imported CrowdStrike registration settings"
         else
             echo "Failed to import CrowdStrike registration settings"
-            terraform import "$settings_resource" "$REGISTRATION_ID" || true
+            terraform import -input=false "$settings_resource" "$REGISTRATION_ID" || true
         fi
         cd - > /dev/null
     fi
@@ -225,14 +232,14 @@ import_wif_resources() {
         # Import the WIF pool
         local pool_resource="module.crowdstrike_gcp_registration.module.workload-identity.google_iam_workload_identity_pool.main"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] Would execute: terraform import \"$pool_resource\" \"$pool_name\""
+            echo "[DRY RUN] Would execute: terraform import -input=false \"$pool_resource\" \"$pool_name\""
         else
             cd "$TERRAFORM_DIR"
-            if terraform import "$pool_resource" "$pool_name" >/dev/null 2>&1; then
+            if terraform import -input=false "$pool_resource" "$pool_name" >/dev/null 2>&1; then
                 echo "Successfully imported WIF pool: $pool_id"
             else
                 echo "Failed to import WIF pool: $pool_id"
-                terraform import "$pool_resource" "$pool_name" || true
+                terraform import -input=false "$pool_resource" "$pool_name" || true
             fi
             cd - > /dev/null
         fi
@@ -246,14 +253,14 @@ import_wif_resources() {
 
                 local provider_resource="module.crowdstrike_gcp_registration.module.workload-identity.google_iam_workload_identity_pool_provider.aws"
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$provider_resource\" \"$provider_import_name\""
+                    echo "[DRY RUN] terraform import -input=false \"$provider_resource\" \"$provider_import_name\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$provider_resource" "$provider_import_name" >/dev/null 2>&1; then
+                    if terraform import -input=false "$provider_resource" "$provider_import_name" >/dev/null 2>&1; then
                         echo "Successfully imported WIF provider: $provider_id"
                     else
                         echo "Failed to import WIF provider: $provider_id"
-                        terraform import "$provider_resource" "$provider_import_name" || true
+                        terraform import -input=false "$provider_resource" "$provider_import_name" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -337,14 +344,14 @@ import_asset_inventory_resources() {
                     esac
 
                     if [[ "$DRY_RUN" == "true" ]]; then
-                        echo "[DRY RUN] terraform import \"$resource_name\" \"$import_id\""
+                        echo "[DRY RUN] terraform import -input=false \"$resource_name\" \"$import_id\""
                     else
                         cd "$TERRAFORM_DIR"
-                        if terraform import "$resource_name" "$import_id" >/dev/null 2>&1; then
+                        if terraform import -input=false "$resource_name" "$import_id" >/dev/null 2>&1; then
                             echo "Successfully imported IAM binding: $role"
                         else
                             echo "Failed to import IAM binding: $role"
-                            terraform import "$resource_name" "$import_id" || true
+                            terraform import -input=false "$resource_name" "$import_id" || true
                         fi
                         cd - > /dev/null
                     fi
@@ -381,14 +388,14 @@ import_log_ingestion_resources() {
     if gcloud pubsub schemas describe "$schema_name" --project="$INFRA_PROJECT_ID" >/dev/null 2>&1; then
         local schema_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_pubsub_schema.crowdstrike_logs[0]"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] terraform import \"$schema_resource\" \"projects/$INFRA_PROJECT_ID/schemas/$schema_name\""
+            echo "[DRY RUN] terraform import -input=false \"$schema_resource\" \"projects/$INFRA_PROJECT_ID/schemas/$schema_name\""
         else
             cd "$TERRAFORM_DIR"
-            if terraform import "$schema_resource" "projects/$INFRA_PROJECT_ID/schemas/$schema_name" >/dev/null 2>&1; then
+            if terraform import -input=false "$schema_resource" "projects/$INFRA_PROJECT_ID/schemas/$schema_name" >/dev/null 2>&1; then
                 echo "Successfully imported Pub/Sub schema: $schema_name"
             else
                 echo "Failed to import Pub/Sub schema: $schema_name"
-                terraform import "$schema_resource" "projects/$INFRA_PROJECT_ID/schemas/$schema_name" || true
+                terraform import -input=false "$schema_resource" "projects/$INFRA_PROJECT_ID/schemas/$schema_name" || true
             fi
             cd - > /dev/null
         fi
@@ -400,14 +407,14 @@ import_log_ingestion_resources() {
     if gcloud pubsub topics describe "$topic_name" --project="$INFRA_PROJECT_ID" >/dev/null 2>&1; then
         local topic_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_pubsub_topic.crowdstrike_logs[0]"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] terraform import \"$topic_resource\" \"projects/$INFRA_PROJECT_ID/topics/$topic_name\""
+            echo "[DRY RUN] terraform import -input=false \"$topic_resource\" \"projects/$INFRA_PROJECT_ID/topics/$topic_name\""
         else
             cd "$TERRAFORM_DIR"
-            if terraform import "$topic_resource" "projects/$INFRA_PROJECT_ID/topics/$topic_name" >/dev/null 2>&1; then
+            if terraform import -input=false "$topic_resource" "projects/$INFRA_PROJECT_ID/topics/$topic_name" >/dev/null 2>&1; then
                 echo "Successfully imported Pub/Sub topic: $topic_name"
             else
                 echo "Failed to import Pub/Sub topic: $topic_name"
-                terraform import "$topic_resource" "projects/$INFRA_PROJECT_ID/topics/$topic_name" || true
+                terraform import -input=false "$topic_resource" "projects/$INFRA_PROJECT_ID/topics/$topic_name" || true
             fi
             cd - > /dev/null
         fi
@@ -419,14 +426,14 @@ import_log_ingestion_resources() {
     if gcloud pubsub subscriptions describe "$subscription_name" --project="$INFRA_PROJECT_ID" >/dev/null 2>&1; then
         local subscription_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_pubsub_subscription.crowdstrike_logs[0]"
         if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] terraform import \"$subscription_resource\" \"projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name\""
+            echo "[DRY RUN] terraform import -input=false \"$subscription_resource\" \"projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name\""
         else
             cd "$TERRAFORM_DIR"
-            if terraform import "$subscription_resource" "projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name" >/dev/null 2>&1; then
+            if terraform import -input=false "$subscription_resource" "projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name" >/dev/null 2>&1; then
                 echo "Successfully imported Pub/Sub subscription: $subscription_name"
             else
                 echo "Failed to import Pub/Sub subscription: $subscription_name"
-                terraform import "$subscription_resource" "projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name" || true
+                terraform import -input=false "$subscription_resource" "projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name" || true
             fi
             cd - > /dev/null
         fi
@@ -444,14 +451,14 @@ import_log_ingestion_resources() {
                 local sink_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_logging_organization_sink.crowdstrike_logs[0]"
 
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$sink_resource\" \"organizations/$ORGANIZATION_ID/sinks/$sink_name\""
+                    echo "[DRY RUN] terraform import -input=false \"$sink_resource\" \"organizations/$ORGANIZATION_ID/sinks/$sink_name\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$sink_resource" "organizations/$ORGANIZATION_ID/sinks/$sink_name" >/dev/null 2>&1; then
+                    if terraform import -input=false "$sink_resource" "organizations/$ORGANIZATION_ID/sinks/$sink_name" >/dev/null 2>&1; then
                         echo "Successfully imported organization log sink: $sink_name"
                     else
                         echo "Failed to import organization log sink: $sink_name"
-                        terraform import "$sink_resource" "organizations/$ORGANIZATION_ID/sinks/$sink_name" || true
+                        terraform import -input=false "$sink_resource" "organizations/$ORGANIZATION_ID/sinks/$sink_name" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -465,14 +472,14 @@ import_log_ingestion_resources() {
                 local sink_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_logging_folder_sink.crowdstrike_logs[\"$folder_id\"]"
 
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$sink_resource\" \"folders/$folder_id/sinks/$sink_name_with_folder\""
+                    echo "[DRY RUN] terraform import -input=false \"$sink_resource\" \"folders/$folder_id/sinks/$sink_name_with_folder\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$sink_resource" "folders/$folder_id/sinks/$sink_name_with_folder" >/dev/null 2>&1; then
+                    if terraform import -input=false "$sink_resource" "folders/$folder_id/sinks/$sink_name_with_folder" >/dev/null 2>&1; then
                         echo "Successfully imported folder log sink: $sink_name_with_folder"
                     else
                         echo "Failed to import folder log sink: $sink_name_with_folder"
-                        terraform import "$sink_resource" "folders/$folder_id/sinks/$sink_name_with_folder" || true
+                        terraform import -input=false "$sink_resource" "folders/$folder_id/sinks/$sink_name_with_folder" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -486,14 +493,14 @@ import_log_ingestion_resources() {
                 local sink_resource="module.crowdstrike_gcp_registration.module.log-ingestion[0].google_logging_project_sink.crowdstrike_logs[\"$project_id\"]"
 
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$sink_resource\" \"projects/$project_id/sinks/$sink_name_with_project\""
+                    echo "[DRY RUN] terraform import -input=false \"$sink_resource\" \"projects/$project_id/sinks/$sink_name_with_project\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$sink_resource" "projects/$project_id/sinks/$sink_name_with_project" >/dev/null 2>&1; then
+                    if terraform import -input=false "$sink_resource" "projects/$project_id/sinks/$sink_name_with_project" >/dev/null 2>&1; then
                         echo "Successfully imported project log sink: $sink_name_with_project"
                     else
                         echo "Failed to import project log sink: $sink_name_with_project"
-                        terraform import "$sink_resource" "projects/$project_id/sinks/$sink_name_with_project" || true
+                        terraform import -input=false "$sink_resource" "projects/$project_id/sinks/$sink_name_with_project" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -555,14 +562,14 @@ import_log_ingestion_resources() {
                 local import_id="projects/$INFRA_PROJECT_ID/topics/$topic_name $role $member"
 
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$resource_name\" \"$import_id\""
+                    echo "[DRY RUN] terraform import -input=false \"$resource_name\" \"$import_id\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$resource_name" "$import_id" >/dev/null 2>&1; then
+                    if terraform import -input=false "$resource_name" "$import_id" >/dev/null 2>&1; then
                         echo "Successfully imported Pub/Sub topic IAM binding: $role"
                     else
                         echo "Failed to import Pub/Sub topic IAM binding: $role"
-                        terraform import "$resource_name" "$import_id" || true
+                        terraform import -input=false "$resource_name" "$import_id" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -582,14 +589,14 @@ import_log_ingestion_resources() {
                 local import_id="projects/$INFRA_PROJECT_ID/subscriptions/$subscription_name $role $member"
 
                 if [[ "$DRY_RUN" == "true" ]]; then
-                    echo "[DRY RUN] terraform import \"$resource_name\" \"$import_id\""
+                    echo "[DRY RUN] terraform import -input=false \"$resource_name\" \"$import_id\""
                 else
                     cd "$TERRAFORM_DIR"
-                    if terraform import "$resource_name" "$import_id" >/dev/null 2>&1; then
+                    if terraform import -input=false "$resource_name" "$import_id" >/dev/null 2>&1; then
                         echo "Successfully imported Pub/Sub subscription IAM binding: $role"
                     else
                         echo "Failed to import Pub/Sub subscription IAM binding: $role"
-                        terraform import "$resource_name" "$import_id" || true
+                        terraform import -input=false "$resource_name" "$import_id" || true
                     fi
                     cd - > /dev/null
                 fi
@@ -608,14 +615,14 @@ import_log_ingestion_resources() {
             local import_id="$INFRA_PROJECT_ID $role $member"
 
             if [[ "$DRY_RUN" == "true" ]]; then
-                echo "[DRY RUN] terraform import \"$resource_name\" \"$import_id\""
+                echo "[DRY RUN] terraform import -input=false \"$resource_name\" \"$import_id\""
             else
                 cd "$TERRAFORM_DIR"
-                if terraform import "$resource_name" "$import_id" >/dev/null 2>&1; then
+                if terraform import -input=false "$resource_name" "$import_id" >/dev/null 2>&1; then
                     echo "Successfully imported monitoring.viewer IAM binding"
                 else
                     echo "Failed to import monitoring.viewer IAM binding"
-                    terraform import "$resource_name" "$import_id" || true
+                    terraform import -input=false "$resource_name" "$import_id" || true
                 fi
                 cd - > /dev/null
             fi
