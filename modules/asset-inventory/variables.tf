@@ -8,9 +8,18 @@ variable "wif_iam_principal" {
   }
 }
 
-variable "discovered_projects" {
+
+variable "project_ids" {
   type        = list(string)
-  description = "List of all discovered projects where APIs will be enabled"
+  description = "List of Google Cloud project IDs for project-level registration"
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for project_id in var.project_ids : length(project_id) >= 6 && length(project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", project_id))
+    ])
+    error_message = "All project IDs must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
 }
 
 variable "registration_type" {
@@ -81,5 +90,25 @@ variable "google_iam_roles" {
       for role in var.google_iam_roles : can(regex("^roles/", role))
     ])
     error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "infra_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where CrowdStrike infrastructure resources are deployed"
+
+  validation {
+    condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
+  }
+}
+
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
+
+  validation {
+    condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
+    error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }

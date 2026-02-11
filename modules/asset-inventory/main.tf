@@ -29,7 +29,7 @@ resource "google_folder_iam_member" "crowdstrike_folder" {
 resource "google_project_iam_member" "crowdstrike_project" {
   for_each = toset([
     for pair in setproduct(
-      var.registration_type == "project" ? var.discovered_projects : [],
+      var.registration_type == "project" ? var.project_ids : [],
       var.google_iam_roles
     ) : "${pair[0]}::${pair[1]}"
   ])
@@ -39,11 +39,11 @@ resource "google_project_iam_member" "crowdstrike_project" {
   member  = var.wif_iam_principal
 }
 
-# Enable required APIs for all discovered projects
+# Enable required APIs for CrowdStrike infrastructure and WIF projects
 resource "google_project_service" "asset_inventory_apis" {
   for_each = toset([
     for pair in setproduct(
-      var.discovered_projects,
+      toset([var.infra_project_id, var.wif_project_id]),
       ["iam.googleapis.com", "iamcredentials.googleapis.com", "cloudresourcemanager.googleapis.com", "cloudasset.googleapis.com"]
     ) : "${pair[0]}::${pair[1]}"
   ])
