@@ -77,25 +77,17 @@ module "workload-identity" {
   resource_suffix      = var.resource_suffix
 }
 
-module "project-discovery" {
-  source = "../../modules/project-discovery/"
+module "asset-inventory" {
+  source = "../../modules/asset-inventory/"
 
+  wif_iam_principal = module.workload-identity.wif_iam_principal
   registration_type = var.registration_type
   organization_id   = var.organization_id
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
-}
+  wif_project_id    = local.effective_wif_project_id
 
-module "asset-inventory" {
-  source = "../../modules/asset-inventory/"
-
-  wif_iam_principal   = module.workload-identity.wif_iam_principal
-  registration_type   = var.registration_type
-  organization_id     = var.organization_id
-  folder_ids          = var.folder_ids
-  discovered_projects = module.project-discovery.discovered_projects
-
-  depends_on = [module.workload-identity, module.project-discovery]
+  depends_on = [module.workload-identity]
 }
 
 module "log-ingestion" {

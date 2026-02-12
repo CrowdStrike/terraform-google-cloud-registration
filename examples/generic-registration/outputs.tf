@@ -54,11 +54,6 @@ output "registered_project_ids" {
   value       = var.project_ids
 }
 
-output "discovered_projects" {
-  description = "Detailed information about discovered and registered projects"
-  value       = module.project-discovery.discovered_projects
-}
-
 # =============================================================================
 # LOG INGESTION OUTPUTS (RTV&D)
 # =============================================================================
