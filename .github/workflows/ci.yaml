@@ -39,7 +39,6 @@ jobs:
           - "examples/native-terraform"
           - "modules/asset-inventory"
           - "modules/log-ingestion"
-          - "modules/project-discovery"
           - "modules/workload-identity"
 
     steps:
