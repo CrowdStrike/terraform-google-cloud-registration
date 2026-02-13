@@ -98,6 +98,16 @@ variable "infra_project_id" {
   }
 }
 
+variable "wif_project_id" {
+  type        = string
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
+
+  validation {
+    condition     = can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.wif_project_id))
+    error_message = "Project ID must be 6-30 characters, start with lowercase letter, contain only lowercase letters/numbers/hyphens, and not end with hyphen."
+  }
+}
+
 variable "message_retention_duration" {
   type        = string
   description = "Message retention duration for Pub/Sub subscription (e.g., '604800s' for 7 days)"

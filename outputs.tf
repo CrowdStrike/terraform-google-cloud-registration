@@ -41,11 +41,6 @@ output "registration_id" {
   sensitive   = true
 }
 
-output "discovered_projects" {
-  description = "Detailed information about discovered and registered projects"
-  value       = module.project-discovery.discovered_projects
-}
-
 # =============================================================================
 # Log Ingestion Outputs (Optional - only when RTV&D is enabled)
 # =============================================================================

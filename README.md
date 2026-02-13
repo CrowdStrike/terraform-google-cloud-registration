@@ -133,7 +133,6 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Description |
 |------|-------------|
-| <a name="output_discovered_projects"></a> [discovered\_projects](#output\_discovered\_projects) | Detailed information about discovered and registered projects |
 | <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |
 | <a name="output_log_subscription_id"></a> [log\_subscription\_id](#output\_log\_subscription\_id) | The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled) |
 | <a name="output_log_topic_id"></a> [log\_topic\_id](#output\_log\_topic\_id) | The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled) |

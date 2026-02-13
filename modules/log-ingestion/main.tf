@@ -37,7 +37,7 @@ resource "google_project_service" "log_ingestion_apis" {
     "serviceusage.googleapis.com"
   ])
 
-  project                    = var.infra_project_id
+  project                    = var.wif_project_id
   service                    = each.value
   disable_dependent_services = false
   disable_on_destroy         = false
