@@ -121,6 +121,7 @@ module "log_ingestion" {
 | <a name="input_topic_message_retention_duration"></a> [topic\_message\_retention\_duration](#input\_topic\_message\_retention\_duration) | Message retention duration for Pub/Sub topic (e.g., '604800s' for 7 days) | `string` | `"604800s"` | no |
 | <a name="input_topic_storage_regions"></a> [topic\_storage\_regions](#input\_topic\_storage\_regions) | Regions for topic message storage. If empty, uses default region | `list(string)` | `[]` | no |
 | <a name="input_wif_iam_principal"></a> [wif\_iam\_principal](#input\_wif\_iam\_principal) | Google Cloud IAM Principal that identifies CrowdStrike resources | `string` | n/a | yes |
+| <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed | `string` | n/a | yes |
 ## Outputs
 
 | Name | Description |
