@@ -101,6 +101,7 @@ module "log-ingestion" {
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
   infra_project_id  = var.infra_project_id
+  wif_project_id    = local.effective_wif_project_id
   resource_prefix   = var.resource_prefix
   resource_suffix   = var.resource_suffix
   labels            = var.labels
