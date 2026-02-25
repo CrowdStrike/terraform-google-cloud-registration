@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -31,6 +31,9 @@ module "log_ingestion" {
 
   # Infrastructure project where existing resources are located
   infra_project_id = "my-crowdstrike-project"
+
+  # WIF project (usually same as infra_project_id unless separated)
+  wif_project_id = "my-crowdstrike-project"
 
   # Use existing Pub/Sub resources instead of creating new ones
   existing_topic_name        = "my-existing-audit-topic"

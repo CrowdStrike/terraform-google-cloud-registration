@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -28,10 +28,6 @@ module "asset-inventory" {
   registration_type = "organization"
   organization_id   = "123456789012" # Replace with your 12-digit org ID
 
-  # Discovered projects list (from project-discovery module output)
-  discovered_projects = [
-    "my-prod-project",
-    "my-staging-project",
-    "my-dev-project"
-  ]
+  # WIF project (usually same as infra project unless separated)
+  wif_project_id = "my-crowdstrike-project"
 }

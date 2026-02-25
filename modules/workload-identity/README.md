@@ -16,7 +16,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -51,7 +51,7 @@ module "workload_identity" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
 ## Resources
 
 | Name | Type |
