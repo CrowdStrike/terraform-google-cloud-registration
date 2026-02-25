@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -28,9 +28,6 @@ module "asset-inventory" {
   registration_type = "folder"
   folder_ids        = ["111111111111"] # Replace with your folder IDs
 
-  # Discovered projects list (from project-discovery module output)
-  discovered_projects = [
-    "my-folder-project-1",
-    "my-folder-project-2"
-  ]
+  # WIF project (usually same as infra project unless separated)
+  wif_project_id = "my-crowdstrike-project"
 }
