@@ -4,11 +4,11 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
     crowdstrike = {
       source  = "crowdstrike/crowdstrike"
-      version = "~> 0.0.55"
+      version = ">= 0.0.55"
     }
   }
 }

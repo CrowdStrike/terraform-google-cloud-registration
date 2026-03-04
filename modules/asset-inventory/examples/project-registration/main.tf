@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -27,8 +27,11 @@ module "asset-inventory" {
 
   registration_type = "project"
 
+  # WIF project (usually same as infra project unless separated)
+  wif_project_id = "my-crowdstrike-project"
+
   # Projects list used by the module
-  discovered_projects = [
+  project_ids = [
     "my-specific-project" # Replace with your project IDs
   ]
 

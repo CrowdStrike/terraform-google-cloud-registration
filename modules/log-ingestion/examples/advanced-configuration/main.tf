@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 5.0"
+      version = ">= 5.0"
     }
   }
 }
@@ -31,6 +31,9 @@ module "log_ingestion" {
 
   # Infrastructure project for Pub/Sub resources
   infra_project_id = "my-crowdstrike-project"
+
+  # WIF project (usually same as infra_project_id unless separated)
+  wif_project_id = "my-crowdstrike-project"
 
   # Comprehensive audit log types including data access
   audit_log_types = ["activity", "system_event", "policy", "data_access"]
