@@ -247,7 +247,8 @@ for role in "${PROJECT_ROLES[@]}"; do
     echo "  Binding $role..."
     gcloud projects add-iam-policy-binding $INFRA_PROJECT_ID \
         --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-        --role="$role"
+        --role="$role" \
+        --condition=None
 done
 
 # Apply WIF project roles
@@ -255,7 +256,8 @@ echo "Applying WIF project roles..."
 echo "  Binding roles/iam.workloadIdentityPoolAdmin to WIF project: $WIF_PROJECT_ID..."
 gcloud projects add-iam-policy-binding $WIF_PROJECT_ID \
     --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-    --role="roles/iam.workloadIdentityPoolAdmin"
+    --role="roles/iam.workloadIdentityPoolAdmin" \
+    --condition=None
 
 # Apply folder-level roles (for multiple folders)
 if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
@@ -283,7 +285,8 @@ if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
             echo "    Binding $role to folder $folder..."
             gcloud resource-manager folders add-iam-policy-binding "$folder" \
                 --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-                --role="$role"
+                --role="$role" \
+                --condition=None
             sleep 2
         done
     done
@@ -309,7 +312,8 @@ if [[ "$REGISTRATION_TYPE" == "organization" ]]; then
         echo "  Binding $role to organization $ORGANIZATION_ID..."
         gcloud organizations add-iam-policy-binding $ORGANIZATION_ID \
             --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-            --role="$role"
+            --role="$role" \
+            --condition=None
         sleep 3
     done
 fi
@@ -323,7 +327,8 @@ if [[ "$REGISTRATION_TYPE" == "project" && -n "$TARGET_PROJECTS" ]]; then
         echo "  Applying Owner role to project: $project"
         gcloud projects add-iam-policy-binding "$project" \
             --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-            --role="roles/owner"
+            --role="roles/owner" \
+            --condition=None
     done
 fi
 
