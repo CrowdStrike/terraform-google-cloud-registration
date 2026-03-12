@@ -69,20 +69,22 @@ variable "google_iam_roles" {
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
     "roles/cloudtasks.viewer",
+    "roles/cloudtranslate.viewer",
     "roles/compute.viewer",
     "roles/dataplex.viewer",
+    "roles/dialogflow.reader",
     "roles/essentialcontacts.viewer",
     "roles/firebaseappcheck.viewer",
     "roles/firebaseauth.viewer",
     "roles/firebasedatabase.viewer",
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
-    "roles/iam.securityReviewer",
+    "roles/iam.securityReviewer.organizations",
+    "roles/iam.securityReviewer.projects",
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
-    "roles/securitycenter.adminViewer",
-    "roles/cloudtranslate.viewer"
+    "roles/securitycenter.adminViewer"
   ]
 
   validation {
