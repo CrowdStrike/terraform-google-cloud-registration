@@ -230,3 +230,9 @@ variable "labels" {
     error_message = "Maximum of 64 labels allowed per resource."
   }
 }
+
+variable "infra_project_in_scope" {
+  type        = bool
+  description = "Whether the infrastructure project is within the registration scope (used for conditional IAM permissions)"
+  default     = true
+}

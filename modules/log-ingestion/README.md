@@ -85,6 +85,7 @@ module "log_ingestion" {
 | [google_logging_organization_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_organization_sink) | resource |
 | [google_logging_project_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_project_sink) | resource |
 | [google_project_iam_member.crowdstrike_monitoring_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.crowdstrike_pubsub_project_viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_service.log_ingestion_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 | [google_pubsub_schema.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_schema) | resource |
 | [google_pubsub_subscription.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription) | resource |
@@ -108,6 +109,7 @@ module "log_ingestion" {
 | <a name="input_existing_topic_name"></a> [existing\_topic\_name](#input\_existing\_topic\_name) | Name of existing Pub/Sub topic to use. If empty, creates new topic | `string` | `null` | no |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Project ID used for CrowdStrike infrastructure resources (topic, subscription, and other components). Defaults to WIF project if not specified | `string` | `null` | no |
+| <a name="input_infra_project_in_scope"></a> [infra\_project\_in\_scope](#input\_infra\_project\_in\_scope) | Whether the infrastructure project is within the registration scope (used for conditional IAM permissions) | `bool` | `true` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
 | <a name="input_message_retention_duration"></a> [message\_retention\_duration](#input\_message\_retention\_duration) | Message retention duration for Pub/Sub subscription (e.g., '604800s' for 7 days) | `string` | `"604800s"` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | The Google Cloud organization being registered | `string` | `null` | no |

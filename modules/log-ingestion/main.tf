@@ -1,24 +1,6 @@
-# Data source to check if infra_project_id is within folder registration scope
-data "google_project_ancestry" "infra_project" {
-  count   = var.registration_type == "folder" ? 1 : 0
-  project = var.infra_project_id
-}
-
 locals {
   folder_list  = var.folder_ids
   project_list = var.project_ids
-
-  # Extract folder IDs from infra project's ancestors
-  infra_project_folder_ancestors = var.registration_type == "folder" ? [
-    for ancestor in data.google_project_ancestry.infra_project[0].ancestors :
-    ancestor.id if ancestor.type == "folder"
-  ] : []
-
-  # Check if any target folder is an ancestor of infra_project_id
-  infra_project_in_scope = var.registration_type == "folder" ? length(setintersection(
-    toset(var.folder_ids),
-    toset(local.infra_project_folder_ancestors)
-  )) > 0 : true
 
   # Generate resource names with prefix/suffix or use existing names
   topic_name        = var.existing_topic_name != null ? var.existing_topic_name : "${var.resource_prefix}CrowdStrikeLogTopic-${var.registration_id}${var.resource_suffix}"
@@ -236,7 +218,7 @@ resource "google_pubsub_subscription_iam_member" "crowdstrike_subscriber" {
 }
 
 resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
-  count = local.infra_project_in_scope ? 1 : 0
+  count = var.infra_project_in_scope ? 1 : 0
 
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
   project = var.infra_project_id
@@ -247,8 +229,8 @@ resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
 }
 
 # Grant CrowdStrike principal project-level Pub/Sub viewer access when infra project is outside registration scope
-resource "google_project_iam_member" "crowdstrike_pubsub_topic_reader" {
-  count = local.infra_project_in_scope ? 0 : 1
+resource "google_project_iam_member" "crowdstrike_pubsub_project_viewer" {
+  count = var.infra_project_in_scope ? 0 : 1
 
   project = var.infra_project_id
   role    = "roles/pubsub.viewer"
