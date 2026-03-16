@@ -5,7 +5,7 @@
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
 | <a name="requirement_crowdstrike"></a> [crowdstrike](#requirement\_crowdstrike) | >= 0.0.50 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 5.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 6.22 |
 
 ## Providers
 

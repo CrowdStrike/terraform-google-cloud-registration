@@ -42,7 +42,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 5.0"
+      version = ">= 6.22"
     }
   }
 }
@@ -101,7 +101,7 @@ module "crowdstrike_gcp_registration" {
 | Name | Version |
 |------|---------|
 | <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.55 |
-| <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 6.22 |
 ## Resources
 
 | Name | Type |
