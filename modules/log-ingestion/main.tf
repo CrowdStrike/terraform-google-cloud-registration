@@ -217,14 +217,7 @@ resource "google_pubsub_subscription_iam_member" "crowdstrike_subscriber" {
   depends_on = [google_pubsub_subscription.crowdstrike_logs, data.google_pubsub_subscription.existing_crowdstrike_logs]
 }
 
-moved {
-  from = google_pubsub_topic_iam_member.crowdstrike_viewer
-  to   = google_pubsub_topic_iam_member.crowdstrike_viewer[0]
-}
-
 resource "google_pubsub_topic_iam_member" "crowdstrike_viewer" {
-  count = var.infra_project_in_scope ? 1 : 0
-
   topic   = local.create_topic ? google_pubsub_topic.crowdstrike_logs[0].name : data.google_pubsub_topic.existing_crowdstrike_logs[0].name
   project = var.infra_project_id
   role    = "roles/pubsub.viewer"
