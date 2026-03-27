@@ -63,6 +63,16 @@ module "asset-inventory" {
   depends_on = [module.workload-identity]
 }
 
+# Check if infrastructure project is within registration scope for log ingestion permissions
+module "scope-checker" {
+  count  = var.enable_realtime_visibility ? 1 : 0
+  source = "./modules/scope-checker/"
+
+  registration_type = var.registration_type
+  folder_ids        = var.folder_ids
+  infra_project_id  = var.infra_project_id
+}
+
 module "log-ingestion" {
   count  = var.enable_realtime_visibility ? 1 : 0
   source = "./modules/log-ingestion/"
@@ -79,6 +89,9 @@ module "log-ingestion" {
   resource_prefix   = local.effective_prefix
   resource_suffix   = local.effective_suffix
   labels            = var.labels
+
+  # Scope-based conditional permissions
+  infra_project_in_scope = module.scope-checker[0].infra_project_in_scope
 
   # Optional settings - structured configuration, child module handles defaults
   message_retention_duration       = var.log_ingestion_settings.message_retention_duration
@@ -98,7 +111,7 @@ module "log-ingestion" {
     [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${replace(replace(pattern, "*", ".*"), "?", ".")}$\""]
   )
 
-  depends_on = [module.workload-identity]
+  depends_on = [module.workload-identity, module.scope-checker]
 }
 
 # CrowdStrike registration settings
