@@ -65,6 +65,7 @@ variable "google_iam_roles" {
     "roles/apigee.readOnlyAdmin",
     "roles/appengine.appViewer",
     "roles/artifactregistry.reader",
+    "roles/backupdr.viewer",
     "roles/browser",
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
@@ -74,16 +75,17 @@ variable "google_iam_roles" {
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
     "roles/essentialcontacts.viewer",
+    "roles/eventarc.viewer",
     "roles/firebaseappcheck.viewer",
     "roles/firebaseauth.viewer",
     "roles/firebasedatabase.viewer",
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
-    "roles/iam.securityReviewer",
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
-    "roles/securitycenter.adminViewer"
+    "roles/securitycenter.adminViewer",
+    "roles/storage.bucketViewer"
   ]
 
   validation {
