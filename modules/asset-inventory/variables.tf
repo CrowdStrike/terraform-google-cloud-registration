@@ -85,6 +85,7 @@ variable "google_iam_roles" {
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/securitycenter.adminViewer",
+    "roles/securitycenter.securityReviewer",
     "roles/storage.bucketViewer"
   ]
 
