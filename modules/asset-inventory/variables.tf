@@ -81,11 +81,11 @@ variable "google_iam_roles" {
     "roles/firebasedatabase.viewer",
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
+    "roles/iam.securityReviewer",
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/securitycenter.adminViewer",
-    "roles/securitycenter.securityReviewer",
     "roles/storage.bucketViewer"
   ]
 
