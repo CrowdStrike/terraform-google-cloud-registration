@@ -37,6 +37,7 @@ jobs:
           - "examples/generic-registration"
           - "examples/infrastructure-manager"
           - "examples/native-terraform"
+          - "modules/agentless-scanning"
           - "modules/asset-inventory"
           - "modules/log-ingestion"
           - "modules/workload-identity"

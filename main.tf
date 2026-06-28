@@ -1,7 +1,12 @@
 locals {
-  effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
-  effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
-  effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
+  effective_wif_project_id   = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
+  agentless_is_cross_project = var.agentless_scanning_settings.host_project_id != null
+  effective_prefix           = var.resource_prefix != null ? var.resource_prefix : ""
+  effective_suffix           = var.resource_suffix != null ? var.resource_suffix : ""
+  network_configuration_type = (
+    var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
+    var.agentless_scanning_settings.deploy_cloud_nat ? "managed" : "managed_no_nat"
+  )
 }
 
 # Data source to get WIF project information
@@ -11,8 +16,16 @@ data "google_project" "wif_project" {
 
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
-  name                          = var.registration_name
-  infra_project                 = var.infra_project_id
+  name          = var.registration_name
+  infra_project = var.infra_project_id
+
+  lifecycle {
+    precondition {
+      condition     = length(local.effective_prefix) + length(local.effective_suffix) <= 13
+      error_message = "Combined length of resource_prefix and resource_suffix must not exceed 13 characters."
+    }
+  }
+
   wif_project                   = local.effective_wif_project_id
   wif_project_number            = data.google_project.wif_project.number
   deployment_method             = var.deployment_method
@@ -33,6 +46,11 @@ resource "crowdstrike_cloud_google_registration" "main" {
   # Enable realtime visibility if requested
   realtime_visibility = {
     enabled = var.enable_realtime_visibility
+  }
+
+  # Enable dspm if requested
+  dspm = {
+    enabled = var.enable_dspm
   }
 
   # Project exclusion patterns
@@ -114,6 +132,40 @@ module "log-ingestion" {
   depends_on = [module.workload-identity, module.scope-checker]
 }
 
+module "agentless_scanning" {
+  count  = var.enable_dspm ? 1 : 0
+  source = "./modules/agentless-scanning/"
+
+  # Common vars from root
+  registration_type = var.registration_type
+  registration_id   = crowdstrike_cloud_google_registration.main.id
+  host_project_id   = var.agentless_scanning_settings.host_project_id
+  project_ids       = var.project_ids
+  organization_id   = var.organization_id
+  folder_org_id     = var.agentless_scanning_settings.org_id
+  folder_ids        = var.folder_ids
+  labels            = var.labels
+  resource_prefix   = local.effective_prefix
+  resource_suffix   = local.effective_suffix
+
+  # WIF info from shared pool
+  wif_project_number          = data.google_project.wif_project.number
+  wif_pool_id                 = module.workload-identity.wif_pool_id
+  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+
+  # Falcon credentials (stored in Secret Manager per infra project)
+  falcon_client_id     = var.falcon_client_id
+  falcon_client_secret = var.falcon_client_secret
+
+  # Agentless scanning settings
+  is_cross_project         = local.agentless_is_cross_project
+  regions                  = var.agentless_scanning_settings.regions
+  deploy_cloud_nat         = var.agentless_scanning_settings.deploy_cloud_nat
+  custom_vpc_configuration = var.agentless_scanning_settings.custom_vpc_configuration
+
+  depends_on = [module.workload-identity]
+}
+
 # CrowdStrike registration settings
 resource "crowdstrike_cloud_google_registration_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
@@ -123,10 +175,27 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
 
+  agentless_scanning_settings = var.enable_dspm ? {
+    wif_principal              = module.agentless_scanning[0].agentless_wif_principal
+    deployment_version         = module.agentless_scanning[0].deployment_version
+    regions                    = var.agentless_scanning_settings.regions
+    host_project_id            = local.agentless_is_cross_project ? var.agentless_scanning_settings.host_project_id : null
+    org_id                     = var.registration_type == "folder" ? var.agentless_scanning_settings.org_id : null
+    network_configuration_type = local.network_configuration_type
+
+    custom_network = var.agentless_scanning_settings.custom_vpc_configuration != null ? {
+      vpc_name = var.agentless_scanning_settings.custom_vpc_configuration.vpc_name
+      subnets  = var.agentless_scanning_settings.custom_vpc_configuration.subnets
+    } : null
+
+    infra = module.agentless_scanning[0].agentless_infra
+  } : null
+
   depends_on = [
     crowdstrike_cloud_google_registration.main,
     module.workload-identity,
     module.asset-inventory,
-    module.log-ingestion
+    module.log-ingestion,
+    module.agentless_scanning
   ]
 }

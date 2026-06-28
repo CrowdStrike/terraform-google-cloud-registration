@@ -138,6 +138,38 @@ variable "enable_realtime_visibility" {
   default     = false
 }
 
+variable "enable_dspm" {
+  type        = bool
+  description = "Enable DSPM agentless scanning infrastructure"
+  default     = false
+}
+
+variable "agentless_scanning_role_arn" {
+  type        = string
+  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable_dspm is true."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.agentless_scanning_role_arn))
+    error_message = "Agentless scanning Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "agentless_scanning_settings" {
+  description = "Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings."
+  type = object({
+    host_project_id  = optional(string)
+    org_id           = optional(string)
+    regions          = optional(set(string), [])
+    deploy_cloud_nat = optional(bool, true)
+    custom_vpc_configuration = optional(object({
+      vpc_name = string
+      subnets  = map(string)
+    }))
+  })
+  default = {}
+}
+
 # =============================================================================
 # RESOURCE NAMING & ORGANIZATION
 # =============================================================================

@@ -20,19 +20,19 @@ variable "wif_project_id" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix to be added to all created resource names for identification"
+  description = "Prefix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters."
   default     = null
   type        = string
 
   validation {
     condition     = var.resource_prefix == null || var.resource_prefix == "" || (can(regex("^[A-Za-z0-9][A-Za-z0-9_.-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13)
-    error_message = "Resource prefix must start with alphanumeric character and contain only letters, numbers, underscores, hyphens, and periods, and be 13 characters or less."
+    error_message = "Resource prefix must start with alphanumeric character, contain only letters, numbers, underscores, hyphens, and periods, and be 13 characters or less."
   }
 }
 
 variable "resource_suffix" {
   type        = string
-  description = "Suffix to be added to all created resource names for identification"
+  description = "Suffix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters."
   default     = null
 
   validation {
@@ -100,7 +100,7 @@ variable "organization_id" {
 
 variable "folder_ids" {
   type        = list(string)
-  description = "List of Google Cloud folders being registered"
+  description = "List of Google Cloud folders being registered. When enable_dspm = true, all folders must reside in the same organization."
   default     = []
 
   validation {
@@ -166,6 +166,52 @@ variable "excluded_project_patterns" {
     ])
     error_message = "All excluded project patterns must be non-empty strings."
   }
+}
+
+variable "enable_dspm" {
+  type        = bool
+  description = "Enable DSPM agentless scanning infrastructure"
+  default     = false
+}
+
+variable "falcon_client_id" {
+  type        = string
+  description = "Falcon API client ID."
+  sensitive   = true
+  default     = null
+}
+
+variable "falcon_client_secret" {
+  type        = string
+  description = "Falcon API client secret."
+  sensitive   = true
+  default     = null
+}
+
+variable "agentless_scanning_role_arn" {
+  type        = string
+  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable_dspm is true."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.agentless_scanning_role_arn))
+    error_message = "Agentless scanning Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "agentless_scanning_settings" {
+  description = "Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings."
+  type = object({
+    host_project_id  = optional(string)
+    org_id           = optional(string)
+    regions          = optional(set(string), [])
+    deploy_cloud_nat = optional(bool, true)
+    custom_vpc_configuration = optional(object({
+      vpc_name = string
+      subnets  = map(string)
+    }))
+  })
+  default = {}
 }
 
 variable "log_ingestion_settings" {

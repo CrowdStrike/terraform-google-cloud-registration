@@ -32,3 +32,8 @@ output "log_sink_names" {
   description = "Names of the created log sinks (if RTV&D enabled)"
   value       = module.crowdstrike_gcp_registration.log_sink_names
 }
+
+output "agentless_scanning_wif_principal" {
+  description = "The agentless scanning WIF IAM principal (if DSPM enabled)"
+  value       = module.crowdstrike_gcp_registration.agentless_scanning_wif_principal
+}
