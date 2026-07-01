@@ -164,6 +164,10 @@ resource "terraform_data" "agentless_validation" {
       error_message = "agentless_scanning_settings.org_id is required for folder registration when enable_dspm = true."
     }
     precondition {
+      condition     = !var.is_cross_project || var.host_project_id != null
+      error_message = "agentless_scanning_settings.host_project_id is required when cross-project mode is enabled."
+    }
+    precondition {
       condition     = var.custom_vpc_configuration == null || length(local.host_project_ids) == 1
       error_message = "agentless_scanning_settings.custom_vpc_configuration requires exactly one scanner infra project: use cross-project mode (set host_project_id) or register a single project. Multi-project no-cross has one infra project per project_id and cannot share a single VPC."
     }

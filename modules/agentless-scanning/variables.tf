@@ -129,6 +129,10 @@ variable "resource_suffix" {
 variable "wif_project_number" {
   type        = string
   description = "GCP Project Number for the WIF project (used in principal construction)"
+  validation {
+    condition     = can(regex("^[0-9]+$", var.wif_project_number))
+    error_message = "WIF project number must be a numeric string."
+  }
 }
 
 variable "wif_pool_id" {
@@ -154,6 +158,10 @@ variable "falcon_client_id" {
   type        = string
   sensitive   = true
   description = "Falcon API client ID for scanner authentication"
+  validation {
+    condition     = length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id))
+    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
 }
 
 variable "falcon_client_secret" {

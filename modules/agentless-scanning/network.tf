@@ -17,7 +17,7 @@ resource "google_compute_subnetwork" "agentless_subnet" {
 
   project       = each.value.project
   name          = "${var.resource_prefix}agentless-subnet-${each.value.region}${var.resource_suffix}"
-  ip_cidr_range = "10.${index(local.sorted_regions, each.value.region)}.0.0/24"
+  ip_cidr_range = "10.0.${index(local.sorted_regions, each.value.region)}.0/24"
   region        = each.value.region
   network       = google_compute_network.agentless_vpc[each.value.project].id
 
