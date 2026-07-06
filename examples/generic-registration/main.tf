@@ -27,8 +27,7 @@ provider "crowdstrike" {
 # =============================================================================
 
 locals {
-  effective_wif_project_id   = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
-  agentless_is_cross_project = var.agentless_scanning_settings.host_project_id != null
+  effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
     var.agentless_scanning_settings.deploy_cloud_nat ? "managed" : "managed_no_nat"
@@ -148,7 +147,6 @@ module "agentless_scanning" {
   falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
 
-  is_cross_project         = local.agentless_is_cross_project
   regions                  = var.agentless_scanning_settings.regions
   deploy_cloud_nat         = var.agentless_scanning_settings.deploy_cloud_nat
   custom_vpc_configuration = var.agentless_scanning_settings.custom_vpc_configuration
@@ -172,7 +170,7 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
     wif_principal              = module.agentless_scanning[0].agentless_wif_principal
     deployment_version         = module.agentless_scanning[0].deployment_version
     regions                    = var.agentless_scanning_settings.regions
-    host_project_id            = local.agentless_is_cross_project ? var.agentless_scanning_settings.host_project_id : null
+    host_project_id            = var.agentless_scanning_settings.host_project_id
     org_id                     = var.registration_type == "folder" ? var.agentless_scanning_settings.org_id : null
     network_configuration_type = local.network_configuration_type
 

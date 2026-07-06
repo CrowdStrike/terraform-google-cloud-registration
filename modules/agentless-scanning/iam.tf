@@ -37,7 +37,7 @@ resource "google_project_iam_custom_role" "scanner_gcs_role" {
   for_each = toset(local.host_project_ids)
 
   project     = each.value
-  role_id     = "DSPMScannerGCSRead_${local.role_suffix}_${random_id.gcs_role_suffix[each.value].hex}"
+  role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.gcs_role_suffix[each.value].hex}"
   title       = local.scanner_gcs_role.title
   description = local.scanner_gcs_role.description
 
@@ -127,15 +127,12 @@ resource "google_project_iam_member" "wif_viewer_roles" {
   member  = local.agentless_wif_principal
 }
 
-# Folder/Org mode: project-only roles bound on each host project
+# Folder/Org mode: project-only roles bound on the host project
 resource "google_project_iam_member" "wif_viewer_roles_project_only" {
-  for_each = !local.is_project_registration ? {
-    for pair in setproduct(local.host_project_ids, tolist(local.viewer_roles_project_only)) :
-    "${pair[0]}/${pair[1]}" => { project = pair[0], role = pair[1] }
-  } : {}
+  for_each = !local.is_project_registration ? local.viewer_roles_project_only : toset([])
 
-  project = each.value.project
-  role    = each.value.role
+  project = var.host_project_id
+  role    = each.value
   member  = local.agentless_wif_principal
 }
 

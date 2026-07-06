@@ -51,6 +51,7 @@ locals {
 
   # Scanner GCS read role — reused across host project and cross-target roles at project/folder/org scope.
   scanner_gcs_role = {
+    id_prefix   = "DSPMScannerGCSRead"
     title       = "DSPM Scanner GCS Read"
     description = "Minimal permissions for reading GCS objects in a given bucket"
     permissions = [
@@ -66,7 +67,7 @@ locals {
   # Projects that need full scanning infra (SA, VPC, NAT, custom roles, APIs)
   # - Cross-project (org/folder/multi-project): just the host project
   # - Per-project (project scope only): ALL project_ids (each gets full infra)
-  host_project_ids = var.is_cross_project ? (var.host_project_id != null ? [var.host_project_id] : []) : var.project_ids
+  host_project_ids = var.host_project_id != null ? [var.host_project_id] : var.project_ids
 
   # The single project that owns the scanner VPC/subnets, used by custom (BYO) VPC.
   # Custom VPC requires exactly one infra project: cross => the host project;
@@ -80,7 +81,7 @@ locals {
   # - Org/Folder: empty (org-level role handles all targets automatically)
   # - Project cross: project_ids minus host project
   # - No-cross: empty (each project has own infra with self-scan)
-  cross_target_ids = !var.is_cross_project ? [] : (
+  cross_target_ids = var.host_project_id == null ? [] : (
     (local.is_org_registration || local.is_folder_registration) ? [] : [
       for project_id in var.project_ids : project_id if project_id != var.host_project_id
     ]
@@ -150,7 +151,7 @@ resource "terraform_data" "agentless_validation" {
       error_message = "falcon_client_id and falcon_client_secret are required when enable_dspm = true."
     }
     precondition {
-      condition     = var.registration_type == "project" || var.is_cross_project
+      condition     = var.registration_type == "project" || var.host_project_id != null
       error_message = "Organization and folder registrations require cross-project mode (agentless_scanning_settings.host_project_id must be set)."
     }
     precondition {
@@ -162,10 +163,6 @@ resource "terraform_data" "agentless_validation" {
     precondition {
       condition     = var.registration_type != "folder" || var.folder_org_id != null
       error_message = "agentless_scanning_settings.org_id is required for folder registration when enable_dspm = true."
-    }
-    precondition {
-      condition     = !var.is_cross_project || var.host_project_id != null
-      error_message = "agentless_scanning_settings.host_project_id is required when cross-project mode is enabled."
     }
     precondition {
       condition     = var.custom_vpc_configuration == null || length(local.host_project_ids) == 1

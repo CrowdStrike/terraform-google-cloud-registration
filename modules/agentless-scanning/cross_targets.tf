@@ -16,7 +16,7 @@ resource "google_organization_iam_custom_role" "target_scanner_gcs_role" {
   count = local.is_org_registration ? 1 : 0
 
   org_id      = var.organization_id
-  role_id     = "DSPMScannerGCSRead_${local.role_suffix}_${random_id.target_gcs_role_org_suffix[0].hex}"
+  role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.target_gcs_role_org_suffix[0].hex}"
   title       = local.scanner_gcs_role.title
   description = local.scanner_gcs_role.description
 
@@ -47,7 +47,7 @@ resource "google_project_iam_custom_role" "target_scanner_gcs_role" {
   for_each = toset(local.cross_target_ids)
 
   project     = each.value
-  role_id     = "DSPMScannerGCSRead_${local.role_suffix}_${random_id.target_gcs_role_suffix[each.value].hex}"
+  role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.target_gcs_role_suffix[each.value].hex}"
   title       = local.scanner_gcs_role.title
   description = local.scanner_gcs_role.description
 
@@ -77,7 +77,7 @@ resource "google_organization_iam_custom_role" "folder_scanner_gcs_role" {
   count = local.is_folder_registration ? 1 : 0
 
   org_id      = var.folder_org_id
-  role_id     = "DSPMScannerGCSRead_${local.role_suffix}_${random_id.folder_org_role_suffix[0].hex}"
+  role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.folder_org_role_suffix[0].hex}"
   title       = local.scanner_gcs_role.title
   description = local.scanner_gcs_role.description
 

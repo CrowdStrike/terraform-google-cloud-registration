@@ -23,7 +23,6 @@ module "agentless_scanning" {
   # Project scope
   host_project_id  = "your-infrastructure-project"
   project_ids      = ["your-infrastructure-project"]
-  is_cross_project = false
 
   # Workload Identity Federation
   wif_project_number        = "123456789"

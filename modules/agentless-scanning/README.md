@@ -35,7 +35,6 @@ module "agentless_scanning" {
   # Project scope
   host_project_id  = "your-infrastructure-project"
   project_ids      = ["your-infrastructure-project"]
-  is_cross_project = false
 
   # Workload Identity Federation
   wif_project_number        = "123456789"
@@ -113,7 +112,6 @@ module "agentless_scanning" {
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folder IDs for folder-level registration | `list(string)` | `[]` | no |
 | <a name="input_folder_org_id"></a> [folder\_org\_id](#input\_folder\_org\_id) | Parent GCP Organization ID of the registered folder(s). Required for folder registration to host the org-level scanner custom role bound at folder scope. | `string` | `null` | no |
 | <a name="input_host_project_id"></a> [host\_project\_id](#input\_host\_project\_id) | Google Cloud Project ID hosting the agentless scanning infrastructure (the host project). Set only in cross-project mode (org/folder/multi-project); null for per-project (no-cross) registrations where each project self-hosts. | `string` | `null` | no |
-| <a name="input_is_cross_project"></a> [is\_cross\_project](#input\_is\_cross\_project) | Cross-project scanning mode. true = 1 host project + targets get scan permissions only. false = every target project gets full scanning infra. Org/folder registrations must always be cross-project. | `bool` | `true` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources that support them | `map(string)` | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of registered project IDs (full registration scope). Used for viewer role bindings and cross/no-cross target derivation. | `list(string)` | `[]` | no |

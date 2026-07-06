@@ -17,7 +17,7 @@ resource "google_compute_subnetwork" "agentless_subnet" {
 
   project       = each.value.project
   name          = "${var.resource_prefix}agentless-subnet-${each.value.region}${var.resource_suffix}"
-  ip_cidr_range = "10.0.${index(local.sorted_regions, each.value.region)}.0/24"
+  ip_cidr_range = "10.${parseint(substr(md5(each.value.region), 0, 2), 16)}.${parseint(substr(md5(each.value.region), 2, 2), 16)}.0/24"
   region        = each.value.region
   network       = google_compute_network.agentless_vpc[each.value.project].id
 
@@ -71,7 +71,7 @@ resource "google_compute_subnetwork_iam_member" "wif_byo_subnet_network_user" {
 }
 
 # =============================================================================
-# Cloud Router + NAT (Managed VPC Only, Optional)
+# Cloud Router + NAT (Managed VPC Only, Recommended)
 # =============================================================================
 
 resource "google_compute_router" "agentless_router" {

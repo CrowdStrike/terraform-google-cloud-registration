@@ -171,17 +171,6 @@ variable "falcon_client_secret" {
 }
 
 # -----------------------------------------------------------------------------
-# Agentless Scanning Configuration
-# -----------------------------------------------------------------------------
-
-variable "is_cross_project" {
-  type        = bool
-  description = "Cross-project scanning mode. true = 1 host project + targets get scan permissions only. false = every target project gets full scanning infra. Org/folder registrations must always be cross-project."
-  default     = true
-}
-
-
-# -----------------------------------------------------------------------------
 # Network Configuration
 # -----------------------------------------------------------------------------
 
