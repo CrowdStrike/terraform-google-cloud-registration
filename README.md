@@ -113,10 +113,15 @@ module "crowdstrike_gcp_registration" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable\_dspm is true. | `string` | `null` | no |
+| <a name="input_agentless_scanning_settings"></a> [agentless\_scanning\_settings](#input\_agentless\_scanning\_settings) | Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings. | <pre>object({<br/>    host_project_id  = optional(string)<br/>    org_id           = optional(string)<br/>    regions          = optional(set(string), [])<br/>    deploy_cloud_nat = optional(bool, true)<br/>    custom_vpc_configuration = optional(object({<br/>      vpc_name = string<br/>      subnets  = map(string)<br/>    }))<br/>  })</pre> | `{}` | no |
 | <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
+| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM agentless scanning infrastructure | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility and Detection (RTV&D) features via log ingestion | `bool` | `false` | no |
 | <a name="input_excluded_project_patterns"></a> [excluded\_project\_patterns](#input\_excluded\_project\_patterns) | List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'. | `list(string)` | `[]` | no |
-| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
+| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. | `string` | `null` | no |
+| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. | `string` | `null` | no |
+| <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered. When enable\_dspm = true, all folders must reside in the same organization. | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed | `string` | n/a | yes |
 | <a name="input_infrastructure_manager_region"></a> [infrastructure\_manager\_region](#input\_infrastructure\_manager\_region) | The Google Cloud region for Infrastructure Manager. Required when deployment\_method is infrastructure-manager | `string` | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources created by this module | `map(string)` | `{}` | no |
@@ -125,14 +130,16 @@ module "crowdstrike_gcp_registration" {
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of Google Cloud projects being registered | `list(string)` | `[]` | no |
 | <a name="input_registration_name"></a> [registration\_name](#input\_registration\_name) | Name for the CrowdStrike GCP registration | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `null` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `null` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
 | <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication | `string` | n/a | yes |
 | <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified | `string` | `null` | no |
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_agentless_scanning_sa_emails"></a> [agentless\_scanning\_sa\_emails](#output\_agentless\_scanning\_sa\_emails) | Agentless scanning Service Account emails per infra project (if DSPM enabled) |
+| <a name="output_agentless_scanning_wif_principal"></a> [agentless\_scanning\_wif\_principal](#output\_agentless\_scanning\_wif\_principal) | The agentless scanning WIF IAM principal (if DSPM enabled) |
 | <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |
 | <a name="output_log_subscription_id"></a> [log\_subscription\_id](#output\_log\_subscription\_id) | The ID of the Pub/Sub subscription for log ingestion (if RTV&D enabled) |
 | <a name="output_log_topic_id"></a> [log\_topic\_id](#output\_log\_topic\_id) | The ID of the Pub/Sub topic for log ingestion (if RTV&D enabled) |

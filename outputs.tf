@@ -59,3 +59,17 @@ output "log_sink_names" {
   description = "Names of the created log sinks (if RTV&D enabled)"
   value       = var.enable_realtime_visibility ? module.log-ingestion[0].log_sink_names : null
 }
+
+# =============================================================================
+# Agentless Scanning Outputs (Optional - only when DSPM is enabled)
+# =============================================================================
+
+output "agentless_scanning_wif_principal" {
+  description = "The agentless scanning WIF IAM principal (if DSPM enabled)"
+  value       = var.enable_dspm ? module.agentless_scanning[0].agentless_wif_principal : null
+}
+
+output "agentless_scanning_sa_emails" {
+  description = "Agentless scanning Service Account emails per infra project (if DSPM enabled)"
+  value       = var.enable_dspm ? module.agentless_scanning[0].scanner_sa_emails : null
+}

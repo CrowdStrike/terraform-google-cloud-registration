@@ -21,6 +21,8 @@ usage() {
     echo "Optional parameters:"
     echo "  --wif-project-id      GCP project ID for Workload Identity Federation (default: same as infra-project-id)"
     echo "  --enable-rtvd         Enable Real Time Visibility & Detection (default: false)"
+    echo "  --enable-dspm         Enable DSPM agentless scanning (default: false)"
+    echo "  --agentless-org-id    Organization ID for agentless scanning (required for folder registration with --enable-dspm)"
     echo "  --location            Infrastructure Manager location (default: us-central1)"
     echo "  --help                Show this help message"
     echo ""
@@ -39,6 +41,8 @@ usage() {
 REGISTRATION_TYPE=""
 PROJECT_ID=""
 ENABLE_RTVD=false
+ENABLE_DSPM=false
+AGENTLESS_ORG_ID=""
 ORGANIZATION_ID=""
 FOLDER_IDS=""
 TARGET_PROJECTS=""
@@ -60,6 +64,14 @@ while [[ $# -gt 0 ]]; do
         --enable-rtvd)
             ENABLE_RTVD=true
             shift
+            ;;
+        --enable-dspm)
+            ENABLE_DSPM=true
+            shift
+            ;;
+        --agentless-org-id)
+            AGENTLESS_ORG_ID="$2"
+            shift 2
             ;;
         --organization-id)
             ORGANIZATION_ID="$2"
@@ -241,6 +253,23 @@ if [[ "$ENABLE_RTVD" == true ]]; then
     fi
 fi
 
+# Add DSPM project roles if enabled
+if [[ "$ENABLE_DSPM" == true ]]; then
+    PROJECT_ROLES+=(
+        "roles/compute.networkAdmin"
+        "roles/iam.serviceAccountAdmin"
+        "roles/iam.roleAdmin"
+        "roles/secretmanager.admin"
+    )
+
+    # DSPM needs projectIamAdmin for IAM bindings on infra project
+    if [[ "$REGISTRATION_TYPE" == "project" ]]; then
+        PROJECT_ROLES+=(
+            "roles/resourcemanager.projectIamAdmin"
+        )
+    fi
+fi
+
 # Apply project-level roles
 echo "Applying project-level roles..."
 for role in "${PROJECT_ROLES[@]}"; do
@@ -275,6 +304,23 @@ if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
         )
     fi
 
+    # Add DSPM folder roles (for cross-project IAM bindings on target projects)
+    if [[ "$ENABLE_DSPM" == true ]]; then
+        FOLDER_ROLES+=(
+            "roles/resourcemanager.projectIamAdmin"
+        )
+
+        # Folder+DSPM needs org-level role for custom role creation
+        if [[ -n "$AGENTLESS_ORG_ID" ]]; then
+            echo "  Binding roles/iam.organizationRoleAdmin to organization $AGENTLESS_ORG_ID..."
+            gcloud organizations add-iam-policy-binding $AGENTLESS_ORG_ID \
+                --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+                --role="roles/iam.organizationRoleAdmin" \
+                --condition=None
+            sleep 3
+        fi
+    fi
+
     # Process multiple folders
     IFS=',' read -ra FOLDER_ARRAY <<< "$FOLDER_IDS"
     for folder in "${FOLDER_ARRAY[@]}"; do
@@ -305,6 +351,14 @@ if [[ "$REGISTRATION_TYPE" == "organization" ]]; then
     if [[ "$ENABLE_RTVD" == true ]]; then
         ORG_ROLES+=(
             "roles/logging.configWriter"
+        )
+    fi
+
+    # Add DSPM org roles (for org-level custom role creation)
+    if [[ "$ENABLE_DSPM" == true ]]; then
+        ORG_ROLES+=(
+            "roles/iam.organizationRoleAdmin"
+            "roles/resourcemanager.projectIamAdmin"
         )
     fi
 
