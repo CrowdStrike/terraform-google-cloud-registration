@@ -2,6 +2,12 @@ locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
   effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
   effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
+  identity_source          = crowdstrike_cloud_google_registration.main.identity_source
+
+  wif_iam_principal = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_iam_principal : module.workload-identity-oidc[0].wif_iam_principal
+  wif_pool_name     = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_name : module.workload-identity-oidc[0].wif_pool_name
+  wif_provider_name = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_provider_name : module.workload-identity-oidc[0].wif_provider_name
+
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
     var.agentless_scanning_settings.deploy_cloud_nat ? "managed" : "managed_no_nat"
@@ -11,6 +17,28 @@ locals {
 # Data source to get WIF project information
 data "google_project" "wif_project" {
   project_id = local.effective_wif_project_id
+}
+
+# Validate that the provided identity variables match the registration's identity source
+resource "terraform_data" "validate_identity_config" {
+  lifecycle {
+    precondition {
+      condition = (
+        (local.identity_source == "aws-sts" && var.role_arn != null) ||
+        (local.identity_source == "gcp-oidc" && var.service_account_unique_id != null)
+      )
+      error_message = <<-EOT
+        Configuration mismatch: Your CrowdStrike cloud uses '${local.identity_source}' for identity federation.
+
+        Required variable for ${local.identity_source}:
+          ${local.identity_source == "aws-sts" ? "- role_arn = \"arn:aws:sts::ACCOUNT_ID:assumed-role/ROLE_NAME\"" : "- service_account_unique_id = \"NUMERIC_ID\""}
+
+        Please provide the correct variable for your cloud environment:
+          - AWS-based CS clouds (US-1, US-2, EU-1, US-GOV-1): Use role_arn
+          - Wingspan (GCP-native) CS clouds: Use service_account_unique_id
+      EOT
+    }
+  }
 }
 
 # CrowdStrike GCP registration resource
@@ -57,6 +85,7 @@ resource "crowdstrike_cloud_google_registration" "main" {
 }
 
 module "workload-identity" {
+  count                = local.identity_source == "aws-sts" ? 1 : 0
   source               = "./modules/workload-identity/"
   wif_project_id       = local.effective_wif_project_id
   wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
@@ -67,17 +96,29 @@ module "workload-identity" {
   resource_suffix      = local.effective_suffix
 }
 
+module "workload-identity-oidc" {
+  count                     = local.identity_source == "gcp-oidc" ? 1 : 0
+  source                    = "./modules/workload-identity-oidc/"
+  wif_project_id            = local.effective_wif_project_id
+  wif_pool_id               = crowdstrike_cloud_google_registration.main.wif_pool_id
+  wif_pool_provider_id      = crowdstrike_cloud_google_registration.main.wif_provider_id
+  registration_id           = crowdstrike_cloud_google_registration.main.id
+  service_account_unique_id = var.service_account_unique_id
+  resource_prefix           = local.effective_prefix
+  resource_suffix           = local.effective_suffix
+}
+
 module "asset-inventory" {
   source = "./modules/asset-inventory/"
 
-  wif_iam_principal = module.workload-identity.wif_iam_principal
+  wif_iam_principal = local.wif_iam_principal
   registration_type = var.registration_type
   organization_id   = var.organization_id
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
   wif_project_id    = local.effective_wif_project_id
 
-  depends_on = [module.workload-identity]
+  depends_on = [module.workload-identity, module.workload-identity-oidc]
 }
 
 # Check if infrastructure project is within registration scope for log ingestion permissions
@@ -95,7 +136,7 @@ module "log-ingestion" {
   source = "./modules/log-ingestion/"
 
   # Required parameters
-  wif_iam_principal = module.workload-identity.wif_iam_principal
+  wif_iam_principal = local.wif_iam_principal
   registration_type = var.registration_type
   registration_id   = crowdstrike_cloud_google_registration.main.id
   organization_id   = var.organization_id
@@ -128,7 +169,7 @@ module "log-ingestion" {
     [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${replace(replace(pattern, "*", ".*"), "?", ".")}$\""]
   )
 
-  depends_on = [module.workload-identity, module.scope-checker]
+  depends_on = [module.workload-identity, module.workload-identity-oidc, module.scope-checker]
 }
 
 module "agentless_scanning" {
@@ -149,7 +190,7 @@ module "agentless_scanning" {
 
   # WIF info from shared pool
   wif_project_number          = data.google_project.wif_project.number
-  wif_pool_id                 = module.workload-identity.wif_pool_id
+  wif_pool_id                 = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_id : module.workload-identity-oidc[0].wif_pool_id
   agentless_scanning_role_arn = var.agentless_scanning_role_arn
 
   # Falcon credentials (stored in Secret Manager per infra project)
@@ -161,14 +202,14 @@ module "agentless_scanning" {
   deploy_cloud_nat         = var.agentless_scanning_settings.deploy_cloud_nat
   custom_vpc_configuration = var.agentless_scanning_settings.custom_vpc_configuration
 
-  depends_on = [module.workload-identity]
+  depends_on = [module.workload-identity, module.workload-identity-oidc]
 }
 
 # CrowdStrike registration settings
 resource "crowdstrike_cloud_google_registration_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
-  wif_pool_name                   = module.workload-identity.wif_pool_name
-  wif_provider_name               = module.workload-identity.wif_provider_name
+  wif_pool_name                   = local.wif_pool_name
+  wif_provider_name               = local.wif_provider_name
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
@@ -192,6 +233,7 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
   depends_on = [
     crowdstrike_cloud_google_registration.main,
     module.workload-identity,
+    module.workload-identity-oidc,
     module.asset-inventory,
     module.log-ingestion,
     module.agentless_scanning

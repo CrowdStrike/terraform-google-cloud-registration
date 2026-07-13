@@ -40,8 +40,9 @@ module "crowdstrike_gcp_registration" {
   folder_ids      = var.folder_ids
   project_ids     = var.project_ids
 
-  # Required: AWS integration
-  role_arn = var.role_arn
+  # Required: Identity federation (provide one based on your CS cloud)
+  role_arn                  = var.role_arn
+  service_account_unique_id = var.service_account_unique_id
 
   # Optional: Real-time visibility and detection
   enable_realtime_visibility = var.enable_realtime_visibility

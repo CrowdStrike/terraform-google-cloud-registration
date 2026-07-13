@@ -132,11 +132,23 @@ variable "project_ids" {
 
 variable "role_arn" {
   type        = string
-  description = "AWS IAM Role ARN for CrowdStrike identity federation"
+  description = "AWS IAM Role ARN for CrowdStrike identity federation. Required for AWS-based CS clouds."
+  default     = null
 
   validation {
-    condition     = can(regex("^arn:(aws|aws-us-gov):sts::[0-9]{12}:assumed-role/.+", var.role_arn))
+    condition     = var.role_arn == null || can(regex("^arn:(aws|aws-us-gov):sts::[0-9]{12}:assumed-role/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS STS assumed role ARN format."
+  }
+}
+
+variable "service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's shared service account. Required for Wingspan (GCP-native) CS clouds."
+  default     = null
+
+  validation {
+    condition     = var.service_account_unique_id == null || can(regex("^[0-9]+$", var.service_account_unique_id))
+    error_message = "Service account unique ID must be a numeric string."
   }
 }
 
