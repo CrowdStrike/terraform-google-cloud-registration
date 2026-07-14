@@ -37,7 +37,8 @@ locals {
   # Custom VPC subnet IAM pairs: flatten config into project/region pairs.
   # Keyed off the single scanner infra project (see custom_vpc_project_id), not
   # var.host_project_id, so single-project no-cross (host_project_id == null) works.
-  custom_vpc_subnet_pairs = local.is_custom_vpc ? {
+  # Empty when custom_vpc_project_id is null.
+  custom_vpc_subnet_pairs = local.is_custom_vpc && local.custom_vpc_project_id != null ? {
     for region, subnet in var.custom_vpc_configuration.subnets :
     "${local.custom_vpc_project_id}/${region}" => { project = local.custom_vpc_project_id, region = region, subnetwork = subnet }
   } : {}
@@ -69,13 +70,10 @@ locals {
   # - Per-project (project scope only): ALL project_ids (each gets full infra)
   host_project_ids = var.host_project_id != null ? [var.host_project_id] : var.project_ids
 
-  # The single project that owns the scanner VPC/subnets, used by custom (BYO) VPC.
-  # Custom VPC requires exactly one infra project: cross => the host project;
-  # single-project no-cross => that one project. one() errors if there is >1 infra
-  # project (multi-project no-cross), which custom VPC can't support — a cryptic
-  # last-line backstop. The root module's friendly precondition on
-  # crowdstrike_cloud_google_registration.main catches this first in normal use.
-  custom_vpc_project_id = one(local.host_project_ids)
+  # Single infra project that owns the scanner VPC/subnets (custom BYO VPC only).
+  # Custom VPC requires exactly one infra project. Resolves to null when custom VPC
+  # is unused or the infra project isn't exactly one, so local eval never crashes.
+  custom_vpc_project_id = local.is_custom_vpc && length(local.host_project_ids) == 1 ? local.host_project_ids[0] : null
 
   # Projects that need scanning permissions only (cross mode targets for project registrations)
   # - Org/Folder: empty (org-level role handles all targets automatically)
