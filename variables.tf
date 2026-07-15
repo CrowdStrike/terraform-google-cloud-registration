@@ -54,7 +54,7 @@ variable "role_arn" {
 
 variable "service_account_unique_id" {
   type        = string
-  description = "Numeric unique ID of CrowdStrike's shared service account. Required for Wingspan (GCP-native) CS clouds (identity_source = gcp-oidc)."
+  description = "Numeric unique ID of CrowdStrike's shared service account. Required when identity_source is gcp-oidc."
   default     = null
 
   validation {

@@ -31,10 +31,6 @@ output "wif_project_number" {
   value       = module.workload-identity.wif_project_number
 }
 
-output "identity_source" {
-  description = "The identity source used for workload identity federation (aws-sts or gcp-oidc)"
-  value       = local.identity_source
-}
 
 # =============================================================================
 # Registration Outputs
