@@ -81,11 +81,7 @@ resource "google_iam_workload_identity_pool_provider" "oidc" {
     "google.subject" = "assertion.sub"
   }
 
-  attribute_condition = (
-    var.agentless_scanning_service_account_unique_id != null
-    ? "assertion.sub == '${var.service_account_unique_id}' || assertion.sub == '${var.agentless_scanning_service_account_unique_id}'"
-    : "assertion.sub == '${var.service_account_unique_id}'"
-  )
+  attribute_condition = "assertion.sub in [${join(", ", [for id in compact([var.service_account_unique_id, var.agentless_scanning_service_account_unique_id]) : "'${id}'"])}]"
 
   depends_on = [google_iam_workload_identity_pool.main]
 }
