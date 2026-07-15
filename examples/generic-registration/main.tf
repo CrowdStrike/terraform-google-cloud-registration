@@ -76,31 +76,17 @@ resource "crowdstrike_cloud_google_registration" "main" {
 
 locals {
   identity_source = crowdstrike_cloud_google_registration.main.identity_source
-
-  wif_iam_principal = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_iam_principal : module.workload-identity-oidc[0].wif_iam_principal
-  wif_pool_name     = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_name : module.workload-identity-oidc[0].wif_pool_name
-  wif_provider_name = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_provider_name : module.workload-identity-oidc[0].wif_provider_name
 }
 
 module "workload-identity" {
-  count                = local.identity_source == "aws-sts" ? 1 : 0
-  source               = "../../modules/workload-identity/"
-  wif_project_id       = local.effective_wif_project_id
-  wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
-  wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
-  role_arn             = var.role_arn
-  registration_id      = crowdstrike_cloud_google_registration.main.id
-  resource_prefix      = var.resource_prefix
-  resource_suffix      = var.resource_suffix
-}
+  source = "../../modules/workload-identity/"
 
-module "workload-identity-oidc" {
-  count                     = local.identity_source == "gcp-oidc" ? 1 : 0
-  source                    = "../../modules/workload-identity-oidc/"
   wif_project_id            = local.effective_wif_project_id
   wif_pool_id               = crowdstrike_cloud_google_registration.main.wif_pool_id
   wif_pool_provider_id      = crowdstrike_cloud_google_registration.main.wif_provider_id
+  identity_source           = local.identity_source
   registration_id           = crowdstrike_cloud_google_registration.main.id
+  role_arn                  = var.role_arn
   service_account_unique_id = var.service_account_unique_id
   resource_prefix           = var.resource_prefix
   resource_suffix           = var.resource_suffix
@@ -109,21 +95,21 @@ module "workload-identity-oidc" {
 module "asset-inventory" {
   source = "../../modules/asset-inventory/"
 
-  wif_iam_principal = local.wif_iam_principal
+  wif_iam_principal = module.workload-identity.wif_iam_principal
   registration_type = var.registration_type
   organization_id   = var.organization_id
   folder_ids        = var.folder_ids
   project_ids       = var.project_ids
   wif_project_id    = local.effective_wif_project_id
 
-  depends_on = [module.workload-identity, module.workload-identity-oidc]
+  depends_on = [module.workload-identity]
 }
 
 module "log-ingestion" {
   count  = var.enable_realtime_visibility ? 1 : 0
   source = "../../modules/log-ingestion/"
 
-  wif_iam_principal = local.wif_iam_principal
+  wif_iam_principal = module.workload-identity.wif_iam_principal
   registration_type = var.registration_type
   registration_id   = crowdstrike_cloud_google_registration.main.id
   organization_id   = var.organization_id
@@ -143,7 +129,7 @@ module "log-ingestion" {
     [for pattern in var.excluded_project_patterns : "resource.labels.project_id=~\"^${replace(replace(pattern, "*", ".*"), "?", ".")}$\""]
   )
 
-  depends_on = [module.workload-identity, module.workload-identity-oidc]
+  depends_on = [module.workload-identity]
 }
 
 module "agentless_scanning" {
@@ -162,7 +148,7 @@ module "agentless_scanning" {
   resource_suffix   = var.resource_suffix
 
   wif_project_number                           = data.google_project.wif_project.number
-  wif_pool_id                                  = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_id : module.workload-identity-oidc[0].wif_pool_id
+  wif_pool_id                                  = module.workload-identity.wif_pool_id
   identity_source                              = local.identity_source
   agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
   agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
@@ -174,7 +160,7 @@ module "agentless_scanning" {
   deploy_cloud_nat         = var.agentless_scanning_settings.deploy_cloud_nat
   custom_vpc_configuration = var.agentless_scanning_settings.custom_vpc_configuration
 
-  depends_on = [module.workload-identity, module.workload-identity-oidc]
+  depends_on = [module.workload-identity]
 }
 
 # =============================================================================
@@ -183,8 +169,8 @@ module "agentless_scanning" {
 
 resource "crowdstrike_cloud_google_registration_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
-  wif_pool_name                   = local.wif_pool_name
-  wif_provider_name               = local.wif_provider_name
+  wif_pool_name                   = module.workload-identity.wif_pool_name
+  wif_provider_name               = module.workload-identity.wif_provider_name
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
@@ -208,7 +194,6 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
   depends_on = [
     crowdstrike_cloud_google_registration.main,
     module.workload-identity,
-    module.workload-identity-oidc,
     module.asset-inventory,
     module.log-ingestion,
     module.agentless_scanning
