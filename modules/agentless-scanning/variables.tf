@@ -140,13 +140,34 @@ variable "wif_pool_id" {
   description = "Workload Identity Pool ID from the shared CSPM WIF pool"
 }
 
+variable "identity_source" {
+  type        = string
+  description = "Identity source type (aws-sts or gcp-oidc). Determines how the agentless WIF principal is constructed."
+  validation {
+    condition     = contains(["aws-sts", "gcp-oidc"], var.identity_source)
+    error_message = "Identity source must be one of: aws-sts, gcp-oidc."
+  }
+}
+
 variable "agentless_scanning_role_arn" {
   type        = string
-  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF"
+  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when identity_source is aws-sts."
+  default     = null
 
   validation {
-    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.agentless_scanning_role_arn))
+    condition     = var.agentless_scanning_role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.agentless_scanning_role_arn))
     error_message = "Agentless scanning Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "agentless_scanning_service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's agentless scanning service account. Required when identity_source is gcp-oidc."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_service_account_unique_id == null || can(regex("^[0-9]+$", var.agentless_scanning_service_account_unique_id))
+    error_message = "Agentless scanning service account unique ID must be a numeric string."
   }
 }
 

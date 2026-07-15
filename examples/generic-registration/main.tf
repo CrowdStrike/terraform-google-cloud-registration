@@ -82,28 +82,6 @@ locals {
   wif_provider_name = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_provider_name : module.workload-identity-oidc[0].wif_provider_name
 }
 
-# Validate that the provided identity variables match the registration's identity source
-resource "terraform_data" "validate_identity_config" {
-  lifecycle {
-    precondition {
-      condition = (
-        (local.identity_source == "aws-sts" && var.role_arn != null) ||
-        (local.identity_source == "gcp-oidc" && var.service_account_unique_id != null)
-      )
-      error_message = <<-EOT
-        Configuration mismatch: Your CrowdStrike cloud uses '${local.identity_source}' for identity federation.
-
-        Required variable for ${local.identity_source}:
-          ${local.identity_source == "aws-sts" ? "- role_arn = \"arn:aws:sts::ACCOUNT_ID:assumed-role/ROLE_NAME\"" : "- service_account_unique_id = \"NUMERIC_ID\""}
-
-        Please provide the correct variable for your cloud environment:
-          - AWS-based CS clouds (US-1, US-2, EU-1, US-GOV-1): Use role_arn
-          - Wingspan (GCP-native) CS clouds: Use service_account_unique_id
-      EOT
-    }
-  }
-}
-
 module "workload-identity" {
   count                = local.identity_source == "aws-sts" ? 1 : 0
   source               = "../../modules/workload-identity/"
@@ -183,9 +161,11 @@ module "agentless_scanning" {
   resource_prefix   = var.resource_prefix
   resource_suffix   = var.resource_suffix
 
-  wif_project_number          = data.google_project.wif_project.number
-  wif_pool_id                 = module.workload-identity.wif_pool_id
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+  wif_project_number                           = data.google_project.wif_project.number
+  wif_pool_id                                  = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_id : module.workload-identity-oidc[0].wif_pool_id
+  identity_source                              = local.identity_source
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
 
   falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
@@ -194,7 +174,7 @@ module "agentless_scanning" {
   deploy_cloud_nat         = var.agentless_scanning_settings.deploy_cloud_nat
   custom_vpc_configuration = var.agentless_scanning_settings.custom_vpc_configuration
 
-  depends_on = [module.workload-identity]
+  depends_on = [module.workload-identity, module.workload-identity-oidc]
 }
 
 # =============================================================================

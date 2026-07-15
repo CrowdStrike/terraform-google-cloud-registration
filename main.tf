@@ -19,28 +19,6 @@ data "google_project" "wif_project" {
   project_id = local.effective_wif_project_id
 }
 
-# Validate that the provided identity variables match the registration's identity source
-resource "terraform_data" "validate_identity_config" {
-  lifecycle {
-    precondition {
-      condition = (
-        (local.identity_source == "aws-sts" && var.role_arn != null) ||
-        (local.identity_source == "gcp-oidc" && var.service_account_unique_id != null)
-      )
-      error_message = <<-EOT
-        Configuration mismatch: Your CrowdStrike cloud uses '${local.identity_source}' for identity federation.
-
-        Required variable for ${local.identity_source}:
-          ${local.identity_source == "aws-sts" ? "- role_arn = \"arn:aws:sts::ACCOUNT_ID:assumed-role/ROLE_NAME\"" : "- service_account_unique_id = \"NUMERIC_ID\""}
-
-        Please provide the correct variable for your cloud environment:
-          - AWS-based CS clouds (US-1, US-2, EU-1, US-GOV-1): Use role_arn
-          - Wingspan (GCP-native) CS clouds: Use service_account_unique_id
-      EOT
-    }
-  }
-}
-
 # CrowdStrike GCP registration resource
 resource "crowdstrike_cloud_google_registration" "main" {
   name          = var.registration_name
@@ -189,9 +167,11 @@ module "agentless_scanning" {
   resource_suffix   = local.effective_suffix
 
   # WIF info from shared pool
-  wif_project_number          = data.google_project.wif_project.number
-  wif_pool_id                 = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_id : module.workload-identity-oidc[0].wif_pool_id
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+  wif_project_number                           = data.google_project.wif_project.number
+  wif_pool_id                                  = local.identity_source == "aws-sts" ? module.workload-identity[0].wif_pool_id : module.workload-identity-oidc[0].wif_pool_id
+  identity_source                              = local.identity_source
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
 
   # Falcon credentials (stored in Secret Manager per infra project)
   falcon_client_id     = var.falcon_client_id
