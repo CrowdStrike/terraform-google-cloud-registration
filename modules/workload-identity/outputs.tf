@@ -26,7 +26,7 @@ output "wif_iam_principal" {
   value = (
     var.identity_source == "aws-sts"
     ? "principal://iam.googleapis.com/projects/${data.google_project.wif_project.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.main.workload_identity_pool_id}/subject/${var.role_arn}/${var.registration_id}"
-    : "principal://iam.googleapis.com/projects/${data.google_project.wif_project.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.main.workload_identity_pool_id}/subject/${var.service_account_unique_id}"
+    : "principal://iam.googleapis.com/projects/${data.google_project.wif_project.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.main.workload_identity_pool_id}/subject/${var.service_account_unique_id}/${var.registration_id}"
   )
   description = "Google Cloud IAM Principal that identifies the specific CrowdStrike session for this registration"
 }

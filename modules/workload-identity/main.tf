@@ -78,7 +78,7 @@ resource "google_iam_workload_identity_pool_provider" "oidc" {
   }
 
   attribute_mapping = {
-    "google.subject" = "assertion.sub"
+    "google.subject" = "assertion.sub + '/' + assertion.aud"
   }
 
   attribute_condition = "assertion.sub in [${join(", ", [for id in compact([var.service_account_unique_id, var.agentless_scanning_service_account_unique_id]) : "'${id}'"])}]"
