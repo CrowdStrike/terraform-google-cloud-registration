@@ -91,3 +91,14 @@ variable "service_account_unique_id" {
     error_message = "Service account unique ID must be a numeric string."
   }
 }
+
+variable "agentless_scanning_service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's agentless scanning service account. Included in OIDC attribute_condition when provided."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_service_account_unique_id == null || can(regex("^[0-9]+$", var.agentless_scanning_service_account_unique_id))
+    error_message = "Agentless scanning service account unique ID must be a numeric string."
+  }
+}

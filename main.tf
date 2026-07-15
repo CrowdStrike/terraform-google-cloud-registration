@@ -61,15 +61,16 @@ resource "crowdstrike_cloud_google_registration" "main" {
 module "workload-identity" {
   source = "./modules/workload-identity/"
 
-  wif_project_id            = local.effective_wif_project_id
-  wif_pool_id               = crowdstrike_cloud_google_registration.main.wif_pool_id
-  wif_pool_provider_id      = crowdstrike_cloud_google_registration.main.wif_provider_id
-  identity_source           = local.identity_source
-  registration_id           = crowdstrike_cloud_google_registration.main.id
-  role_arn                  = var.role_arn
-  service_account_unique_id = var.service_account_unique_id
-  resource_prefix           = local.effective_prefix
-  resource_suffix           = local.effective_suffix
+  wif_project_id                               = local.effective_wif_project_id
+  wif_pool_id                                  = crowdstrike_cloud_google_registration.main.wif_pool_id
+  wif_pool_provider_id                         = crowdstrike_cloud_google_registration.main.wif_provider_id
+  identity_source                              = local.identity_source
+  registration_id                              = crowdstrike_cloud_google_registration.main.id
+  role_arn                                     = var.role_arn
+  service_account_unique_id                    = var.service_account_unique_id
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
+  resource_prefix                              = local.effective_prefix
+  resource_suffix                              = local.effective_suffix
 }
 
 module "asset-inventory" {
