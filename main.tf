@@ -2,6 +2,8 @@ locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
   effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
   effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
+  identity_source          = crowdstrike_cloud_google_registration.main.identity_source
+
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
     var.agentless_scanning_settings.deploy_cloud_nat ? "managed" : "managed_no_nat"
@@ -57,14 +59,18 @@ resource "crowdstrike_cloud_google_registration" "main" {
 }
 
 module "workload-identity" {
-  source               = "./modules/workload-identity/"
-  wif_project_id       = local.effective_wif_project_id
-  wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
-  wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
-  role_arn             = var.role_arn
-  registration_id      = crowdstrike_cloud_google_registration.main.id
-  resource_prefix      = local.effective_prefix
-  resource_suffix      = local.effective_suffix
+  source = "./modules/workload-identity/"
+
+  wif_project_id                               = local.effective_wif_project_id
+  wif_pool_id                                  = crowdstrike_cloud_google_registration.main.wif_pool_id
+  wif_pool_provider_id                         = crowdstrike_cloud_google_registration.main.wif_provider_id
+  identity_source                              = local.identity_source
+  registration_id                              = crowdstrike_cloud_google_registration.main.id
+  role_arn                                     = var.role_arn
+  service_account_unique_id                    = var.service_account_unique_id
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
+  resource_prefix                              = local.effective_prefix
+  resource_suffix                              = local.effective_suffix
 }
 
 module "asset-inventory" {
@@ -148,9 +154,11 @@ module "agentless_scanning" {
   resource_suffix   = local.effective_suffix
 
   # WIF info from shared pool
-  wif_project_number          = data.google_project.wif_project.number
-  wif_pool_id                 = module.workload-identity.wif_pool_id
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+  wif_project_number                           = data.google_project.wif_project.number
+  wif_pool_id                                  = module.workload-identity.wif_pool_id
+  identity_source                              = local.identity_source
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
 
   # Falcon credentials (stored in Secret Manager per infra project)
   falcon_client_id     = var.falcon_client_id

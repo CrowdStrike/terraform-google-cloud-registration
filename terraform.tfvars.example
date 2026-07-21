@@ -11,9 +11,14 @@ falcon_client_secret = "YOUR_CLIENT_SECRET_HERE"
 # Project where WIF pools, pub/sub topics, etc. will be created
 infra_project_id = "your-csmp-infrastructure-project"
 
-# REQUIRED: AWS Role ARN for Identity Federation
-# Contains the CrowdStrike AWS account ID and role name
+# REQUIRED: Identity Federation Credentials
+# Provide ONE of the following based on your CrowdStrike cloud's identity source:
+#
+# For AWS-based CS clouds (US-1, US-2, EU-1, US-GOV-1):
 role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeConnectorRoleName"
+#
+# For GCP-native CS clouds (identity_source = gcp-oidc):
+# service_account_unique_id = "123456789012345678901"
 
 # =============================================================================
 # REGISTRATION SCOPE - Choose ONE of the following three options

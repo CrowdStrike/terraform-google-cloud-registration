@@ -43,11 +43,23 @@ variable "resource_suffix" {
 
 variable "role_arn" {
   type        = string
-  description = "AWS Role ARN used by CrowdStrike for authentication"
+  description = "AWS Role ARN used by CrowdStrike for authentication. Required for AWS-based CS clouds (identity_source = aws-sts)."
+  default     = null
 
   validation {
-    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    condition     = var.role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's shared service account. Required when identity_source is gcp-oidc."
+  default     = null
+
+  validation {
+    condition     = var.service_account_unique_id == null || can(regex("^[0-9]+$", var.service_account_unique_id))
+    error_message = "Service account unique ID must be a numeric string."
   }
 }
 
@@ -190,12 +202,23 @@ variable "falcon_client_secret" {
 
 variable "agentless_scanning_role_arn" {
   type        = string
-  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable_dspm is true."
+  description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable_dspm is true and identity_source is aws-sts."
   default     = null
 
   validation {
     condition     = var.agentless_scanning_role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.agentless_scanning_role_arn))
     error_message = "Agentless scanning Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "agentless_scanning_service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's agentless scanning service account. Required when enable_dspm is true and identity_source is gcp-oidc."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_service_account_unique_id == null || can(regex("^[0-9]+$", var.agentless_scanning_service_account_unique_id))
+    error_message = "Agentless scanning service account unique ID must be a numeric string."
   }
 }
 

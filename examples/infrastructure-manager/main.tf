@@ -60,8 +60,9 @@ module "crowdstrike_gcp_registration" {
   folder_ids      = var.folder_ids
   project_ids     = var.project_ids
 
-  # Required: AWS integration
-  role_arn = var.role_arn
+  # Required: Identity federation (provide one based on your CS cloud)
+  role_arn                  = var.role_arn
+  service_account_unique_id = var.service_account_unique_id
 
   # Optional: Real-time visibility and detection
   enable_realtime_visibility = var.enable_realtime_visibility
@@ -80,9 +81,10 @@ module "crowdstrike_gcp_registration" {
   excluded_project_patterns = var.excluded_project_patterns
 
   # Optional: Agentless scanning
-  enable_dspm                 = var.enable_dspm
-  falcon_client_id            = var.falcon_client_id
-  falcon_client_secret        = local.falcon_client_secret
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
-  agentless_scanning_settings = var.agentless_scanning_settings
+  enable_dspm                                  = var.enable_dspm
+  falcon_client_id                             = var.falcon_client_id
+  falcon_client_secret                         = local.falcon_client_secret
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
+  agentless_scanning_settings                  = var.agentless_scanning_settings
 }

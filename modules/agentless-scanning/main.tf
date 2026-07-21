@@ -28,8 +28,12 @@ locals {
   is_folder_registration  = var.registration_type == "folder"
   is_project_registration = var.registration_type == "project"
 
-  # WIF Principal - Agentless scanning (shared pool, different role ARN from CSPM)
-  agentless_wif_principal = "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_role_arn}/${var.registration_id}"
+  # WIF Principal - Agentless scanning (shared pool, identity-source-dependent subject)
+  agentless_wif_principal = (
+    var.identity_source == "aws-sts"
+    ? "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_role_arn}/${var.registration_id}"
+    : "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_service_account_unique_id}/${var.registration_id}"
+  )
 
   # Custom VPC mode detection
   is_custom_vpc = var.custom_vpc_configuration != null
@@ -141,8 +145,11 @@ locals {
 resource "terraform_data" "agentless_validation" {
   lifecycle {
     precondition {
-      condition     = var.agentless_scanning_role_arn != null
-      error_message = "agentless_scanning_role_arn is required when enable_dspm = true."
+      condition = (
+        (var.identity_source == "aws-sts" && var.agentless_scanning_role_arn != null) ||
+        (var.identity_source == "gcp-oidc" && var.agentless_scanning_service_account_unique_id != null)
+      )
+      error_message = "When identity_source is aws-sts, agentless_scanning_role_arn is required. When identity_source is gcp-oidc, agentless_scanning_service_account_unique_id is required."
     }
     precondition {
       condition     = var.falcon_client_id != null && var.falcon_client_secret != null

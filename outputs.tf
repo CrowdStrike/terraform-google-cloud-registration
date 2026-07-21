@@ -31,6 +31,7 @@ output "wif_project_number" {
   value       = module.workload-identity.wif_project_number
 }
 
+
 # =============================================================================
 # Registration Outputs
 # =============================================================================
