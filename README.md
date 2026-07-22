@@ -118,6 +118,7 @@ module "crowdstrike_gcp_registration" {
 | <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM agentless scanning infrastructure | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility and Detection (RTV&D) features via log ingestion | `bool` | `false` | no |
+| <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Enable agentless vulnerability scanning infrastructure | `bool` | `false` | no |
 | <a name="input_excluded_project_patterns"></a> [excluded\_project\_patterns](#input\_excluded\_project\_patterns) | List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'. | `list(string)` | `[]` | no |
 | <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. | `string` | `null` | no |
 | <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. | `string` | `null` | no |

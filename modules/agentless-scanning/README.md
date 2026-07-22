@@ -72,19 +72,29 @@ module "agentless_scanning" {
 | [google_compute_subnetwork_iam_member.wif_byo_subnet_network_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork_iam_member) | resource |
 | [google_compute_subnetwork_iam_member.wif_subnet_network_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork_iam_member) | resource |
 | [google_folder_iam_member.folder_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
+| [google_folder_iam_member.folder_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_folder_iam_member.wif_viewer_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_organization_iam_custom_role.folder_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
+| [google_organization_iam_custom_role.folder_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.target_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
+| [google_organization_iam_custom_role.target_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_member.target_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
+| [google_organization_iam_member.target_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_organization_iam_member.wif_viewer_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_project_iam_custom_role.scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_custom_role.scanner_vulnerability_disk_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.target_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_custom_role.target_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.wif_compute_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_custom_role.wif_vulnerability_target_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_member.scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.scanner_vulnerability_disk_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.target_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.target_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.wif_compute](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.wif_viewer_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.wif_viewer_roles_project_only](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.wif_vulnerability_target_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 | [google_project_service.serviceusage](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 | [google_secret_manager_secret.falcon_credentials](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
@@ -93,10 +103,15 @@ module "agentless_scanning" {
 | [google_service_account.scanner_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_member.wif_can_use_scanner_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [random_id.folder_org_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.folder_vulnerability_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.gcs_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.infra_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.target_gcs_role_org_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.target_gcs_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.target_vulnerability_role_org_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.target_vulnerability_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.vulnerability_disk_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.vulnerability_wif_host_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [terraform_data.agentless_validation](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
 | [google_compute_subnetwork.byo_validation](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |
 | [google_project_ancestry.host_project_scope_check](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project_ancestry) | data source |
@@ -107,6 +122,8 @@ module "agentless_scanning" {
 | <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF | `string` | n/a | yes |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
+| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM (GCS scanning) permissions | `bool` | `false` | no |
+| <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Enable vulnerability scanning (disk snapshot/clone) permissions | `bool` | `false` | no |
 | <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID for scanner authentication | `string` | n/a | yes |
 | <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret for scanner authentication | `string` | n/a | yes |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folder IDs for folder-level registration | `list(string)` | `[]` | no |

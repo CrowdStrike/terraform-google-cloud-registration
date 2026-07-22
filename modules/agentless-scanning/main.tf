@@ -45,6 +45,7 @@ locals {
 
   # Registration ID truncated and sanitized for resource naming constraints:
   # - Custom role_id: max 64 chars. Longest role "AgentlessComputeMgr" (19) + 2 separators + 8 hex = 29 overhead → 33-char reg_id fits (62 total)
+  #   Vuln roles use shorter id_prefixes: "VulnScannerDisk" (15), "VulnScanningOrch" (16) to stay within 64.
   # - SA account_id: max 30 chars. "csscan-" (7) + 8 hex + 13 (max prefix+suffix) = 28 → within limit
   # We use the tighter constraint (23) for resource names, and 33 for role IDs.
   role_suffix  = replace(substr(var.registration_id, 0, 33), "-", "_")
@@ -58,6 +59,27 @@ locals {
     permissions = [
       "storage.objects.get",
       "storage.objects.list",
+    ]
+  }
+
+  # Vulnerability scanning target role — reused across host project (iam.tf) and cross-target roles (cross_targets.tf).
+  vulnerability_wif_target_role = {
+    id_prefix   = "VulnScanningOrch"
+    title       = "Vulnerability Scanning Orchestrator"
+    description = "Snapshot and clone disk permissions for cross-project vulnerability scanning"
+    permissions = [
+      "compute.disks.createSnapshot",
+      "compute.snapshots.create",
+      "compute.snapshots.get",
+      "compute.snapshots.list",
+      "compute.snapshots.useReadOnly",
+      "compute.snapshots.delete",
+      "compute.instances.get",
+      "compute.instances.list",
+      "compute.disks.get",
+      "compute.disks.list",
+      "compute.zoneOperations.get",
+      "compute.globalOperations.get",
     ]
   }
 
@@ -140,6 +162,10 @@ locals {
 
 resource "terraform_data" "agentless_validation" {
   lifecycle {
+    precondition {
+      condition     = var.enable_dspm || var.enable_vulnerability_scanning
+      error_message = "At least one of enable_dspm or enable_vulnerability_scanning must be true."
+    }
     precondition {
       condition     = var.agentless_scanning_role_arn != null
       error_message = "agentless_scanning_role_arn is required when enable_dspm = true."

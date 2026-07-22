@@ -52,6 +52,11 @@ resource "crowdstrike_cloud_google_registration" "main" {
     enabled = var.enable_dspm
   }
 
+  # Enable vulnerability scanning if requested
+  vulnerability_scanning = {
+    enabled = var.enable_vulnerability_scanning
+  }
+
   # Project exclusion patterns
   excluded_project_patterns = var.excluded_project_patterns
 }
@@ -132,8 +137,12 @@ module "log-ingestion" {
 }
 
 module "agentless_scanning" {
-  count  = var.enable_dspm ? 1 : 0
+  count  = (var.enable_dspm || var.enable_vulnerability_scanning) ? 1 : 0
   source = "./modules/agentless-scanning/"
+
+  # Feature flags
+  enable_dspm                   = var.enable_dspm
+  enable_vulnerability_scanning = var.enable_vulnerability_scanning
 
   # Common vars from root
   registration_type = var.registration_type
@@ -173,7 +182,7 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
 
-  agentless_scanning_settings = var.enable_dspm ? {
+  agentless_scanning_settings = (var.enable_dspm || var.enable_vulnerability_scanning) ? {
     wif_principal              = module.agentless_scanning[0].agentless_wif_principal
     deployment_version         = module.agentless_scanning[0].deployment_version
     regions                    = var.agentless_scanning_settings.regions
