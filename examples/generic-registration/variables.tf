@@ -144,6 +144,12 @@ variable "enable_dspm" {
   default     = false
 }
 
+variable "enable_vulnerability_scanning" {
+  type        = bool
+  description = "Enable agentless vulnerability scanning for GCP Compute Engine VMs"
+  default     = false
+}
+
 variable "agentless_scanning_role_arn" {
   type        = string
   description = "AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable_dspm is true."

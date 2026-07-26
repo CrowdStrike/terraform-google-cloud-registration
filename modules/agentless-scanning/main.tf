@@ -168,11 +168,11 @@ resource "terraform_data" "agentless_validation" {
     }
     precondition {
       condition     = var.agentless_scanning_role_arn != null
-      error_message = "agentless_scanning_role_arn is required when enable_dspm = true."
+      error_message = "agentless_scanning_role_arn is required when enable_dspm or enable_vulnerability_scanning is true."
     }
     precondition {
       condition     = var.falcon_client_id != null && var.falcon_client_secret != null
-      error_message = "falcon_client_id and falcon_client_secret are required when enable_dspm = true."
+      error_message = "falcon_client_id and falcon_client_secret are required when enable_dspm or enable_vulnerability_scanning is true."
     }
     precondition {
       condition     = var.registration_type == "project" || var.host_project_id != null

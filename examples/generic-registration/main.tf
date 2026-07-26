@@ -126,7 +126,7 @@ module "log-ingestion" {
 }
 
 module "agentless_scanning" {
-  count  = var.enable_dspm ? 1 : 0
+  count  = (var.enable_dspm || var.enable_vulnerability_scanning) ? 1 : 0
   source = "../../modules/agentless-scanning/"
 
   registration_type = var.registration_type
@@ -143,6 +143,9 @@ module "agentless_scanning" {
   wif_project_number          = data.google_project.wif_project.number
   wif_pool_id                 = module.workload-identity.wif_pool_id
   agentless_scanning_role_arn = var.agentless_scanning_role_arn
+
+  enable_dspm                   = var.enable_dspm
+  enable_vulnerability_scanning = var.enable_vulnerability_scanning
 
   falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
@@ -166,7 +169,7 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
 
-  agentless_scanning_settings = var.enable_dspm ? {
+  agentless_scanning_settings = (var.enable_dspm || var.enable_vulnerability_scanning) ? {
     wif_principal              = module.agentless_scanning[0].agentless_wif_principal
     deployment_version         = module.agentless_scanning[0].deployment_version
     regions                    = var.agentless_scanning_settings.regions
