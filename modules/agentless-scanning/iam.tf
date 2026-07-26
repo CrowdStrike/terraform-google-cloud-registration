@@ -2,6 +2,19 @@
 # IAM - Service Accounts, Custom Roles, Viewer Roles
 # =============================================================================
 
+locals {
+  # IAM condition for scanner resource bindings — restricts Instance/Disk operations to cs-scanning-* only.
+  scanner_resource_condition = {
+    title       = "restrict-to-crowdstrike-scanner-resources"
+    description = "Restrict operations to CrowdStrike agentless scanner resources (cs-scanning-*) only"
+    expression = join(" || ", [
+      "(resource.type == \"compute.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"compute.googleapis.com/Disk\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"compute.googleapis.com/Instance\" && resource.type != \"compute.googleapis.com/Disk\")",
+    ])
+  }
+}
+
 # =============================================================================
 # Scanner Service Account (per host project)
 # =============================================================================
@@ -91,13 +104,9 @@ resource "google_project_iam_member" "scanner_vulnerability_disk_permissions" {
   member  = "serviceAccount:${google_service_account.scanner_sa[each.value].email}"
 
   condition {
-    title       = "restrict-to-crowdstrike-scanner-resources"
-    description = "Limit disk operations to CrowdStrike agentless scanner resources only"
-    expression = join(" || ", [
-      "(resource.type == \"compute.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type == \"compute.googleapis.com/Disk\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"compute.googleapis.com/Instance\" && resource.type != \"compute.googleapis.com/Disk\")",
-    ])
+    title       = local.scanner_resource_condition.title
+    description = local.scanner_resource_condition.description
+    expression  = local.scanner_resource_condition.expression
   }
 }
 
@@ -140,13 +149,9 @@ resource "google_project_iam_member" "wif_compute" {
   member  = local.agentless_wif_principal
 
   condition {
-    title       = "restrict-to-crowdstrike-scanner-resources"
-    description = "Limit mutations to CrowdStrike agentless scanner resources only"
-    expression = join(" || ", [
-      "(resource.type == \"compute.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type == \"compute.googleapis.com/Disk\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"compute.googleapis.com/Instance\" && resource.type != \"compute.googleapis.com/Disk\")",
-    ])
+    title       = local.scanner_resource_condition.title
+    description = local.scanner_resource_condition.description
+    expression  = local.scanner_resource_condition.expression
   }
 }
 
