@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.0.0"
+  deployment_version = "1.1.0"
 
   # Mode detection
   is_org_registration     = var.registration_type == "organization"
@@ -75,6 +75,18 @@ locals {
       "compute.snapshots.useReadOnly",
       "compute.snapshots.delete",
     ]
+  }
+
+  # IAM condition for vulnerability scanning bindings — allows createSnapshot on any disk
+  # but restricts snapshot mutations (create, delete, useReadOnly) to cs-scanning-* resources.
+  vulnerability_snapshot_condition = {
+    title       = "restrict-to-crowdstrike-scanning-snapshots"
+    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
+    expression = join(" || ", [
+      "(resource.type == \"compute.googleapis.com/Disk\")",
+      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
+    ])
   }
 
   # -------------------------------------------------------------------------

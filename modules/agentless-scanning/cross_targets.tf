@@ -116,13 +116,9 @@ resource "google_organization_iam_member" "target_vulnerability_snapshot_permiss
   member = local.agentless_wif_principal
 
   condition {
-    title       = "restrict-to-crowdstrike-scanning-snapshots"
-    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
-    expression = join(" || ", [
-      "(resource.type == \"compute.googleapis.com/Disk\")",
-      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
-    ])
+    title       = local.vulnerability_snapshot_condition.title
+    description = local.vulnerability_snapshot_condition.description
+    expression  = local.vulnerability_snapshot_condition.expression
   }
 }
 
@@ -154,13 +150,9 @@ resource "google_project_iam_member" "target_vulnerability_snapshot_permissions"
   member  = local.agentless_wif_principal
 
   condition {
-    title       = "restrict-to-crowdstrike-scanning-snapshots"
-    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
-    expression = join(" || ", [
-      "(resource.type == \"compute.googleapis.com/Disk\")",
-      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
-    ])
+    title       = local.vulnerability_snapshot_condition.title
+    description = local.vulnerability_snapshot_condition.description
+    expression  = local.vulnerability_snapshot_condition.expression
   }
 }
 
@@ -192,12 +184,8 @@ resource "google_folder_iam_member" "folder_vulnerability_snapshot_permissions" 
   member = local.agentless_wif_principal
 
   condition {
-    title       = "restrict-to-crowdstrike-scanning-snapshots"
-    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
-    expression = join(" || ", [
-      "(resource.type == \"compute.googleapis.com/Disk\")",
-      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
-    ])
+    title       = local.vulnerability_snapshot_condition.title
+    description = local.vulnerability_snapshot_condition.description
+    expression  = local.vulnerability_snapshot_condition.expression
   }
 }
