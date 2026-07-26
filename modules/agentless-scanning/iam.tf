@@ -89,6 +89,16 @@ resource "google_project_iam_member" "scanner_vulnerability_disk_permissions" {
   project = each.value
   role    = google_project_iam_custom_role.scanner_vulnerability_disk_role[each.value].id
   member  = "serviceAccount:${google_service_account.scanner_sa[each.value].email}"
+
+  condition {
+    title       = "restrict-to-crowdstrike-scanner-resources"
+    description = "Limit disk operations to CrowdStrike agentless scanner resources only"
+    expression = join(" || ", [
+      "(resource.type == \"compute.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"compute.googleapis.com/Disk\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"compute.googleapis.com/Instance\" && resource.type != \"compute.googleapis.com/Disk\")",
+    ])
+  }
 }
 
 # =============================================================================
@@ -180,6 +190,16 @@ resource "google_project_iam_member" "wif_vulnerability_target_permissions" {
   project = each.value
   role    = google_project_iam_custom_role.wif_vulnerability_target_role[each.value].id
   member  = local.agentless_wif_principal
+
+  condition {
+    title       = "restrict-to-crowdstrike-scanning-snapshots"
+    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
+    expression = join(" || ", [
+      "(resource.type == \"compute.googleapis.com/Disk\")",
+      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
+    ])
+  }
 }
 
 # =============================================================================

@@ -63,6 +63,8 @@ locals {
   }
 
   # Vulnerability scanning target role — reused across host project (iam.tf) and cross-target roles (cross_targets.tf).
+  # Read-only permissions (get, list, zoneOperations.get, globalOperations.get) are omitted because
+  # roles/compute.viewer (bound to WIF principal at all scopes) already provides them.
   vulnerability_wif_target_role = {
     id_prefix   = "VulnScanningOrch"
     title       = "Vulnerability Scanning Orchestrator"
@@ -70,16 +72,8 @@ locals {
     permissions = [
       "compute.disks.createSnapshot",
       "compute.snapshots.create",
-      "compute.snapshots.get",
-      "compute.snapshots.list",
       "compute.snapshots.useReadOnly",
       "compute.snapshots.delete",
-      "compute.instances.get",
-      "compute.instances.list",
-      "compute.disks.get",
-      "compute.disks.list",
-      "compute.zoneOperations.get",
-      "compute.globalOperations.get",
     ]
   }
 
