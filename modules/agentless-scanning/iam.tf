@@ -131,6 +131,7 @@ resource "google_project_iam_custom_role" "wif_compute_role" {
     "compute.instances.start",
     "compute.disks.create",
     "compute.disks.delete",
+    "compute.disks.setLabels",
     "compute.disks.use",
     "compute.images.useReadOnly",
     "compute.zoneOperations.get",

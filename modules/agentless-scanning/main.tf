@@ -70,6 +70,7 @@ locals {
     permissions = [
       "compute.disks.createSnapshot",
       "compute.snapshots.create",
+      "compute.snapshots.setLabels",
       "compute.snapshots.useReadOnly",
       "compute.snapshots.delete",
     ]
