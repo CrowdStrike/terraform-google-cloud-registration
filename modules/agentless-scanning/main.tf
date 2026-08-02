@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.0.0"
+  deployment_version = "1.1.0"
 
   # Mode detection
   is_org_registration     = var.registration_type == "organization"
@@ -45,6 +45,7 @@ locals {
 
   # Registration ID truncated and sanitized for resource naming constraints:
   # - Custom role_id: max 64 chars. Longest role "AgentlessComputeMgr" (19) + 2 separators + 8 hex = 29 overhead → 33-char reg_id fits (62 total)
+  #   Vuln roles use shorter id_prefixes: "VulnScannerDisk" (15), "VulnScanningOrch" (16) to stay within 64.
   # - SA account_id: max 30 chars. "csscan-" (7) + 8 hex + 13 (max prefix+suffix) = 28 → within limit
   # We use the tighter constraint (23) for resource names, and 33 for role IDs.
   role_suffix  = replace(substr(var.registration_id, 0, 33), "-", "_")
@@ -59,6 +60,32 @@ locals {
       "storage.objects.get",
       "storage.objects.list",
     ]
+  }
+
+  # Vulnerability scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
+  vulnerability_wif_target_role = {
+    id_prefix   = "VulnScanningOrch"
+    title       = "Vulnerability Scanning Orchestrator"
+    description = "Snapshot and clone disk permissions for cross-project vulnerability scanning"
+    permissions = [
+      "compute.disks.createSnapshot",
+      "compute.snapshots.create",
+      "compute.snapshots.setLabels",
+      "compute.snapshots.useReadOnly",
+      "compute.snapshots.delete",
+    ]
+  }
+
+  # IAM condition for vulnerability scanning bindings — allows createSnapshot on any disk
+  # but restricts snapshot mutations (create, delete, useReadOnly) to cs-scanning-* resources.
+  vulnerability_snapshot_condition = {
+    title       = "restrict-to-crowdstrike-scanning-snapshots"
+    description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
+    expression = join(" || ", [
+      "(resource.type == \"compute.googleapis.com/Disk\")",
+      "(resource.type == \"compute.googleapis.com/Snapshot\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"compute.googleapis.com/Disk\" && resource.type != \"compute.googleapis.com/Snapshot\")",
+    ])
   }
 
   # -------------------------------------------------------------------------
@@ -141,12 +168,16 @@ locals {
 resource "terraform_data" "agentless_validation" {
   lifecycle {
     precondition {
+      condition     = var.enable_dspm || var.enable_vulnerability_scanning
+      error_message = "At least one of enable_dspm or enable_vulnerability_scanning must be true."
+    }
+    precondition {
       condition     = var.agentless_scanning_role_arn != null
-      error_message = "agentless_scanning_role_arn is required when enable_dspm = true."
+      error_message = "agentless_scanning_role_arn is required when enable_dspm or enable_vulnerability_scanning is true."
     }
     precondition {
       condition     = var.falcon_client_id != null && var.falcon_client_secret != null
-      error_message = "falcon_client_id and falcon_client_secret are required when enable_dspm = true."
+      error_message = "falcon_client_id and falcon_client_secret are required when enable_dspm or enable_vulnerability_scanning is true."
     }
     precondition {
       condition     = var.registration_type == "project" || var.host_project_id != null

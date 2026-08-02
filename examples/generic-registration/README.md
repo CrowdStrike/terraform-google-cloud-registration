@@ -4,22 +4,23 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
-| <a name="requirement_crowdstrike"></a> [crowdstrike](#requirement\_crowdstrike) | >= 0.0.50 |
+| <a name="requirement_crowdstrike"></a> [crowdstrike](#requirement\_crowdstrike) | >= 0.0.55 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 6.22 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.55  |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.55 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 6.22 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_agentless_scanning"></a> [agentless\_scanning](#module\_agentless\_scanning) | ../../modules/agentless-scanning/ | n/a |
 | <a name="module_asset-inventory"></a> [asset-inventory](#module\_asset-inventory) | ../../modules/asset-inventory/ | n/a |
 | <a name="module_log-ingestion"></a> [log-ingestion](#module\_log-ingestion) | ../../modules/log-ingestion/ | n/a |
-| <a name="module_project-discovery"></a> [project-discovery](#module\_project-discovery) | ../../modules/project-discovery/ | n/a |
 | <a name="module_workload-identity"></a> [workload-identity](#module\_workload-identity) | ../../modules/workload-identity/ | n/a |
 
 ## Resources
@@ -27,18 +28,26 @@
 | Name | Type |
 |------|------|
 | [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
-| [crowdstrike_cloud_google_registration_logging_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_logging_settings) | resource |
+| [crowdstrike_cloud_google_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_settings) | resource |
+| [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable\_dspm is true. | `string` | `null` | no |
+| <a name="input_agentless_scanning_settings"></a> [agentless\_scanning\_settings](#input\_agentless\_scanning\_settings) | Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings. | <pre>object({<br/>    host_project_id  = optional(string)<br/>    org_id           = optional(string)<br/>    regions          = optional(set(string), [])<br/>    deploy_cloud_nat = optional(bool, true)<br/>    custom_vpc_configuration = optional(object({<br/>      vpc_name = string<br/>      subnets  = map(string)<br/>    }))<br/>  })</pre> | `{}` | no |
+| <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
+| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM agentless scanning infrastructure | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Enable Real Time Visibility & Detection features (requires log ingestion setup) | `bool` | `false` | no |
+| <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Enable agentless vulnerability scanning for GCP Compute Engine VMs | `bool` | `false` | no |
+| <a name="input_excluded_project_patterns"></a> [excluded\_project\_patterns](#input\_excluded\_project\_patterns) | List of shell-style patterns to exclude specific projects from CSPM registration. Supports wildcards (* and ?). Projects matching these patterns will be excluded from asset inventory and log ingestion. Examples: 'sys-*', 'dev-?'. | `list(string)` | `[]` | no |
 | <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. | `string` | n/a | yes |
 | <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. | `string` | n/a | yes |
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | GCP Project ID where CrowdStrike infrastructure will be created (WIF pools, Pub/Sub topics, etc.) | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | Labels to apply to all created resources | `map(string)` | `{}` | no |
+| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls Pub/Sub topic and subscription settings, audit log types, schema validation, and allows using existing resources. | <pre>object({<br/>    message_retention_duration       = optional(string, "604800s")<br/>    ack_deadline_seconds             = optional(number, 600)<br/>    topic_message_retention_duration = optional(string, "604800s")<br/>    audit_log_types                  = optional(list(string), ["activity", "system_event", "policy"])<br/>    topic_storage_regions            = optional(list(string), [])<br/>    enable_schema_validation         = optional(bool, false)<br/>    schema_type                      = optional(string, "AVRO")<br/>    schema_definition                = optional(string)<br/>    existing_topic_name              = optional(string)<br/>    existing_subscription_name       = optional(string)<br/>    exclusion_filters                = optional(list(string), [])<br/>  })</pre> | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of GCP Project IDs to register with CrowdStrike CSPM | `list(string)` | `[]` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region for resource deployment | `string` | `"us-central1"` | no |
@@ -55,7 +64,6 @@
 |------|-------------|
 | <a name="output_aws_integration"></a> [aws\_integration](#output\_aws\_integration) | AWS integration details for CrowdStrike identity federation |
 | <a name="output_deployment_timestamp"></a> [deployment\_timestamp](#output\_deployment\_timestamp) | Timestamp when the deployment was completed |
-| <a name="output_discovered_projects"></a> [discovered\_projects](#output\_discovered\_projects) | Detailed information about discovered and registered projects |
 | <a name="output_infra_project_id"></a> [infra\_project\_id](#output\_infra\_project\_id) | The GCP Project ID where CrowdStrike infrastructure was created |
 | <a name="output_log_ingestion_enabled"></a> [log\_ingestion\_enabled](#output\_log\_ingestion\_enabled) | Whether Real Time Visibility & Detection log ingestion is enabled |
 | <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |

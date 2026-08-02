@@ -174,6 +174,12 @@ variable "enable_dspm" {
   default     = false
 }
 
+variable "enable_vulnerability_scanning" {
+  type        = bool
+  description = "Enable agentless vulnerability scanning infrastructure"
+  default     = false
+}
+
 variable "falcon_client_id" {
   type        = string
   description = "Falcon API client ID."

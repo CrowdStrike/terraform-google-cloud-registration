@@ -3,6 +3,22 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
+# Feature Flags
+# -----------------------------------------------------------------------------
+
+variable "enable_dspm" {
+  type        = bool
+  description = "Enable DSPM (GCS scanning) permissions"
+  default     = false
+}
+
+variable "enable_vulnerability_scanning" {
+  type        = bool
+  description = "Enable vulnerability scanning (disk snapshot/clone) permissions"
+  default     = false
+}
+
+# -----------------------------------------------------------------------------
 # Common (passed from root module)
 # -----------------------------------------------------------------------------
 
