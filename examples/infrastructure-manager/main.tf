@@ -36,6 +36,7 @@ provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = local.falcon_client_secret
   cloud         = var.falcon_cloud
+  host_override = var.crowdstrike_host_override
 }
 
 # =============================================================================

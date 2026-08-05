@@ -290,3 +290,9 @@ variable "falcon_cloud" {
     error_message = "Falcon cloud must be null (for commercial) or one of: us-gov-1, us-gov-2."
   }
 }
+
+variable "crowdstrike_host_override" {
+  type        = string
+  description = "Override the CrowdStrike API host. Used for testing against non-production environments. Leave null for production usage."
+  default     = null
+}
