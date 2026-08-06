@@ -165,6 +165,15 @@ resource "google_service_account_iam_member" "wif_can_use_scanner_sa" {
   member             = local.agentless_wif_principal
 }
 
+# Scanner SA can use itself (required to modify the instance it runs on)
+resource "google_service_account_iam_member" "scanner_sa_self_use" {
+  for_each = toset(local.host_project_ids)
+
+  service_account_id = google_service_account.scanner_sa[each.value].id
+  role               = "roles/iam.serviceAccountUser"
+  member             = "serviceAccount:${google_service_account.scanner_sa[each.value].email}"
+}
+
 # =============================================================================
 # WIF Principal - Vulnerability Scanning Target Role (project registrations)
 # =============================================================================
