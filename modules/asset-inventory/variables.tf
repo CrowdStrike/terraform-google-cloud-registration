@@ -85,7 +85,6 @@ variable "google_iam_roles" {
     "roles/firebasestorage.viewer",
     "roles/iam.roleViewer",
     "roles/iam.securityReviewer",
-    "roles/iam.workforcePoolViewer",
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
