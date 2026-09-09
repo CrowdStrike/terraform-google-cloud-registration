@@ -71,9 +71,11 @@ variable "google_iam_roles" {
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
     "roles/cloudfunctions.viewer",
+    "roles/cloudsql.viewer",
     "roles/cloudtasks.viewer",
     "roles/cloudtranslate.viewer",
     "roles/compute.viewer",
+    "roles/container.viewer",
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
     "roles/essentialcontacts.viewer",
@@ -87,6 +89,7 @@ variable "google_iam_roles" {
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
+    "roles/secretmanager.viewer",
     "roles/securitycenter.adminViewer",
     "roles/storage.bucketViewer"
   ]
