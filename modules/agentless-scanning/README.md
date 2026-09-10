@@ -136,8 +136,8 @@ module "agentless_scanning" {
 | <a name="input_regions"></a> [regions](#input\_regions) | GCP regions to deploy scanner infrastructure (VPC, subnets, NAT). | `set(string)` | `[]` | no |
 | <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID from CrowdStrike backend. Used as suffix for resources with soft-delete lifecycle (SA, custom roles). | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to created resource names | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to created resource names | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to created resource names. Lowercased before use. | `string` | `""` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to created resource names. Lowercased before use. | `string` | `""` | no |
 | <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | Workload Identity Pool ID from the shared CSPM WIF pool | `string` | n/a | yes |
 | <a name="input_wif_project_number"></a> [wif\_project\_number](#input\_wif\_project\_number) | GCP Project Number for the WIF project (used in principal construction) | `string` | n/a | yes |
 ## Outputs

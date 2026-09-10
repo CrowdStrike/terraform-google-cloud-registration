@@ -29,7 +29,7 @@ resource "google_service_account" "scanner_sa" {
   for_each = toset(local.host_project_ids)
 
   project      = each.value
-  account_id   = "${var.resource_prefix}csscan-${random_id.infra_suffix[each.value].hex}${var.resource_suffix}"
+  account_id   = "${local.effective_prefix}csscan-${random_id.infra_suffix[each.value].hex}${local.effective_suffix}"
   display_name = "Agentless Scanner SA"
   description  = "Runs on scanner VM, has GCS read permissions"
 
