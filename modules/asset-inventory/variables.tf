@@ -66,16 +66,12 @@ variable "google_iam_roles" {
     "roles/appengine.appViewer",
     "roles/artifactregistry.reader",
     "roles/backupdr.viewer",
-    "roles/bigquery.metadataViewer",
     "roles/browser",
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
-    "roles/cloudfunctions.viewer",
-    "roles/cloudsql.viewer",
     "roles/cloudtasks.viewer",
     "roles/cloudtranslate.viewer",
     "roles/compute.viewer",
-    "roles/container.viewer",
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
     "roles/essentialcontacts.viewer",
@@ -89,7 +85,6 @@ variable "google_iam_roles" {
     "roles/notebooks.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
-    "roles/secretmanager.viewer",
     "roles/securitycenter.adminViewer",
     "roles/storage.bucketViewer"
   ]
@@ -110,4 +105,10 @@ variable "wif_project_id" {
     condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
+}
+
+variable "manage_wif_project_apis" {
+  type        = bool
+  description = "Whether to enable the GCP APIs required for asset inventory scanning on wif_project_id. Set to false when attaching to a WIF pool created by an earlier registration: that registration already enabled these APIs, and this flow must not require any write access to the WIF/infra project."
+  default     = true
 }

@@ -2,6 +2,13 @@ locals {
   effective_wif_project_id = var.wif_project_id != null ? var.wif_project_id : var.infra_project_id
   effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
   effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
+  use_existing_wif         = var.existing_wif_pool_id != null
+
+  wif_project_number = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_project_number : data.google_project.wif_project[0].number
+  wif_pool_name     = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_pool_name
+  wif_provider_name = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_provider_name
+  wif_iam_principal = local.use_existing_wif ? "principal://iam.googleapis.com/projects/${crowdstrike_cloud_google_registration.main.wif_project_number}/locations/global/workloadIdentityPools/${crowdstrike_cloud_google_registration.main.wif_pool_id}/subject/${var.role_arn}/${crowdstrike_cloud_google_registration.main.id}" : module.workload-identity[0].wif_iam_principal
+
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
     var.agentless_scanning_settings.deploy_cloud_nat ? "managed" : "managed_no_nat"
@@ -10,6 +17,7 @@ locals {
 
 # Data source to get WIF project information
 data "google_project" "wif_project" {
+  count      = local.use_existing_wif ? 0 : 1
   project_id = local.effective_wif_project_id
 }
 
@@ -23,10 +31,16 @@ resource "crowdstrike_cloud_google_registration" "main" {
       condition     = length(local.effective_prefix) + length(local.effective_suffix) <= 13
       error_message = "Combined length of resource_prefix and resource_suffix must not exceed 13 characters."
     }
+
+    precondition {
+      condition     = var.existing_wif_pool_id == null || var.wif_project_id == null
+      error_message = "wif_project_id must not be set when existing_wif_pool_id is set; the two are mutually exclusive."
+    }
   }
 
-  wif_project                   = local.effective_wif_project_id
-  wif_project_number            = data.google_project.wif_project.number
+  existing_wif_pool_id          = local.use_existing_wif ? var.existing_wif_pool_id : null
+  wif_project                   = local.use_existing_wif ? null : local.effective_wif_project_id
+  wif_project_number            = local.use_existing_wif ? null : data.google_project.wif_project[0].number
   deployment_method             = var.deployment_method
   infrastructure_manager_region = var.infrastructure_manager_region
 
@@ -62,6 +76,7 @@ resource "crowdstrike_cloud_google_registration" "main" {
 }
 
 module "workload-identity" {
+  count                = local.use_existing_wif ? 0 : 1
   source               = "./modules/workload-identity/"
   wif_project_id       = local.effective_wif_project_id
   wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
@@ -72,15 +87,21 @@ module "workload-identity" {
   resource_suffix      = local.effective_suffix
 }
 
+moved {
+  from = module.workload-identity
+  to   = module.workload-identity[0]
+}
+
 module "asset-inventory" {
   source = "./modules/asset-inventory/"
 
-  wif_iam_principal = module.workload-identity.wif_iam_principal
-  registration_type = var.registration_type
-  organization_id   = var.organization_id
-  folder_ids        = var.folder_ids
-  project_ids       = var.project_ids
-  wif_project_id    = local.effective_wif_project_id
+  wif_iam_principal       = local.wif_iam_principal
+  registration_type       = var.registration_type
+  organization_id         = var.organization_id
+  folder_ids              = var.folder_ids
+  project_ids             = var.project_ids
+  wif_project_id          = local.effective_wif_project_id
+  manage_wif_project_apis = !local.use_existing_wif
 
   depends_on = [module.workload-identity]
 }
@@ -100,7 +121,7 @@ module "log-ingestion" {
   source = "./modules/log-ingestion/"
 
   # Required parameters
-  wif_iam_principal = module.workload-identity.wif_iam_principal
+  wif_iam_principal = local.wif_iam_principal
   registration_type = var.registration_type
   registration_id   = crowdstrike_cloud_google_registration.main.id
   organization_id   = var.organization_id
@@ -157,8 +178,8 @@ module "agentless_scanning" {
   resource_suffix   = local.effective_suffix
 
   # WIF info from shared pool
-  wif_project_number          = data.google_project.wif_project.number
-  wif_pool_id                 = module.workload-identity.wif_pool_id
+  wif_project_number          = local.wif_project_number
+  wif_pool_id                 = module.workload-identity[0].wif_pool_id
   agentless_scanning_role_arn = var.agentless_scanning_role_arn
 
   # Falcon credentials (stored in Secret Manager per infra project)
@@ -176,8 +197,8 @@ module "agentless_scanning" {
 # CrowdStrike registration settings
 resource "crowdstrike_cloud_google_registration_settings" "main" {
   registration_id                 = crowdstrike_cloud_google_registration.main.id
-  wif_pool_name                   = module.workload-identity.wif_pool_name
-  wif_provider_name               = module.workload-identity.wif_provider_name
+  wif_pool_name                   = local.wif_pool_name
+  wif_provider_name               = local.wif_provider_name
   log_ingestion_topic_id          = try(module.log-ingestion[0].pubsub_topic_name, null)
   log_ingestion_subscription_name = try(module.log-ingestion[0].subscription_name, null)
   log_ingestion_sink_name         = try(values(module.log-ingestion[0].log_sink_names)[0], null)
