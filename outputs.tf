@@ -18,17 +18,17 @@ output "wif_pool_provider_id" {
 
 output "wif_iam_principal" {
   description = "The IAM principal that CrowdStrike uses to access GCP resources"
-  value       = module.workload-identity.wif_iam_principal
+  value       = local.wif_iam_principal
 }
 
 output "wif_project_id" {
   description = "The GCP Project ID where Workload Identity resources were created"
-  value       = module.workload-identity.wif_project_id
+  value       = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_project : local.effective_wif_project_id
 }
 
 output "wif_project_number" {
   description = "The GCP Project Number for the Workload Identity project"
-  value       = module.workload-identity.wif_project_number
+  value       = local.wif_project_number
 }
 
 # =============================================================================

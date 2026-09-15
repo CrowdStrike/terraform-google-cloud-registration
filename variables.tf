@@ -1,6 +1,6 @@
 variable "infra_project_id" {
   type        = string
-  description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed"
+  description = "Google Cloud Project ID where CrowdStrike infrastructure resources will be deployed."
 
   validation {
     condition     = length(var.infra_project_id) >= 6 && length(var.infra_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.infra_project_id))
@@ -10,7 +10,7 @@ variable "infra_project_id" {
 
 variable "wif_project_id" {
   type        = string
-  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified"
+  description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra_project_id if not specified. Must not be set when existing_wif_pool_id is set; the two are mutually exclusive."
   default     = null
 
   validation {
@@ -218,6 +218,17 @@ variable "agentless_scanning_settings" {
     }))
   })
   default = {}
+}
+
+variable "existing_wif_pool_id" {
+  description = "The ID of an existing GCP Workload Identity Pool, created by another registration under the same CID, to attach this registration to instead of creating a new pool. The CrowdStrike backend resolves the owner registration's WIF settings for this registration. Mutually exclusive with wif_project_id. Only supported when registration_type = \"project\"; not compatible with enable_realtime_visibility, enable_dspm, or enable_vulnerability_scanning."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.existing_wif_pool_id == null || (length(var.existing_wif_pool_id) >= 4 && length(var.existing_wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.existing_wif_pool_id)))
+    error_message = "existing_wif_pool_id must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
+  }
 }
 
 variable "log_ingestion_settings" {
