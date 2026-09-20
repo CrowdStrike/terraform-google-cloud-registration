@@ -84,23 +84,23 @@ output "project_in_scope" {
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | >= 6.22.0 |
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [google_project_ancestry.infra_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project_ancestry) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_infra_project_id"></a> [infra\_project\_id](#input\_infra\_project\_id) | Project ID used for CrowdStrike infrastructure resources | `string` | n/a | yes |
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | The scope of the Google Cloud registration which can be one of the following values: organization, folder, project | `string` | n/a | yes |
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_infra_project_in_scope"></a> [infra\_project\_in\_scope](#output\_infra\_project\_in\_scope) | Boolean indicating whether the infrastructure project is within the registration scope |
 <!-- END_TF_DOCS -->

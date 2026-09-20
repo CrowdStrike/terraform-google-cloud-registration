@@ -55,12 +55,12 @@ module "asset_inventory" {
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [google_folder_iam_member.crowdstrike_folder](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_organization_iam_member.crowdstrike_organization](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_project_iam_member.crowdstrike_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
@@ -68,7 +68,7 @@ module "asset_inventory" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folders being registered | `list(string)` | `[]` | no |
 | <a name="input_google_iam_roles"></a> [google\_iam\_roles](#input\_google\_iam\_roles) | List of Google Cloud IAM roles that will be granted to the wif\_iam\_principal identity for asset inventory access | `list(string)` | <pre>[<br/>  "roles/aiplatform.viewer",<br/>  "roles/alloydb.viewer",<br/>  "roles/apigee.readOnlyAdmin",<br/>  "roles/appengine.appViewer",<br/>  "roles/artifactregistry.reader",<br/>  "roles/backupdr.viewer",<br/>  "roles/bigquery.metadataViewer",<br/>  "roles/browser",<br/>  "roles/cloudasset.viewer",<br/>  "roles/cloudfunctions.developer",<br/>  "roles/cloudfunctions.viewer",<br/>  "roles/cloudsql.viewer",<br/>  "roles/cloudtasks.viewer",<br/>  "roles/cloudtranslate.viewer",<br/>  "roles/compute.viewer",<br/>  "roles/container.viewer",<br/>  "roles/dataplex.viewer",<br/>  "roles/dialogflow.reader",<br/>  "roles/essentialcontacts.viewer",<br/>  "roles/eventarc.viewer",<br/>  "roles/firebaseappcheck.viewer",<br/>  "roles/firebaseauth.viewer",<br/>  "roles/firebasedatabase.viewer",<br/>  "roles/firebasehosting.viewer",<br/>  "roles/firebasestorage.viewer",<br/>  "roles/iam.securityReviewer",<br/>  "roles/notebooks.viewer",<br/>  "roles/recommender.iamViewer",<br/>  "roles/recommender.iampolicychangeriskViewer",<br/>  "roles/secretmanager.viewer",<br/>  "roles/securitycenter.adminViewer",<br/>  "roles/storage.bucketViewer"<br/>]</pre> | no |
 | <a name="input_manage_wif_project_apis"></a> [manage\_wif\_project\_apis](#input\_manage\_wif\_project\_apis) | Whether to enable the GCP APIs required for asset inventory scanning on wif\_project\_id. Set to false when attaching to a WIF pool created by an earlier registration: that registration already enabled these APIs, and this flow must not require any write access to the WIF/infra project. | `bool` | `true` | no |

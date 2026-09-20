@@ -75,12 +75,12 @@ module "log_ingestion" {
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [google_logging_folder_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_folder_sink) | resource |
 | [google_logging_organization_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_organization_sink) | resource |
 | [google_logging_project_sink.crowdstrike_logs](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/logging_project_sink) | resource |
@@ -100,7 +100,7 @@ module "log_ingestion" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_ack_deadline_seconds"></a> [ack\_deadline\_seconds](#input\_ack\_deadline\_seconds) | Message acknowledgment deadline in seconds | `number` | `600` | no |
 | <a name="input_audit_log_types"></a> [audit\_log\_types](#input\_audit\_log\_types) | List of audit log types to include in the filter | `list(string)` | <pre>[<br/>  "activity",<br/>  "system_event",<br/>  "policy"<br/>]</pre> | no |
 | <a name="input_enable_schema_validation"></a> [enable\_schema\_validation](#input\_enable\_schema\_validation) | Enable schema validation for the topic | `bool` | `false` | no |
@@ -127,7 +127,7 @@ module "log_ingestion" {
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_apis_enabled"></a> [apis\_enabled](#output\_apis\_enabled) | List of Google Cloud APIs enabled for log ingestion |
 | <a name="output_log_filter"></a> [log\_filter](#output\_log\_filter) | The log filter used by the log router sinks |
 | <a name="output_log_ingestion_project_id"></a> [log\_ingestion\_project\_id](#output\_log\_ingestion\_project\_id) | Project ID where log ingestion resources are deployed |
