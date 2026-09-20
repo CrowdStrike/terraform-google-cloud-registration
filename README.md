@@ -99,20 +99,20 @@ module "crowdstrike_gcp_registration" {
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.78 |
+| ---- | ------- |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.88 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 6.22 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
 | [crowdstrike_cloud_google_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_settings) | resource |
 | [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable\_dspm is true. | `string` | `null` | no |
 | <a name="input_agentless_scanning_settings"></a> [agentless\_scanning\_settings](#input\_agentless\_scanning\_settings) | Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings. | <pre>object({<br/>    host_project_id  = optional(string)<br/>    org_id           = optional(string)<br/>    regions          = optional(set(string), [])<br/>    deploy_cloud_nat = optional(bool, true)<br/>    custom_vpc_configuration = optional(object({<br/>      vpc_name = string<br/>      subnets  = map(string)<br/>    }))<br/>  })</pre> | `{}` | no |
 | <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
@@ -139,7 +139,7 @@ module "crowdstrike_gcp_registration" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_agentless_scanning_sa_emails"></a> [agentless\_scanning\_sa\_emails](#output\_agentless\_scanning\_sa\_emails) | Agentless scanning Service Account emails per infra project (if DSPM enabled) |
 | <a name="output_agentless_scanning_wif_principal"></a> [agentless\_scanning\_wif\_principal](#output\_agentless\_scanning\_wif\_principal) | The agentless scanning WIF IAM principal (if DSPM enabled) |
 | <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |

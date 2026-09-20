@@ -57,14 +57,14 @@ module "agentless_scanning" {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.7.1 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [google_compute_network.agentless_vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
 | [google_compute_router.agentless_router](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router) | resource |
 | [google_compute_router_nat.agentless_nat](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router_nat) | resource |
@@ -119,7 +119,7 @@ module "agentless_scanning" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF | `string` | n/a | yes |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
@@ -143,7 +143,7 @@ module "agentless_scanning" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_agentless_infra"></a> [agentless\_infra](#output\_agentless\_infra) | Per-project infrastructure map for agentless scanning provider settings |
 | <a name="output_agentless_wif_principal"></a> [agentless\_wif\_principal](#output\_agentless\_wif\_principal) | WIF Principal string for agentless scanning IAM bindings |
 | <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS scanning permissions |
