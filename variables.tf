@@ -226,7 +226,7 @@ variable "existing_wif_pool_id" {
   default     = null
 
   validation {
-    condition     = var.existing_wif_pool_id == null || (length(var.existing_wif_pool_id) >= 4 && length(var.existing_wif_pool_id) <= 32 && can(regex("^[a-z0-9-]+$", var.existing_wif_pool_id)))
+    condition     = var.existing_wif_pool_id == null || can(regex("^[a-z0-9-]{4,32}$", var.existing_wif_pool_id))
     error_message = "existing_wif_pool_id must be 4-32 characters and contain only lowercase letters, numbers, and hyphens."
   }
 }
