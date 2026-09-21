@@ -111,3 +111,9 @@ variable "wif_project_id" {
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
+
+variable "manage_wif_project_apis" {
+  type        = bool
+  description = "Whether to enable the GCP APIs required for asset inventory scanning on wif_project_id. Set to false when attaching to a WIF pool created by an earlier registration: that registration already enabled these APIs, and this flow must not require any write access to the WIF/infra project."
+  default     = true
+}

@@ -5,6 +5,8 @@ recursive:
 sections:
   hide:
     - requirements
+settings:
+  lockfile: false
 output:
   file: README.md
   mode: inject
