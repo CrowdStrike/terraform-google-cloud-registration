@@ -41,12 +41,12 @@ resource "google_project_iam_member" "crowdstrike_project" {
 
 # Enable required APIs for CrowdStrike WIF project
 resource "google_project_service" "asset_inventory_apis" {
-  for_each = toset([
+  for_each = var.manage_wif_project_apis ? toset([
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "cloudasset.googleapis.com"
-  ])
+  ]) : []
 
   project                    = var.wif_project_id
   service                    = each.value
