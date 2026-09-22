@@ -21,7 +21,11 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.1.0"
+  deployment_version = "1.1.1"
+
+  # Guard for resources that reject uppercase
+  effective_prefix = lower(var.resource_prefix)
+  effective_suffix = lower(var.resource_suffix)
 
   # Mode detection
   is_org_registration     = var.registration_type == "organization"

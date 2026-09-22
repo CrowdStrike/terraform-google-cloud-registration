@@ -6,7 +6,7 @@ resource "google_compute_network" "agentless_vpc" {
   for_each = local.is_custom_vpc ? toset([]) : toset(local.host_project_ids)
 
   project                 = each.value
-  name                    = "${var.resource_prefix}agentless-vpc${var.resource_suffix}"
+  name                    = "${local.effective_prefix}agentless-vpc${local.effective_suffix}"
   auto_create_subnetworks = false
 
   depends_on = [google_project_service.required_apis]
@@ -16,7 +16,7 @@ resource "google_compute_subnetwork" "agentless_subnet" {
   for_each = local.project_region_pairs
 
   project       = each.value.project
-  name          = "${var.resource_prefix}agentless-subnet-${each.value.region}${var.resource_suffix}"
+  name          = "${local.effective_prefix}agentless-subnet-${each.value.region}${local.effective_suffix}"
   ip_cidr_range = "10.${parseint(substr(md5(each.value.region), 0, 2), 16)}.${parseint(substr(md5(each.value.region), 2, 2), 16)}.0/24"
   region        = each.value.region
   network       = google_compute_network.agentless_vpc[each.value.project].id
@@ -78,7 +78,7 @@ resource "google_compute_router" "agentless_router" {
   for_each = local.project_region_nat_pairs
 
   project = each.value.project
-  name    = "${var.resource_prefix}agentless-router-${each.value.region}${var.resource_suffix}"
+  name    = "${local.effective_prefix}agentless-router-${each.value.region}${local.effective_suffix}"
   region  = each.value.region
   network = google_compute_network.agentless_vpc[each.value.project].id
 }
@@ -87,7 +87,7 @@ resource "google_compute_router_nat" "agentless_nat" {
   for_each = local.project_region_nat_pairs
 
   project                            = each.value.project
-  name                               = "${var.resource_prefix}agentless-nat-${each.value.region}${var.resource_suffix}"
+  name                               = "${local.effective_prefix}agentless-nat-${each.value.region}${local.effective_suffix}"
   router                             = google_compute_router.agentless_router[each.key].name
   region                             = each.value.region
   nat_ip_allocate_option             = "AUTO_ONLY"

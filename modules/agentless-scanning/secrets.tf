@@ -6,7 +6,7 @@ resource "google_secret_manager_secret" "falcon_credentials" {
   for_each = toset(local.host_project_ids)
 
   project   = each.value
-  secret_id = "${var.resource_prefix}csscanning-falcon-credentials-${local.reg_id_short}${var.resource_suffix}"
+  secret_id = "${local.effective_prefix}csscanning-falcon-credentials-${local.reg_id_short}${local.effective_suffix}"
 
   labels = var.labels
 

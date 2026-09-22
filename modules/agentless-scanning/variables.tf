@@ -128,13 +128,13 @@ variable "labels" {
 
 variable "resource_prefix" {
   type        = string
-  description = "Prefix to be added to created resource names"
+  description = "Prefix to be added to created resource names. Lowercased before use."
   default     = ""
 }
 
 variable "resource_suffix" {
   type        = string
-  description = "Suffix to be added to created resource names"
+  description = "Suffix to be added to created resource names. Lowercased before use."
   default     = ""
 }
 
