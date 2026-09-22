@@ -80,9 +80,24 @@ locals {
     ]
   }
 
-  # IAM condition for vulnerability scanning bindings — allows createSnapshot on any disk
+  # DSPM scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
+  dspm_wif_target_role = {
+    id_prefix   = "DSPMScanningDisk"
+    title       = "DSPM Scanning Disk"
+    description = "Snapshot and clone disk permissions for cross-project DSPM scanning"
+    permissions = [
+      "compute.disks.createSnapshot",
+      "compute.snapshots.create",
+      "compute.snapshots.setLabels",
+      "compute.snapshots.useReadOnly",
+      "compute.snapshots.delete",
+    ]
+  }
+
+  # IAM condition for snapshot scanning bindings — allows createSnapshot on any disk
   # but restricts snapshot mutations (create, delete, useReadOnly) to cs-scanning-* resources.
-  vulnerability_snapshot_condition = {
+  # Shared by both vulnerability and DSPM scanning roles.
+  snapshot_scanning_condition = {
     title       = "restrict-to-crowdstrike-scanning-snapshots"
     description = "Allow createSnapshot on any disk but restrict snapshot mutations to cs-scanning-* resources"
     expression = join(" || ", [
