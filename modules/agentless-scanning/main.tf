@@ -81,7 +81,7 @@ locals {
   }
 
   # DSPM scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
-  dspm_wif_target_role = {
+  dspm_gce_vm_wif_target_role = {
     id_prefix   = "DSPMScanningDisk"
     title       = "DSPM Scanning Disk"
     description = "Snapshot and clone disk permissions for cross-project DSPM scanning"
