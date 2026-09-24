@@ -55,6 +55,24 @@ locals {
   role_suffix  = replace(substr(var.registration_id, 0, 33), "-", "_")
   reg_id_short = substr(var.registration_id, 0, 23)
 
+  # Shared permission sets — single source of truth for permissions used by both DSPM and vulnerability roles.
+  scanner_disk_permissions = [
+    "compute.instances.attachDisk",
+    "compute.instances.detachDisk",
+    "compute.instances.get",
+    "compute.disks.use",
+    "compute.disks.useReadOnly",
+    "compute.zoneOperations.get",
+  ]
+
+  snapshot_scanning_permissions = [
+    "compute.disks.createSnapshot",
+    "compute.snapshots.create",
+    "compute.snapshots.setLabels",
+    "compute.snapshots.useReadOnly",
+    "compute.snapshots.delete",
+  ]
+
   # Scanner GCS read role — reused across host project and cross-target roles at project/folder/org scope.
   scanner_gcs_role = {
     id_prefix   = "DSPMScannerGCSRead"
@@ -71,13 +89,7 @@ locals {
     id_prefix   = "VulnScanningOrch"
     title       = "Vulnerability Scanning Orchestrator"
     description = "Snapshot and clone disk permissions for cross-project vulnerability scanning"
-    permissions = [
-      "compute.disks.createSnapshot",
-      "compute.snapshots.create",
-      "compute.snapshots.setLabels",
-      "compute.snapshots.useReadOnly",
-      "compute.snapshots.delete",
-    ]
+    permissions = local.snapshot_scanning_permissions
   }
 
   # DSPM scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
@@ -85,13 +97,7 @@ locals {
     id_prefix   = "DSPMScanningDisk"
     title       = "DSPM Scanning Disk"
     description = "Snapshot and clone disk permissions for cross-project DSPM scanning"
-    permissions = [
-      "compute.disks.createSnapshot",
-      "compute.snapshots.create",
-      "compute.snapshots.setLabels",
-      "compute.snapshots.useReadOnly",
-      "compute.snapshots.delete",
-    ]
+    permissions = local.snapshot_scanning_permissions
   }
 
   # IAM condition for snapshot scanning bindings — allows createSnapshot on any disk

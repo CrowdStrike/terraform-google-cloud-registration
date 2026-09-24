@@ -84,14 +84,7 @@ resource "google_project_iam_custom_role" "scanner_dspm_disk_role" {
   title       = "DSPM Scanner Disk"
   description = "Disk attach/detach/read permissions for DSPM scanning"
 
-  permissions = [
-    "compute.instances.attachDisk",
-    "compute.instances.detachDisk",
-    "compute.instances.get",
-    "compute.disks.use",
-    "compute.disks.useReadOnly",
-    "compute.zoneOperations.get",
-  ]
+  permissions = local.scanner_disk_permissions
 
   depends_on = [google_project_service.required_apis]
 }
@@ -127,14 +120,7 @@ resource "google_project_iam_custom_role" "scanner_vulnerability_disk_role" {
   title       = "Vulnerability Scanner Disk"
   description = "Disk attach/detach/read permissions for vulnerability scanning"
 
-  permissions = [
-    "compute.instances.attachDisk",
-    "compute.instances.detachDisk",
-    "compute.instances.get",
-    "compute.disks.use",
-    "compute.disks.useReadOnly",
-    "compute.zoneOperations.get",
-  ]
+  permissions = local.scanner_disk_permissions
 
   depends_on = [google_project_service.required_apis]
 }
