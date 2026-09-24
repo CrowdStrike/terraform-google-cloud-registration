@@ -37,7 +37,7 @@ resource "google_service_account" "scanner_sa" {
 }
 
 # =============================================================================
-# GCS IAM - Scanner SA Custom Role (per host project) [DSPM only]
+# DSPM Scanning - Scanner SA GCS Role (per host project)
 # =============================================================================
 
 # Protects scanner_gcs_role against 44-day soft-delete collision
@@ -68,6 +68,42 @@ resource "google_project_iam_member" "scanner_gcs_permissions" {
 }
 
 # =============================================================================
+# DSPM Scanning - Scanner SA Disk Role (per host project)
+# =============================================================================
+
+resource "random_id" "dspm_disk_role_suffix" {
+  for_each    = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "scanner_dspm_disk_role" {
+  for_each = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+
+  project     = each.value
+  role_id     = "DSPMScannerDisk_${local.role_suffix}_${random_id.dspm_disk_role_suffix[each.value].hex}"
+  title       = "DSPM Scanner Disk"
+  description = "Disk attach/detach/read permissions for DSPM scanning"
+
+  permissions = local.scanner_disk_permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_project_iam_member" "scanner_dspm_disk_permissions" {
+  for_each = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.scanner_dspm_disk_role[each.value].id
+  member  = "serviceAccount:${google_service_account.scanner_sa[each.value].email}"
+
+  condition {
+    title       = local.scanner_resource_condition.title
+    description = local.scanner_resource_condition.description
+    expression  = local.scanner_resource_condition.expression
+  }
+}
+
+# =============================================================================
 # Vulnerability Scanning - Scanner SA Disk Role (per host project)
 # =============================================================================
 
@@ -84,14 +120,7 @@ resource "google_project_iam_custom_role" "scanner_vulnerability_disk_role" {
   title       = "Vulnerability Scanner Disk"
   description = "Disk attach/detach/read permissions for vulnerability scanning"
 
-  permissions = [
-    "compute.instances.attachDisk",
-    "compute.instances.detachDisk",
-    "compute.instances.get",
-    "compute.disks.use",
-    "compute.disks.useReadOnly",
-    "compute.zoneOperations.get",
-  ]
+  permissions = local.scanner_disk_permissions
 
   depends_on = [google_project_service.required_apis]
 }
@@ -207,9 +236,48 @@ resource "google_project_iam_member" "wif_vulnerability_target_permissions" {
   member  = local.agentless_wif_principal
 
   condition {
-    title       = local.vulnerability_snapshot_condition.title
-    description = local.vulnerability_snapshot_condition.description
-    expression  = local.vulnerability_snapshot_condition.expression
+    title       = local.snapshot_scanning_condition.title
+    description = local.snapshot_scanning_condition.description
+    expression  = local.snapshot_scanning_condition.expression
+  }
+}
+
+# =============================================================================
+# WIF Principal - DSPM Scanning Target Role (project registrations)
+# =============================================================================
+# In project registration mode, the host project is also a scan target (has VMs).
+# Org/folder modes don't need this — their org/folder-level binding in
+# cross_targets.tf already covers the host project.
+
+resource "random_id" "dspm_gce_vm_wif_host_role_suffix" {
+  for_each    = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "wif_dspm_gce_vm_target_role" {
+  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project     = each.value
+  role_id     = "${local.dspm_gce_vm_wif_target_role.id_prefix}_${local.role_suffix}_${random_id.dspm_gce_vm_wif_host_role_suffix[each.value].hex}"
+  title       = local.dspm_gce_vm_wif_target_role.title
+  description = local.dspm_gce_vm_wif_target_role.description
+
+  permissions = local.dspm_gce_vm_wif_target_role.permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_project_iam_member" "wif_dspm_gce_vm_target_permissions" {
+  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.wif_dspm_gce_vm_target_role[each.value].id
+  member  = local.agentless_wif_principal
+
+  condition {
+    title       = local.snapshot_scanning_condition.title
+    description = local.snapshot_scanning_condition.description
+    expression  = local.snapshot_scanning_condition.expression
   }
 }
 
