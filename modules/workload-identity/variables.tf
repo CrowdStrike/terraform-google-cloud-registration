@@ -72,7 +72,7 @@ variable "registration_id" {
 
 variable "role_arn" {
   type        = string
-  description = "AWS Role ARN used by CrowdStrike for authentication. Required when identity_source is aws-sts."
+  description = "AWS Role ARN used by CrowdStrike for authentication. Required when CrowdStrike authenticates via AWS STS. Mutually exclusive with service_account_unique_id."
   default     = null
 
   validation {
@@ -83,7 +83,7 @@ variable "role_arn" {
 
 variable "service_account_unique_id" {
   type        = string
-  description = "Numeric unique ID of CrowdStrike's shared service account. Required when identity_source is gcp-oidc."
+  description = "Numeric unique ID of CrowdStrike's shared service account. Required when CrowdStrike authenticates via GCP OIDC. Mutually exclusive with role_arn."
   default     = null
 
   validation {
