@@ -87,18 +87,18 @@ resource "crowdstrike_cloud_google_registration" "main" {
 }
 
 module "workload-identity" {
-  count                = local.use_existing_wif ? 0 : 1
-  source               = "./modules/workload-identity/"
-  wif_project_id       = local.effective_wif_project_id
-  wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
-  wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
-  identity_source      = local.identity_source
-  registration_id      = crowdstrike_cloud_google_registration.main.id
-  role_arn             = var.role_arn
+  count                                        = local.use_existing_wif ? 0 : 1
+  source                                       = "./modules/workload-identity/"
+  wif_project_id                               = local.effective_wif_project_id
+  wif_pool_id                                  = crowdstrike_cloud_google_registration.main.wif_pool_id
+  wif_pool_provider_id                         = crowdstrike_cloud_google_registration.main.wif_provider_id
+  identity_source                              = local.identity_source
+  registration_id                              = crowdstrike_cloud_google_registration.main.id
+  role_arn                                     = var.role_arn
   service_account_unique_id                    = var.service_account_unique_id
   agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
-  resource_prefix      = local.effective_prefix
-  resource_suffix      = local.effective_suffix
+  resource_prefix                              = local.effective_prefix
+  resource_suffix                              = local.effective_suffix
 }
 
 moved {
@@ -192,10 +192,10 @@ module "agentless_scanning" {
   resource_suffix   = local.effective_suffix
 
   # WIF info from shared pool
-  wif_project_number          = local.wif_project_number
-  wif_pool_id                 = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_pool_id : module.workload-identity[0].wif_pool_id
-  identity_source             = local.identity_source
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+  wif_project_number                           = local.wif_project_number
+  wif_pool_id                                  = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_pool_id : module.workload-identity[0].wif_pool_id
+  identity_source                              = local.identity_source
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
   agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
 
   # Falcon credentials (stored in Secret Manager per infra project)

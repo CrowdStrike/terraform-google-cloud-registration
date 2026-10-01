@@ -57,14 +57,14 @@ module "agentless_scanning" {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 5.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.7.1 |
 | <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [google_compute_network.agentless_vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network) | resource |
 | [google_compute_router.agentless_router](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router) | resource |
 | [google_compute_router_nat.agentless_nat](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_router_nat) | resource |
@@ -134,8 +134,9 @@ module "agentless_scanning" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF | `string` | n/a | yes |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when identity\_source is aws-sts. | `string` | `null` | no |
+| <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Required when identity\_source is gcp-oidc. | `string` | `null` | no |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM (GCS scanning) permissions | `bool` | `false` | no |
@@ -145,6 +146,7 @@ module "agentless_scanning" {
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folder IDs for folder-level registration | `list(string)` | `[]` | no |
 | <a name="input_folder_org_id"></a> [folder\_org\_id](#input\_folder\_org\_id) | Parent GCP Organization ID of the registered folder(s). Required for folder registration to host the org-level scanner custom role bound at folder scope. | `string` | `null` | no |
 | <a name="input_host_project_id"></a> [host\_project\_id](#input\_host\_project\_id) | Google Cloud Project ID hosting the agentless scanning infrastructure (the host project). Set only in cross-project mode (org/folder/multi-project); null for per-project (no-cross) registrations where each project self-hosts. | `string` | `null` | no |
+| <a name="input_identity_source"></a> [identity\_source](#input\_identity\_source) | Identity source type (aws-sts or gcp-oidc). Determines how the agentless WIF principal is constructed. | `string` | n/a | yes |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources that support them | `map(string)` | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of registered project IDs (full registration scope). Used for viewer role bindings and cross/no-cross target derivation. | `list(string)` | `[]` | no |
@@ -158,7 +160,7 @@ module "agentless_scanning" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_agentless_infra"></a> [agentless\_infra](#output\_agentless\_infra) | Per-project infrastructure map for agentless scanning provider settings |
 | <a name="output_agentless_wif_principal"></a> [agentless\_wif\_principal](#output\_agentless\_wif\_principal) | WIF Principal string for agentless scanning IAM bindings |
 | <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS scanning permissions |

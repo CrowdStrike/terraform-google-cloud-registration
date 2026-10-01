@@ -99,21 +99,22 @@ module "crowdstrike_gcp_registration" {
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.88 |
+| ---- | ------- |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 1.0.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 6.22 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [crowdstrike_cloud_google_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration) | resource |
 | [crowdstrike_cloud_google_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_registration_settings) | resource |
 | [google_project.wif_project](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable\_dspm is true. | `string` | `null` | no |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when enable\_dspm is true and identity\_source is aws-sts. | `string` | `null` | no |
+| <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Required when enable\_dspm is true and identity\_source is gcp-oidc. | `string` | `null` | no |
 | <a name="input_agentless_scanning_settings"></a> [agentless\_scanning\_settings](#input\_agentless\_scanning\_settings) | Configuration settings for agentless scanning infrastructure. Controls scanning scope, VPC, and network settings. | <pre>object({<br/>    host_project_id  = optional(string)<br/>    org_id           = optional(string)<br/>    regions          = optional(set(string), [])<br/>    deploy_cloud_nat = optional(bool, true)<br/>    custom_vpc_configuration = optional(object({<br/>      vpc_name = string<br/>      subnets  = map(string)<br/>    }))<br/>  })</pre> | `{}` | no |
 | <a name="input_deployment_method"></a> [deployment\_method](#input\_deployment\_method) | Deployment method for the CrowdStrike GCP registration | `string` | `"terraform-native"` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM agentless scanning infrastructure | `bool` | `false` | no |
@@ -134,12 +135,13 @@ module "crowdstrike_gcp_registration" {
 | <a name="input_registration_type"></a> [registration\_type](#input\_registration\_type) | Type of registration: organization, folder, or project | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
-| <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication | `string` | n/a | yes |
+| <a name="input_role_arn"></a> [role\_arn](#input\_role\_arn) | AWS Role ARN used by CrowdStrike for authentication. Required for AWS-based CS clouds (identity\_source = aws-sts). | `string` | `null` | no |
+| <a name="input_service_account_unique_id"></a> [service\_account\_unique\_id](#input\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's shared service account. Required when identity\_source is gcp-oidc. | `string` | `null` | no |
 | <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed. Defaults to infra\_project\_id if not specified. Must not be set when existing\_wif\_pool\_id is set; the two are mutually exclusive. | `string` | `null` | no |
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_agentless_scanning_sa_emails"></a> [agentless\_scanning\_sa\_emails](#output\_agentless\_scanning\_sa\_emails) | Agentless scanning Service Account emails per infra project (if DSPM enabled) |
 | <a name="output_agentless_scanning_wif_principal"></a> [agentless\_scanning\_wif\_principal](#output\_agentless\_scanning\_wif\_principal) | The agentless scanning WIF IAM principal (if DSPM enabled) |
 | <a name="output_log_sink_names"></a> [log\_sink\_names](#output\_log\_sink\_names) | Names of the created log sinks (if RTV&D enabled) |
