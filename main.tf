@@ -3,11 +3,12 @@ locals {
   effective_prefix         = var.resource_prefix != null ? var.resource_prefix : ""
   effective_suffix         = var.resource_suffix != null ? var.resource_suffix : ""
   use_existing_wif         = var.existing_wif_pool_id != null
+  identity_source          = var.service_account_unique_id != null ? "gcp-oidc" : "aws-sts"
 
   wif_project_number = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_project_number : data.google_project.wif_project[0].number
   wif_pool_name      = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_pool_name
   wif_provider_name  = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_provider_name
-  wif_iam_principal  = local.use_existing_wif ? "principal://iam.googleapis.com/projects/${crowdstrike_cloud_google_registration.main.wif_project_number}/locations/global/workloadIdentityPools/${crowdstrike_cloud_google_registration.main.wif_pool_id}/subject/${var.role_arn}/${crowdstrike_cloud_google_registration.main.id}" : module.workload-identity[0].wif_iam_principal
+  wif_iam_principal  = local.use_existing_wif ? "principal://iam.googleapis.com/projects/${crowdstrike_cloud_google_registration.main.wif_project_number}/locations/global/workloadIdentityPools/${crowdstrike_cloud_google_registration.main.wif_pool_id}/subject/${local.identity_source == "aws-sts" ? var.role_arn : var.service_account_unique_id}/${crowdstrike_cloud_google_registration.main.id}" : module.workload-identity[0].wif_iam_principal
 
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :
@@ -35,6 +36,16 @@ resource "crowdstrike_cloud_google_registration" "main" {
     precondition {
       condition     = var.existing_wif_pool_id == null || var.wif_project_id == null
       error_message = "wif_project_id must not be set when existing_wif_pool_id is set; the two are mutually exclusive."
+    }
+
+    precondition {
+      condition     = (var.role_arn != null) != (var.service_account_unique_id != null)
+      error_message = "Exactly one of role_arn or service_account_unique_id must be provided. For CrowdStrike regions (US-1, US-2, EU-1, Gov-1, Gov-2) role_arn should be used. Please consult CrowdStrike documentation for other region values."
+    }
+
+    postcondition {
+      condition     = self.wif_identity_source == local.identity_source
+      error_message = "Identity source mismatch: CrowdStrike API returned '${self.wif_identity_source}' but the provided credentials indicate '${local.identity_source}'. Provide service_account_unique_id for gcp-oidc clouds or role_arn for aws-sts clouds."
     }
   }
 
@@ -76,15 +87,18 @@ resource "crowdstrike_cloud_google_registration" "main" {
 }
 
 module "workload-identity" {
-  count                = local.use_existing_wif ? 0 : 1
-  source               = "./modules/workload-identity/"
-  wif_project_id       = local.effective_wif_project_id
-  wif_pool_id          = crowdstrike_cloud_google_registration.main.wif_pool_id
-  wif_pool_provider_id = crowdstrike_cloud_google_registration.main.wif_provider_id
-  role_arn             = var.role_arn
-  registration_id      = crowdstrike_cloud_google_registration.main.id
-  resource_prefix      = local.effective_prefix
-  resource_suffix      = local.effective_suffix
+  count                                        = local.use_existing_wif ? 0 : 1
+  source                                       = "./modules/workload-identity/"
+  wif_project_id                               = local.effective_wif_project_id
+  wif_pool_id                                  = crowdstrike_cloud_google_registration.main.wif_pool_id
+  wif_pool_provider_id                         = crowdstrike_cloud_google_registration.main.wif_provider_id
+  identity_source                              = local.identity_source
+  registration_id                              = crowdstrike_cloud_google_registration.main.id
+  role_arn                                     = var.role_arn
+  service_account_unique_id                    = var.service_account_unique_id
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
+  resource_prefix                              = local.effective_prefix
+  resource_suffix                              = local.effective_suffix
 }
 
 moved {
@@ -178,9 +192,11 @@ module "agentless_scanning" {
   resource_suffix   = local.effective_suffix
 
   # WIF info from shared pool
-  wif_project_number          = local.wif_project_number
-  wif_pool_id                 = module.workload-identity[0].wif_pool_id
-  agentless_scanning_role_arn = var.agentless_scanning_role_arn
+  wif_project_number                           = local.wif_project_number
+  wif_pool_id                                  = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_pool_id : module.workload-identity[0].wif_pool_id
+  identity_source                              = local.identity_source
+  agentless_scanning_role_arn                  = var.agentless_scanning_role_arn
+  agentless_scanning_service_account_unique_id = var.agentless_scanning_service_account_unique_id
 
   # Falcon credentials (stored in Secret Manager per infra project)
   falcon_client_id     = var.falcon_client_id
