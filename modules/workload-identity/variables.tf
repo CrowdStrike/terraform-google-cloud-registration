@@ -31,6 +31,7 @@ variable "wif_pool_provider_id" {
 variable "identity_source" {
   type        = string
   description = "Identity federation type: aws-sts (AWS role ARN) or gcp-oidc (GCP service account)"
+  default     = "aws-sts"
 
   validation {
     condition     = contains(["aws-sts", "gcp-oidc"], var.identity_source)

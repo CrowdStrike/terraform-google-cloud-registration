@@ -159,6 +159,7 @@ variable "wif_pool_id" {
 variable "identity_source" {
   type        = string
   description = "Identity source type (aws-sts or gcp-oidc). Determines how the agentless WIF principal is constructed."
+  default     = "aws-sts"
   validation {
     condition     = contains(["aws-sts", "gcp-oidc"], var.identity_source)
     error_message = "Identity source must be one of: aws-sts, gcp-oidc."

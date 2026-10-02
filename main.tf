@@ -8,7 +8,7 @@ locals {
   wif_project_number = local.use_existing_wif ? crowdstrike_cloud_google_registration.main.wif_project_number : data.google_project.wif_project[0].number
   wif_pool_name      = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_pool_name
   wif_provider_name  = local.use_existing_wif ? null : crowdstrike_cloud_google_registration.main.wif_provider_name
-  wif_iam_principal  = local.use_existing_wif ? "principal://iam.googleapis.com/projects/${crowdstrike_cloud_google_registration.main.wif_project_number}/locations/global/workloadIdentityPools/${crowdstrike_cloud_google_registration.main.wif_pool_id}/subject/${var.role_arn}/${crowdstrike_cloud_google_registration.main.id}" : module.workload-identity[0].wif_iam_principal
+  wif_iam_principal  = local.use_existing_wif ? "principal://iam.googleapis.com/projects/${crowdstrike_cloud_google_registration.main.wif_project_number}/locations/global/workloadIdentityPools/${crowdstrike_cloud_google_registration.main.wif_pool_id}/subject/${local.identity_source == "aws-sts" ? var.role_arn : var.service_account_unique_id}/${crowdstrike_cloud_google_registration.main.id}" : module.workload-identity[0].wif_iam_principal
 
   network_configuration_type = (
     var.agentless_scanning_settings.custom_vpc_configuration != null ? "custom" :

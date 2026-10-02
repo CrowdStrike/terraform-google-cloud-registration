@@ -62,6 +62,11 @@ resource "google_iam_workload_identity_pool_provider" "aws" {
   depends_on = [google_iam_workload_identity_pool.main]
 }
 
+moved {
+  from = google_iam_workload_identity_pool_provider.aws
+  to   = google_iam_workload_identity_pool_provider.aws[0]
+}
+
 # OIDC provider — created when identity_source is gcp-oidc
 resource "google_iam_workload_identity_pool_provider" "oidc" {
   count = var.identity_source == "gcp-oidc" ? 1 : 0
