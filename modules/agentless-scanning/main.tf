@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.1.2"
+  deployment_version = "1.1.3"
 
   # Guard for resources that reject uppercase
   effective_prefix = lower(var.resource_prefix)
