@@ -67,7 +67,7 @@ module "workload_identity" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Included in OIDC attribute\_condition when provided. | `string` | `null` | no |
-| <a name="input_identity_source"></a> [identity\_source](#input\_identity\_source) | Identity federation type: aws-sts (AWS role ARN) or gcp-oidc (GCP service account) | `string` | n/a | yes |
+| <a name="input_identity_source"></a> [identity\_source](#input\_identity\_source) | Identity federation type: aws-sts (AWS role ARN) or gcp-oidc (GCP service account) | `string` | `"aws-sts"` | no |
 | <a name="input_registration_id"></a> [registration\_id](#input\_registration\_id) | Unique registration ID returned by CrowdStrike Registration API | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `null` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `null` | no |
