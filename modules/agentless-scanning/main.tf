@@ -35,8 +35,8 @@ locals {
   # WIF Principal - Agentless scanning (shared pool, identity-source-dependent subject)
   agentless_wif_principal = (
     var.identity_source == "aws-sts"
-    ? "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_role_arn}/${var.registration_id}"
-    : "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_service_account_unique_id}/${var.registration_id}"
+    ? "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${coalesce(var.agentless_scanning_role_arn, "")}/${var.registration_id}"
+    : "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${coalesce(var.agentless_scanning_service_account_unique_id, "")}/${var.registration_id}"
   )
 
   # Custom VPC mode detection
