@@ -33,11 +33,14 @@ locals {
   is_project_registration = var.registration_type == "project"
 
   # WIF Principal - Agentless scanning (shared pool, identity-source-dependent subject)
-  agentless_wif_principal = (
+  # The ternary guarantees only the non-null variable is interpolated at runtime;
+  # the fallback satisfies tflint's static null-in-string-template check.
+  agentless_scanning_subject = (
     var.identity_source == "aws-sts"
-    ? "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${coalesce(var.agentless_scanning_role_arn, "")}/${var.registration_id}"
-    : "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${coalesce(var.agentless_scanning_service_account_unique_id, "")}/${var.registration_id}"
+    ? (var.agentless_scanning_role_arn != null ? var.agentless_scanning_role_arn : "")
+    : (var.agentless_scanning_service_account_unique_id != null ? var.agentless_scanning_service_account_unique_id : "")
   )
+  agentless_wif_principal = "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${local.agentless_scanning_subject}/${var.registration_id}"
 
   # Custom VPC mode detection
   is_custom_vpc = var.custom_vpc_configuration != null
