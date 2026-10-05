@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.1.2"
+  deployment_version = "1.1.3"
 
   # Guard for resources that reject uppercase
   effective_prefix = lower(var.resource_prefix)
@@ -32,8 +32,15 @@ locals {
   is_folder_registration  = var.registration_type == "folder"
   is_project_registration = var.registration_type == "project"
 
-  # WIF Principal - Agentless scanning (shared pool, different role ARN from CSPM)
-  agentless_wif_principal = "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${var.agentless_scanning_role_arn}/${var.registration_id}"
+  # WIF Principal - Agentless scanning (shared pool, identity-source-dependent subject)
+  # The ternary guarantees only the non-null variable is interpolated at runtime;
+  # the fallback satisfies tflint's static null-in-string-template check.
+  agentless_scanning_subject = (
+    var.identity_source == "aws-sts"
+    ? (var.agentless_scanning_role_arn != null ? var.agentless_scanning_role_arn : "")
+    : (var.agentless_scanning_service_account_unique_id != null ? var.agentless_scanning_service_account_unique_id : "")
+  )
+  agentless_wif_principal = "principal://iam.googleapis.com/projects/${var.wif_project_number}/locations/global/workloadIdentityPools/${var.wif_pool_id}/subject/${local.agentless_scanning_subject}/${var.registration_id}"
 
   # Custom VPC mode detection
   is_custom_vpc = var.custom_vpc_configuration != null
@@ -197,8 +204,11 @@ resource "terraform_data" "agentless_validation" {
       error_message = "At least one of enable_dspm or enable_vulnerability_scanning must be true."
     }
     precondition {
-      condition     = var.agentless_scanning_role_arn != null
-      error_message = "agentless_scanning_role_arn is required when enable_dspm or enable_vulnerability_scanning is true."
+      condition = (
+        (var.identity_source == "aws-sts" && var.agentless_scanning_role_arn != null) ||
+        (var.identity_source == "gcp-oidc" && var.agentless_scanning_service_account_unique_id != null)
+      )
+      error_message = "When identity_source is aws-sts, agentless_scanning_role_arn is required. When identity_source is gcp-oidc, agentless_scanning_service_account_unique_id is required."
     }
     precondition {
       condition     = var.falcon_client_id != null && var.falcon_client_secret != null

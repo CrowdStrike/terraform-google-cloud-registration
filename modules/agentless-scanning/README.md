@@ -135,7 +135,8 @@ module "agentless_scanning" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF | `string` | n/a | yes |
+| <a name="input_agentless_scanning_role_arn"></a> [agentless\_scanning\_role\_arn](#input\_agentless\_scanning\_role\_arn) | AWS Role ARN used by CrowdStrike agentless scanning for authentication via WIF. Required when agentless scanning is enabled and role\_arn is set. | `string` | `null` | no |
+| <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Required when agentless scanning is enabled and service\_account\_unique\_id is set. | `string` | `null` | no |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM (GCS scanning) permissions | `bool` | `false` | no |
@@ -145,6 +146,7 @@ module "agentless_scanning" {
 | <a name="input_folder_ids"></a> [folder\_ids](#input\_folder\_ids) | List of Google Cloud folder IDs for folder-level registration | `list(string)` | `[]` | no |
 | <a name="input_folder_org_id"></a> [folder\_org\_id](#input\_folder\_org\_id) | Parent GCP Organization ID of the registered folder(s). Required for folder registration to host the org-level scanner custom role bound at folder scope. | `string` | `null` | no |
 | <a name="input_host_project_id"></a> [host\_project\_id](#input\_host\_project\_id) | Google Cloud Project ID hosting the agentless scanning infrastructure (the host project). Set only in cross-project mode (org/folder/multi-project); null for per-project (no-cross) registrations where each project self-hosts. | `string` | `null` | no |
+| <a name="input_identity_source"></a> [identity\_source](#input\_identity\_source) | Identity source type (aws-sts or gcp-oidc). Determines how the agentless WIF principal is constructed. | `string` | `"aws-sts"` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Map of labels to be applied to all resources that support them | `map(string)` | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | GCP Organization ID for organization-level registration | `string` | `null` | no |
 | <a name="input_project_ids"></a> [project\_ids](#input\_project\_ids) | List of registered project IDs (full registration scope). Used for viewer role bindings and cross/no-cross target derivation. | `list(string)` | `[]` | no |

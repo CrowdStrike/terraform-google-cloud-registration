@@ -49,3 +49,6 @@ Makefile
 
 # Macos dummy files
 **/.DS_Store
+
+# Claude Code
+.claude/

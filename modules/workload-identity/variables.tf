@@ -28,6 +28,17 @@ variable "wif_pool_provider_id" {
   }
 }
 
+variable "identity_source" {
+  type        = string
+  description = "Identity federation type: aws-sts (AWS role ARN) or gcp-oidc (GCP service account)"
+  default     = "aws-sts"
+
+  validation {
+    condition     = contains(["aws-sts", "gcp-oidc"], var.identity_source)
+    error_message = "identity_source must be either 'aws-sts' or 'gcp-oidc'."
+  }
+}
+
 variable "resource_prefix" {
   description = "Prefix to be added to all created resource names for identification"
   default     = null
@@ -62,10 +73,33 @@ variable "registration_id" {
 
 variable "role_arn" {
   type        = string
-  description = "AWS Role ARN used by CrowdStrike for authentication"
+  description = "AWS Role ARN used by CrowdStrike for authentication. Required when CrowdStrike authenticates via AWS STS. Mutually exclusive with service_account_unique_id."
+  default     = null
 
   validation {
-    condition     = can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
+    condition     = var.role_arn == null || can(regex("^arn:(aws|aws-us-gov|aws-cn):(iam|sts)::[0-9]{12}:(role|assumed-role)/.+", var.role_arn))
     error_message = "Role ARN must be a valid AWS IAM role ARN or STS assumed role ARN format."
+  }
+}
+
+variable "service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's shared service account. Required when CrowdStrike authenticates via GCP OIDC. Mutually exclusive with role_arn."
+  default     = null
+
+  validation {
+    condition     = var.service_account_unique_id == null || can(regex("^[0-9]+$", var.service_account_unique_id))
+    error_message = "Service account unique ID must be a numeric string."
+  }
+}
+
+variable "agentless_scanning_service_account_unique_id" {
+  type        = string
+  description = "Numeric unique ID of CrowdStrike's agentless scanning service account. Included in OIDC attribute_condition when provided."
+  default     = null
+
+  validation {
+    condition     = var.agentless_scanning_service_account_unique_id == null || can(regex("^[0-9]+$", var.agentless_scanning_service_account_unique_id))
+    error_message = "Agentless scanning service account unique ID must be a numeric string."
   }
 }
