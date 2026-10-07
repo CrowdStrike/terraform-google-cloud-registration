@@ -41,6 +41,7 @@ jobs:
           - "modules/asset-inventory"
           - "modules/log-ingestion"
           - "modules/workload-identity"
+          - "modules/workspace"
 
     steps:
       - name: Checkout source code
