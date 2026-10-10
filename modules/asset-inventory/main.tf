@@ -1,10 +1,18 @@
 locals {
   folder_list = var.folder_ids
+
+  # Effective IAM roles for the current registration scope:
+  # - org/folder: universal + org-level roles
+  # - project: universal + project-level roles
+  effective_iam_roles = concat(
+    var.google_iam_roles,
+    var.registration_type == "project" ? var.google_iam_roles_project_level : var.google_iam_roles_org_level
+  )
 }
 
 # IAM bindings for organization-level registration
 resource "google_organization_iam_member" "crowdstrike_organization" {
-  for_each = toset(var.registration_type == "organization" ? var.google_iam_roles : [])
+  for_each = toset(var.registration_type == "organization" ? local.effective_iam_roles : [])
 
   org_id = var.organization_id
   role   = each.value
@@ -16,7 +24,7 @@ resource "google_folder_iam_member" "crowdstrike_folder" {
   for_each = toset([
     for pair in setproduct(
       var.registration_type == "folder" ? local.folder_list : [],
-      var.google_iam_roles
+      local.effective_iam_roles
     ) : "${pair[0]}::${pair[1]}"
   ])
 
@@ -30,7 +38,7 @@ resource "google_project_iam_member" "crowdstrike_project" {
   for_each = toset([
     for pair in setproduct(
       var.registration_type == "project" ? var.project_ids : [],
-      var.google_iam_roles
+      local.effective_iam_roles
     ) : "${pair[0]}::${pair[1]}"
   ])
 

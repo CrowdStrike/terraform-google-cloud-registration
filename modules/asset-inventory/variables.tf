@@ -58,7 +58,7 @@ variable "folder_ids" {
 
 variable "google_iam_roles" {
   type        = list(string)
-  description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access"
+  description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access at any registration scope"
   default = [
     "roles/aiplatform.viewer",
     "roles/alloydb.viewer",
@@ -67,7 +67,6 @@ variable "google_iam_roles" {
     "roles/artifactregistry.reader",
     "roles/backupdr.viewer",
     "roles/bigquery.metadataViewer",
-    "roles/browser",
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
     "roles/cloudfunctions.viewer",
@@ -78,7 +77,6 @@ variable "google_iam_roles" {
     "roles/container.viewer",
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
-    "roles/essentialcontacts.viewer",
     "roles/eventarc.viewer",
     "roles/firebaseappcheck.viewer",
     "roles/firebaseauth.viewer",
@@ -90,13 +88,42 @@ variable "google_iam_roles" {
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/secretmanager.viewer",
-    "roles/securitycenter.adminViewer",
     "roles/storage.bucketViewer"
   ]
 
   validation {
     condition = alltrue([
       for role in var.google_iam_roles : can(regex("^roles/", role))
+    ])
+    error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "google_iam_roles_org_level" {
+  type        = list(string)
+  description = "IAM roles that are only meaningful at organization or folder scope. Bound for org/folder registration, skipped for project registration."
+  default = [
+    "roles/browser",
+    "roles/essentialcontacts.viewer",
+    "roles/securitycenter.adminViewer",
+  ]
+
+  validation {
+    condition = alltrue([
+      for role in var.google_iam_roles_org_level : can(regex("^roles/", role))
+    ])
+    error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "google_iam_roles_project_level" {
+  type        = list(string)
+  description = "IAM roles that can only be applied at project scope (GCP limitation). Bound for project registration, skipped for org/folder registration."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for role in var.google_iam_roles_project_level : can(regex("^roles/", role))
     ])
     error_message = "All IAM roles must start with 'roles/'."
   }
