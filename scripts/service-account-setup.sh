@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Universal Infrastructure Manager Service Principal Setup Script
-# Supports PROJECT/FOLDER/ORGANIZATION registration with optional RTV&D
+# Supports PROJECT/FOLDER/ORGANIZATION registration with optional RTV&D, and Google Workspace registration
 
 set -e
 
@@ -13,7 +13,7 @@ usage() {
     echo "  --name                Service account name for Infrastructure Manager"
     echo "  --infra-project-id    GCP project ID where Infrastructure Manager runs"
     echo ""
-    echo "Registration scope (provide exactly one):"
+    echo "Registration scope (provide exactly one; give none with --enable-workspace):"
     echo "  --organization-id     Organization ID (for organization registration)"
     echo "  --folder-ids          Comma-separated list of folder IDs (for folder registration)"
     echo "  --project-ids         Comma-separated list of target project IDs (for project registration)"
@@ -24,6 +24,8 @@ usage() {
     echo "  --enable-dspm         Enable DSPM agentless scanning (default: false)"
     echo "  --enable-vulnerability-scanning  Enable agentless vulnerability scanning (default: false)"
     echo "  --agentless-org-id    Organization ID for agentless scanning (required for folder registration with agentless features)"
+    echo "  --enable-workspace    Grant only the roles for a Google Workspace registration. Takes no scope or GCP feature option (default: false)"
+    echo "  --workspace-org-id    ID of the GCP organization linked to the Google Workspace (required with --enable-workspace)"
     echo "  --location            Infrastructure Manager location (default: us-central1)"
     echo "  --help                Show this help message"
     echo ""
@@ -36,6 +38,9 @@ usage() {
     echo ""
     echo "  # Organization registration with RTV&D"
     echo "  $0 --name my-sa --infra-project-id my-project --organization-id 123456789 --enable-rtvd"
+    echo ""
+    echo "  # Google Workspace registration"
+    echo "  $0 --name my-sa --infra-project-id my-project --wif-project-id my-wif-project --enable-workspace --workspace-org-id 123456789"
 }
 
 # Default values
@@ -45,6 +50,8 @@ ENABLE_RTVD=false
 ENABLE_DSPM=false
 ENABLE_VULNERABILITY_SCANNING=false
 AGENTLESS_ORG_ID=""
+ENABLE_WORKSPACE=false
+WORKSPACE_ORG_ID=""
 ORGANIZATION_ID=""
 FOLDER_IDS=""
 TARGET_PROJECTS=""
@@ -77,6 +84,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --agentless-org-id)
             AGENTLESS_ORG_ID="$2"
+            shift 2
+            ;;
+        --enable-workspace)
+            ENABLE_WORKSPACE=true
+            shift
+            ;;
+        --workspace-org-id)
+            WORKSPACE_ORG_ID="$2"
             shift 2
             ;;
         --organization-id)
@@ -124,6 +139,24 @@ if [[ -z "$INFRA_PROJECT_ID" ]]; then
     exit 1
 fi
 
+# A Google Workspace registration is apart from the GCP registration, so it takes no GCP scope or feature
+if [[ "$ENABLE_WORKSPACE" == true ]]; then
+    if [[ -n "$ORGANIZATION_ID" || -n "$FOLDER_IDS" || -n "$TARGET_PROJECTS" || -n "$AGENTLESS_ORG_ID" || "$ENABLE_RTVD" == true || "$ENABLE_DSPM" == true || "$ENABLE_VULNERABILITY_SCANNING" == true ]]; then
+        echo "Error: --enable-workspace takes no scope parameter and no RTV&D or agentless option"
+        usage
+        exit 1
+    fi
+    if [[ -z "$WORKSPACE_ORG_ID" ]]; then
+        echo "Error: --workspace-org-id is required with --enable-workspace"
+        usage
+        exit 1
+    fi
+elif [[ -n "$WORKSPACE_ORG_ID" ]]; then
+    echo "Error: --workspace-org-id requires --enable-workspace"
+    usage
+    exit 1
+fi
+
 # Set WIF project ID to infra project ID if not specified
 if [[ -z "$WIF_PROJECT_ID" ]]; then
     WIF_PROJECT_ID="$INFRA_PROJECT_ID"
@@ -135,7 +168,7 @@ SCOPE_PARAMS=0
 [[ -n "$FOLDER_IDS" ]] && SCOPE_PARAMS=$((SCOPE_PARAMS + 1))
 [[ -n "$TARGET_PROJECTS" ]] && SCOPE_PARAMS=$((SCOPE_PARAMS + 1))
 
-if [[ $SCOPE_PARAMS -eq 0 ]]; then
+if [[ $SCOPE_PARAMS -eq 0 && "$ENABLE_WORKSPACE" != true ]]; then
     echo "Error: Must provide exactly one scope parameter: --organization-id, --folder-ids, or --project-ids"
     usage
     exit 1
@@ -152,6 +185,9 @@ elif [[ -n "$FOLDER_IDS" ]]; then
     REGISTRATION_TYPE="folder"
 elif [[ -n "$TARGET_PROJECTS" ]]; then
     REGISTRATION_TYPE="project"
+else
+    # A Workspace registration gets no GCP scope role
+    REGISTRATION_TYPE="workspace"
 fi
 
 # Derived variables
@@ -293,6 +329,26 @@ gcloud projects add-iam-policy-binding $WIF_PROJECT_ID \
     --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
     --role="roles/iam.workloadIdentityPoolAdmin" \
     --condition=None
+
+# Terraform enables its APIs and creates the Workspace service account and its WIF binding in the WIF project
+if [[ "$ENABLE_WORKSPACE" == true ]]; then
+    for role in "roles/iam.serviceAccountAdmin" "roles/serviceusage.serviceUsageAdmin"; do
+        echo "  Binding $role to WIF project: $WIF_PROJECT_ID..."
+        gcloud projects add-iam-policy-binding $WIF_PROJECT_ID \
+            --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+            --role="$role" \
+            --condition=None
+    done
+
+    # The plan reads the organization for the link check; the deployer makes no grant there
+    echo "Applying Google Workspace organization role..."
+    echo "  Binding roles/resourcemanager.organizationViewer to organization $WORKSPACE_ORG_ID..."
+    gcloud organizations add-iam-policy-binding $WORKSPACE_ORG_ID \
+        --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+        --role="roles/resourcemanager.organizationViewer" \
+        --condition=None
+    sleep 3
+fi
 
 # Apply folder-level roles (for multiple folders)
 if [[ "$REGISTRATION_TYPE" == "folder" ]]; then
