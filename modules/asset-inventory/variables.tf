@@ -129,6 +129,19 @@ variable "google_iam_roles_project_level" {
   }
 }
 
+variable "custom_role_permissions" {
+  type        = list(string)
+  description = "Permissions for the CrowdStrike custom IAM role. These are least-privilege permissions not covered by any predefined role."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for perm in var.custom_role_permissions : can(regex("^[a-zA-Z]", perm))
+    ])
+    error_message = "All permissions must start with a letter."
+  }
+}
+
 variable "wif_project_id" {
   type        = string
   description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"

@@ -2,15 +2,13 @@ locals {
   # Custom IAM roles are supported for organization and project registration.
   # Folder registration requires creating the role at the org level, which needs
   # an additional organization ID input — this will be handled in a follow-up.
-  create_custom_role = var.registration_type != "folder"
+  create_custom_role = var.registration_type != "folder" && length(var.custom_role_permissions) > 0
 
   cspm_custom_role = {
     id_prefix   = "CspmAssetViewer"
     title       = "CrowdStrike CSPM Asset Viewer"
     description = "Least-privilege permissions for CrowdStrike CSPM asset inventory scanning, replacing broader predefined roles"
-    permissions = [
-      "cloudfunctions.functions.sourceCodeGet",
-    ]
+    permissions = var.custom_role_permissions
   }
 }
 
