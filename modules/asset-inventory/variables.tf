@@ -129,6 +129,17 @@ variable "google_iam_roles_project_level" {
   }
 }
 
+variable "registration_id" {
+  type        = string
+  description = "Unique registration ID from CrowdStrike backend. Used as suffix for resources with soft-delete lifecycle (custom roles)."
+  default     = ""
+
+  validation {
+    condition     = var.registration_id == "" || can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
 variable "custom_role_permissions" {
   type        = list(string)
   description = "Permissions for the CrowdStrike custom IAM role. These are least-privilege permissions not covered by any predefined role."
