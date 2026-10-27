@@ -67,6 +67,7 @@ variable "google_iam_roles" {
     "roles/artifactregistry.reader",
     "roles/backupdr.viewer",
     "roles/bigquery.metadataViewer",
+    "roles/browser",
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
     "roles/cloudfunctions.viewer",
@@ -77,6 +78,7 @@ variable "google_iam_roles" {
     "roles/container.viewer",
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
+    "roles/essentialcontacts.viewer",
     "roles/eventarc.viewer",
     "roles/firebaseappcheck.viewer",
     "roles/firebaseauth.viewer",
@@ -88,6 +90,7 @@ variable "google_iam_roles" {
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/secretmanager.viewer",
+    "roles/securitycenter.adminViewer",
     "roles/storage.bucketViewer"
   ]
 
@@ -101,12 +104,8 @@ variable "google_iam_roles" {
 
 variable "google_iam_roles_org_level" {
   type        = list(string)
-  description = "IAM roles that are only meaningful at organization or folder scope. Bound for org/folder registration, skipped for project registration."
-  default = [
-    "roles/browser",
-    "roles/essentialcontacts.viewer",
-    "roles/securitycenter.adminViewer",
-  ]
+  description = "IAM roles bound only for organization/folder registration, in addition to google_iam_roles. Empty by default; populate once a role is confirmed to be needed only at org/folder scope."
+  default     = []
 
   validation {
     condition = alltrue([
@@ -118,7 +117,7 @@ variable "google_iam_roles_org_level" {
 
 variable "google_iam_roles_project_level" {
   type        = list(string)
-  description = "IAM roles that can only be applied at project scope (GCP limitation). Bound for project registration, skipped for org/folder registration."
+  description = "IAM roles bound only for project registration, in addition to google_iam_roles. Empty by default; populate once a role is confirmed to be needed only at project scope."
   default     = []
 
   validation {

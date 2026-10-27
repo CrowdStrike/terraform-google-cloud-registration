@@ -34,4 +34,12 @@ module "asset-inventory" {
   project_ids = [
     "my-specific-project" # Replace with your project IDs
   ]
+
+  # Optional: Customize IAM roles if needed
+  google_iam_roles = [
+    "roles/browser",
+    "roles/cloudasset.viewer",
+    "roles/compute.viewer",
+    "roles/securitycenter.adminViewer"
+  ]
 }
