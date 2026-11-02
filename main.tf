@@ -179,6 +179,10 @@ module "agentless_scanning" {
   enable_dspm                   = var.enable_dspm
   enable_vulnerability_scanning = var.enable_vulnerability_scanning
 
+  # Per-service DSPM permissions
+  dspm_gcs_access  = var.dspm_gcs_access
+  dspm_disk_access = var.dspm_disk_access
+
   # Common vars from root
   registration_type = var.registration_type
   registration_id   = crowdstrike_cloud_google_registration.main.id

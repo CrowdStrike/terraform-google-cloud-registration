@@ -62,6 +62,11 @@ locals {
   role_suffix  = replace(substr(var.registration_id, 0, 33), "-", "_")
   reg_id_short = substr(var.registration_id, 0, 23)
 
+  # Per-service DSPM permission gates. Each gates only its DSPM resources, so a flag
+  # set to false never removes a permission vulnerability scanning relies on.
+  create_gcs_permissions       = var.enable_dspm && var.dspm_gcs_access
+  create_dspm_disk_permissions = var.enable_dspm && var.dspm_disk_access
+
   # Shared permission sets — single source of truth for permissions used by both DSPM and vulnerability roles.
   scanner_disk_permissions = [
     "compute.instances.attachDisk",
@@ -176,16 +181,22 @@ locals {
   project_region_nat_pairs = local.is_custom_vpc || !var.deploy_cloud_nat ? {} : local.project_region_pairs
 
   # Viewer roles supported at all levels (project, folder, org)
-  viewer_roles = toset([
+  viewer_roles_base = [
     "roles/iam.securityReviewer",
     "roles/compute.viewer",
     "roles/monitoring.viewer",
     "roles/logging.privateLogViewer",
     "roles/cloudasset.viewer",
-    "roles/storage.insightsCollectorService",
     "roles/secretmanager.viewer",
     "roles/browser",
-  ])
+  ]
+
+  # storage.insightsCollectorService carries storage.buckets.get, the backend's bucket
+  # metadata read, so it belongs to GCS scanning rather than the base ops grant.
+  viewer_roles = toset(concat(
+    local.viewer_roles_base,
+    local.create_gcs_permissions ? ["roles/storage.insightsCollectorService"] : [],
+  ))
 
   # Viewer roles only supported at project level (GCP limitation)
   viewer_roles_project_only = toset([

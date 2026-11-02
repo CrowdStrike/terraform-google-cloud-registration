@@ -62,6 +62,8 @@ module "crowdstrike_gcp_registration" {
 
   # Optional: Agentless scanning
   enable_dspm                                  = var.enable_dspm
+  dspm_gcs_access                              = var.dspm_gcs_access
+  dspm_disk_access                             = var.dspm_disk_access
   enable_vulnerability_scanning                = var.enable_vulnerability_scanning
   falcon_client_id                             = var.falcon_client_id
   falcon_client_secret                         = var.falcon_client_secret

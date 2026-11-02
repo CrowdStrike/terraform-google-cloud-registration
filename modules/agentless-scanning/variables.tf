@@ -19,6 +19,24 @@ variable "enable_vulnerability_scanning" {
 }
 
 # -----------------------------------------------------------------------------
+# Per-Service DSPM Permissions
+# -----------------------------------------------------------------------------
+# Narrow which services DSPM may scan. Each only applies when enable_dspm is
+# true, and never affects vulnerability scanning.
+
+variable "dspm_gcs_access" {
+  type        = bool
+  description = "Apply permissions for DSPM GCS bucket scanning"
+  default     = true
+}
+
+variable "dspm_disk_access" {
+  type        = bool
+  description = "Apply permissions for DSPM VM scanning"
+  default     = true
+}
+
+# -----------------------------------------------------------------------------
 # Common (passed from root module)
 # -----------------------------------------------------------------------------
 

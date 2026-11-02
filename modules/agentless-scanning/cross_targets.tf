@@ -8,12 +8,12 @@
 
 # Protects org-level target role against 44-day soft-delete collision
 resource "random_id" "target_gcs_role_org_suffix" {
-  count       = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count       = local.create_gcs_permissions && local.is_org_registration ? 1 : 0
   byte_length = 4
 }
 
 resource "google_organization_iam_custom_role" "target_scanner_gcs_role" {
-  count = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count = local.create_gcs_permissions && local.is_org_registration ? 1 : 0
 
   org_id      = var.organization_id
   role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.target_gcs_role_org_suffix[0].hex}"
@@ -24,7 +24,7 @@ resource "google_organization_iam_custom_role" "target_scanner_gcs_role" {
 }
 
 resource "google_organization_iam_member" "target_scanner_gcs_permissions" {
-  count = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count = local.create_gcs_permissions && local.is_org_registration ? 1 : 0
 
   org_id = var.organization_id
   role   = google_organization_iam_custom_role.target_scanner_gcs_role[0].id
@@ -37,12 +37,12 @@ resource "google_organization_iam_member" "target_scanner_gcs_permissions" {
 
 # Protects per-target-project role against 44-day soft-delete collision
 resource "random_id" "target_gcs_role_suffix" {
-  for_each    = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each    = local.create_gcs_permissions ? toset(local.cross_target_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "target_scanner_gcs_role" {
-  for_each = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each = local.create_gcs_permissions ? toset(local.cross_target_ids) : toset([])
 
   project     = each.value
   role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.target_gcs_role_suffix[each.value].hex}"
@@ -53,7 +53,7 @@ resource "google_project_iam_custom_role" "target_scanner_gcs_role" {
 }
 
 resource "google_project_iam_member" "target_scanner_gcs_permissions" {
-  for_each = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each = local.create_gcs_permissions ? toset(local.cross_target_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.target_scanner_gcs_role[each.value].id
@@ -65,12 +65,12 @@ resource "google_project_iam_member" "target_scanner_gcs_permissions" {
 # =============================================================================
 
 resource "random_id" "folder_org_role_suffix" {
-  count       = var.enable_dspm && local.is_folder_registration ? 1 : 0
+  count       = local.create_gcs_permissions && local.is_folder_registration ? 1 : 0
   byte_length = 4
 }
 
 resource "google_organization_iam_custom_role" "folder_scanner_gcs_role" {
-  count = var.enable_dspm && local.is_folder_registration ? 1 : 0
+  count = local.create_gcs_permissions && local.is_folder_registration ? 1 : 0
 
   org_id      = var.folder_org_id
   role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.folder_org_role_suffix[0].hex}"
@@ -81,7 +81,7 @@ resource "google_organization_iam_custom_role" "folder_scanner_gcs_role" {
 }
 
 resource "google_folder_iam_member" "folder_scanner_gcs_permissions" {
-  for_each = var.enable_dspm && local.is_folder_registration ? toset(var.folder_ids) : toset([])
+  for_each = local.create_gcs_permissions && local.is_folder_registration ? toset(var.folder_ids) : toset([])
 
   folder = "folders/${each.value}"
   role   = google_organization_iam_custom_role.folder_scanner_gcs_role[0].id
@@ -93,12 +93,12 @@ resource "google_folder_iam_member" "folder_scanner_gcs_permissions" {
 # =============================================================================
 
 resource "random_id" "target_dspm_gce_vm_role_org_suffix" {
-  count       = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count       = local.create_dspm_disk_permissions && local.is_org_registration ? 1 : 0
   byte_length = 4
 }
 
 resource "google_organization_iam_custom_role" "target_dspm_gce_vm_snapshot_role" {
-  count = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count = local.create_dspm_disk_permissions && local.is_org_registration ? 1 : 0
 
   org_id      = var.organization_id
   role_id     = "${local.dspm_gce_vm_wif_target_role.id_prefix}_${local.role_suffix}_${random_id.target_dspm_gce_vm_role_org_suffix[0].hex}"
@@ -109,7 +109,7 @@ resource "google_organization_iam_custom_role" "target_dspm_gce_vm_snapshot_role
 }
 
 resource "google_organization_iam_member" "target_dspm_gce_vm_snapshot_permissions" {
-  count = var.enable_dspm && local.is_org_registration ? 1 : 0
+  count = local.create_dspm_disk_permissions && local.is_org_registration ? 1 : 0
 
   org_id = var.organization_id
   role   = google_organization_iam_custom_role.target_dspm_gce_vm_snapshot_role[0].id
@@ -127,12 +127,12 @@ resource "google_organization_iam_member" "target_dspm_gce_vm_snapshot_permissio
 # =============================================================================
 
 resource "random_id" "target_dspm_gce_vm_role_suffix" {
-  for_each    = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each    = local.create_dspm_disk_permissions ? toset(local.cross_target_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "target_dspm_gce_vm_snapshot_role" {
-  for_each = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions ? toset(local.cross_target_ids) : toset([])
 
   project     = each.value
   role_id     = "${local.dspm_gce_vm_wif_target_role.id_prefix}_${local.role_suffix}_${random_id.target_dspm_gce_vm_role_suffix[each.value].hex}"
@@ -143,7 +143,7 @@ resource "google_project_iam_custom_role" "target_dspm_gce_vm_snapshot_role" {
 }
 
 resource "google_project_iam_member" "target_dspm_gce_vm_snapshot_permissions" {
-  for_each = var.enable_dspm ? toset(local.cross_target_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions ? toset(local.cross_target_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.target_dspm_gce_vm_snapshot_role[each.value].id
@@ -161,12 +161,12 @@ resource "google_project_iam_member" "target_dspm_gce_vm_snapshot_permissions" {
 # =============================================================================
 
 resource "random_id" "folder_dspm_gce_vm_role_suffix" {
-  count       = var.enable_dspm && local.is_folder_registration ? 1 : 0
+  count       = local.create_dspm_disk_permissions && local.is_folder_registration ? 1 : 0
   byte_length = 4
 }
 
 resource "google_organization_iam_custom_role" "folder_dspm_gce_vm_snapshot_role" {
-  count = var.enable_dspm && local.is_folder_registration ? 1 : 0
+  count = local.create_dspm_disk_permissions && local.is_folder_registration ? 1 : 0
 
   org_id      = var.folder_org_id
   role_id     = "${local.dspm_gce_vm_wif_target_role.id_prefix}_${local.role_suffix}_${random_id.folder_dspm_gce_vm_role_suffix[0].hex}"
@@ -177,7 +177,7 @@ resource "google_organization_iam_custom_role" "folder_dspm_gce_vm_snapshot_role
 }
 
 resource "google_folder_iam_member" "folder_dspm_gce_vm_snapshot_permissions" {
-  for_each = var.enable_dspm && local.is_folder_registration ? toset(var.folder_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions && local.is_folder_registration ? toset(var.folder_ids) : toset([])
 
   folder = "folders/${each.value}"
   role   = google_organization_iam_custom_role.folder_dspm_gce_vm_snapshot_role[0].id
