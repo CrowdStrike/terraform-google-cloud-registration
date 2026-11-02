@@ -8,7 +8,7 @@
 
 variable "enable_dspm" {
   type        = bool
-  description = "Enable DSPM (GCS scanning) permissions"
+  description = "Enable DSPM scanning"
   default     = false
 }
 
