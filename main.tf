@@ -180,8 +180,9 @@ module "agentless_scanning" {
   enable_vulnerability_scanning = var.enable_vulnerability_scanning
 
   # Per-service DSPM permissions
-  dspm_gcs_access  = var.dspm_gcs_access
-  dspm_disk_access = var.dspm_disk_access
+  dspm_gcs_access      = var.dspm_gcs_access
+  dspm_bigquery_access = var.dspm_bigquery_access
+  dspm_disk_access     = var.dspm_disk_access
 
   # Common vars from root
   registration_type = var.registration_type
