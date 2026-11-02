@@ -65,6 +65,7 @@ locals {
   # Per-service DSPM permission gates. Each gates only its DSPM resources, so a flag
   # set to false never removes a permission vulnerability scanning relies on.
   create_gcs_permissions       = var.enable_dspm && var.dspm_gcs_access
+  create_bigquery_permissions  = var.enable_dspm && var.dspm_bigquery_access
   create_dspm_disk_permissions = var.enable_dspm && var.dspm_disk_access
 
   # Shared permission sets — single source of truth for permissions used by both DSPM and vulnerability roles.
@@ -93,6 +94,21 @@ locals {
     permissions = [
       "storage.objects.get",
       "storage.objects.list",
+    ]
+  }
+
+  # Scanner BigQuery read role — reused across host project and cross-target roles at project/folder/org scope.
+  # jobs.create is only exercised by external table scanning; granted now so enabling that needs no re-registration.
+  scanner_bigquery_role = {
+    id_prefix   = "DSPMScannerBQRead"
+    title       = "DSPM Scanner BigQuery Read"
+    description = "Minimal permissions for reading BigQuery dataset and table data"
+    permissions = [
+      "bigquery.datasets.get",
+      "bigquery.tables.list",
+      "bigquery.tables.get",
+      "bigquery.tables.getData",
+      "bigquery.jobs.create",
     ]
   }
 
@@ -164,6 +180,7 @@ locals {
     "compute.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "storage.googleapis.com",
+    "bigquery.googleapis.com",
     "secretmanager.googleapis.com",
     "cloudasset.googleapis.com",
   ])
@@ -191,11 +208,12 @@ locals {
     "roles/browser",
   ]
 
-  # storage.insightsCollectorService carries storage.buckets.get, the backend's bucket
-  # metadata read, so it belongs to GCS scanning rather than the base ops grant.
+  # Each of these is the backend half of a per-service grant: insightsCollectorService carries
+  # storage.buckets.get, metadataViewer the dataset and table location reads.
   viewer_roles = toset(concat(
     local.viewer_roles_base,
     local.create_gcs_permissions ? ["roles/storage.insightsCollectorService"] : [],
+    local.create_bigquery_permissions ? ["roles/bigquery.metadataViewer"] : [],
   ))
 
   # Viewer roles only supported at project level (GCP limitation)

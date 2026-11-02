@@ -72,32 +72,40 @@ module "agentless_scanning" {
 | [google_compute_subnetwork_iam_member.wif_byo_subnet_network_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork_iam_member) | resource |
 | [google_compute_subnetwork_iam_member.wif_subnet_network_user](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork_iam_member) | resource |
 | [google_folder_iam_member.folder_dspm_gce_vm_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
+| [google_folder_iam_member.folder_scanner_bigquery_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_folder_iam_member.folder_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_folder_iam_member.folder_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_folder_iam_member.wif_viewer_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/folder_iam_member) | resource |
 | [google_organization_iam_custom_role.folder_dspm_gce_vm_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
+| [google_organization_iam_custom_role.folder_scanner_bigquery_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.folder_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.folder_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.target_dspm_gce_vm_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
+| [google_organization_iam_custom_role.target_scanner_bigquery_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.target_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_custom_role.target_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_custom_role) | resource |
 | [google_organization_iam_member.target_dspm_gce_vm_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
+| [google_organization_iam_member.target_scanner_bigquery_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_organization_iam_member.target_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_organization_iam_member.target_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_organization_iam_member.wif_viewer_roles](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
+| [google_project_iam_custom_role.scanner_bigquery_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.scanner_dspm_disk_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.scanner_vulnerability_disk_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.target_dspm_gce_vm_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_custom_role.target_scanner_bigquery_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.target_scanner_gcs_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.target_vulnerability_snapshot_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.wif_compute_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.wif_dspm_gce_vm_target_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
 | [google_project_iam_custom_role.wif_vulnerability_target_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_member.scanner_bigquery_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.scanner_dspm_disk_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.scanner_vulnerability_disk_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.target_dspm_gce_vm_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.target_scanner_bigquery_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.target_scanner_gcs_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.target_vulnerability_snapshot_permissions](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_project_iam_member.wif_compute](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
@@ -113,13 +121,17 @@ module "agentless_scanning" {
 | [google_service_account.scanner_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_member.scanner_sa_self_use](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_service_account_iam_member.wif_can_use_scanner_sa](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
+| [random_id.bigquery_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.dspm_disk_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.dspm_gce_vm_wif_host_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.folder_bigquery_org_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.folder_dspm_gce_vm_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.folder_org_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.folder_vulnerability_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.gcs_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.infra_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.target_bigquery_role_org_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
+| [random_id.target_bigquery_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.target_dspm_gce_vm_role_org_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.target_dspm_gce_vm_role_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.target_gcs_role_org_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -139,6 +151,7 @@ module "agentless_scanning" {
 | <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Required when agentless scanning is enabled and service\_account\_unique\_id is set. | `string` | `null` | no |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
+| <a name="input_dspm_bigquery_access"></a> [dspm\_bigquery\_access](#input\_dspm\_bigquery\_access) | Apply permissions for DSPM BigQuery dataset scanning | `bool` | `true` | no |
 | <a name="input_dspm_disk_access"></a> [dspm\_disk\_access](#input\_dspm\_disk\_access) | Apply permissions for DSPM VM scanning | `bool` | `true` | no |
 | <a name="input_dspm_gcs_access"></a> [dspm\_gcs\_access](#input\_dspm\_gcs\_access) | Apply permissions for DSPM GCS bucket scanning | `bool` | `true` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM scanning | `bool` | `false` | no |
@@ -165,7 +178,7 @@ module "agentless_scanning" {
 |------|-------------|
 | <a name="output_agentless_infra"></a> [agentless\_infra](#output\_agentless\_infra) | Per-project infrastructure map for agentless scanning provider settings |
 | <a name="output_agentless_wif_principal"></a> [agentless\_wif\_principal](#output\_agentless\_wif\_principal) | WIF Principal string for agentless scanning IAM bindings |
-| <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS scanning permissions |
+| <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS and BigQuery scanning permissions |
 | <a name="output_deployment_version"></a> [deployment\_version](#output\_deployment\_version) | Module deployment version for BE tracking |
 | <a name="output_host_project_ids"></a> [host\_project\_ids](#output\_host\_project\_ids) | GCP host project IDs (single project in cross mode, multiple in no-cross) |
 | <a name="output_scanner_sa_emails"></a> [scanner\_sa\_emails](#output\_scanner\_sa\_emails) | Scanner Service Account emails per host project |

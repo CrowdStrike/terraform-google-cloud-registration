@@ -68,6 +68,37 @@ resource "google_project_iam_member" "scanner_gcs_permissions" {
 }
 
 # =============================================================================
+# DSPM Scanning - Scanner SA BigQuery Role (per host project)
+# =============================================================================
+
+# Protects scanner_bigquery_role against 44-day soft-delete collision
+resource "random_id" "bigquery_role_suffix" {
+  for_each    = local.create_bigquery_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "scanner_bigquery_role" {
+  for_each = local.create_bigquery_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project     = each.value
+  role_id     = "${local.scanner_bigquery_role.id_prefix}_${local.role_suffix}_${random_id.bigquery_role_suffix[each.value].hex}"
+  title       = local.scanner_bigquery_role.title
+  description = local.scanner_bigquery_role.description
+
+  permissions = local.scanner_bigquery_role.permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_project_iam_member" "scanner_bigquery_permissions" {
+  for_each = local.create_bigquery_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.scanner_bigquery_role[each.value].id
+  member  = "serviceAccount:${google_service_account.scanner_sa[each.value].email}"
+}
+
+# =============================================================================
 # DSPM Scanning - Scanner SA Disk Role (per host project)
 # =============================================================================
 

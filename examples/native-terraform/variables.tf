@@ -251,6 +251,12 @@ variable "dspm_gcs_access" {
   default     = true
 }
 
+variable "dspm_bigquery_access" {
+  type        = bool
+  description = "Apply permissions for DSPM BigQuery dataset scanning"
+  default     = true
+}
+
 variable "dspm_disk_access" {
   type        = bool
   description = "Apply permissions for DSPM VM scanning"
