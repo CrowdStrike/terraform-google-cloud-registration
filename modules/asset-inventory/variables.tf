@@ -67,10 +67,12 @@ variable "google_iam_roles" {
     "roles/artifactregistry.reader",
     "roles/backupdr.viewer",
     "roles/bigquery.metadataViewer",
+    "roles/binaryauthorization.attestorsViewer",
     "roles/browser",
     "roles/cloudasset.viewer",
     "roles/cloudfunctions.developer",
     "roles/cloudfunctions.viewer",
+    "roles/cloudkms.viewer",
     "roles/cloudsql.viewer",
     "roles/cloudtasks.viewer",
     "roles/cloudtranslate.viewer",
@@ -78,7 +80,6 @@ variable "google_iam_roles" {
     "roles/container.viewer",
     "roles/dataplex.viewer",
     "roles/dialogflow.reader",
-    "roles/essentialcontacts.viewer",
     "roles/eventarc.viewer",
     "roles/firebaseappcheck.viewer",
     "roles/firebaseauth.viewer",
@@ -87,11 +88,11 @@ variable "google_iam_roles" {
     "roles/firebasestorage.viewer",
     "roles/iam.securityReviewer",
     "roles/notebooks.viewer",
+    "roles/osconfig.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/secretmanager.viewer",
-    "roles/securitycenter.adminViewer",
-    "roles/storage.bucketViewer"
+    "roles/storage.bucketViewer",
   ]
 
   validation {
@@ -105,7 +106,11 @@ variable "google_iam_roles" {
 variable "google_iam_roles_org_level" {
   type        = list(string)
   description = "IAM roles bound only for organization registration (not folder or project), in addition to google_iam_roles. Some org-only roles (e.g. roles/iam.workforcePoolViewer) fail to apply at folder/project scope. Empty by default; populated by caf-automation from catalog roles tagged Scope \"org\"."
-  default     = []
+  default = [
+    "roles/essentialcontacts.viewer",
+    "roles/iam.workforcePoolViewer",
+    "roles/securitycenter.adminViewer",
+  ]
 
   validation {
     condition = alltrue([
