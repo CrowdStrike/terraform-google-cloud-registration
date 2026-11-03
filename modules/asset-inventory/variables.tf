@@ -104,7 +104,7 @@ variable "google_iam_roles" {
 
 variable "google_iam_roles_org_level" {
   type        = list(string)
-  description = "IAM roles bound only for organization/folder registration, in addition to google_iam_roles. Empty by default; populate once a role is confirmed to be needed only at org/folder scope."
+  description = "IAM roles bound only for organization registration (not folder or project), in addition to google_iam_roles. Some org-only roles (e.g. roles/iam.workforcePoolViewer) fail to apply at folder/project scope. Empty by default; populated by caf-automation from catalog roles tagged Scope \"org\"."
   default     = []
 
   validation {
@@ -117,7 +117,7 @@ variable "google_iam_roles_org_level" {
 
 variable "google_iam_roles_project_level" {
   type        = list(string)
-  description = "IAM roles bound only for project registration, in addition to google_iam_roles. Empty by default; populate once a role is confirmed to be needed only at project scope."
+  description = "IAM roles bound only for project registration (not organization or folder), in addition to google_iam_roles. Empty by default; populated by caf-automation from catalog roles tagged Scope \"project\"."
   default     = []
 
   validation {

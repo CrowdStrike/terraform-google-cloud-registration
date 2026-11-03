@@ -1,12 +1,16 @@
 locals {
   folder_list = var.folder_ids
 
-  # Effective IAM roles for the current registration scope:
-  # - org/folder: universal + org-level roles
-  # - project: universal + project-level roles
+  # Effective IAM roles for the current registration scope, matching the
+  # scanner's permissionsOutsideScope filtering:
+  # - organization: universal + org-level roles
+  # - folder:       universal only (org-only and project-only perms are dropped)
+  # - project:      universal + project-level roles
   effective_iam_roles = concat(
     var.google_iam_roles,
-    var.registration_type == "project" ? var.google_iam_roles_project_level : var.google_iam_roles_org_level
+    var.registration_type == "organization" ? var.google_iam_roles_org_level :
+    var.registration_type == "project" ? var.google_iam_roles_project_level :
+    []
   )
 }
 
