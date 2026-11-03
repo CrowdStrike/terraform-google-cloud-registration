@@ -104,8 +104,10 @@ variable "google_iam_roles" {
 
 variable "google_iam_roles_org_level" {
   type        = list(string)
-  description = "IAM roles bound only for organization registration (not folder or project), in addition to google_iam_roles. Some org-only roles (e.g. roles/iam.workforcePoolViewer) fail to apply at folder/project scope. Empty by default; populated by caf-automation from catalog roles tagged Scope \"org\"."
-  default     = []
+  description = "IAM roles bound only for organization registration (not folder or project), in addition to google_iam_roles. For org-level resources that are not scanned below the organization; some (e.g. roles/iam.workforcePoolViewer) also fail to apply at folder/project scope. Populated by caf-automation from catalog roles tagged Scope \"org\"."
+  default = [
+    "roles/iam.workforcePoolViewer",
+  ]
 
   validation {
     condition = alltrue([
