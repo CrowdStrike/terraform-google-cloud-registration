@@ -38,6 +38,7 @@ jobs:
           - "examples/infrastructure-manager"
           - "examples/native-terraform"
           - "examples/workspace"
+          - "examples/workspace-infrastructure-manager"
           - "modules/agentless-scanning"
           - "modules/asset-inventory"
           - "modules/log-ingestion"

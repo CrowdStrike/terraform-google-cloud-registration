@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 6.22"
     }
+    crowdstrike = {
+      source  = "crowdstrike/crowdstrike"
+      version = ">= 1.3.0"
+    }
   }
 }
 
@@ -13,15 +17,17 @@ provider "google" {
   project = "your-wif-project"
 }
 
+provider "crowdstrike" {
+  client_id     = "your-falcon-client-id"
+  client_secret = "your-falcon-client-secret"
+  cloud         = "us-2"
+}
+
 module "crowdstrike_gws_registration" {
   source = "CrowdStrike/terraform-google-cloud-registration//workspace"
 
-  # Registration values, as given by the CrowdStrike console
-  gws_registration_id = "0123abcd-4567-89ef-0123-456789abcdef"
-  wif_pool_id         = "cs-fcs-wif-0123456789abcdef"
-  wif_provider_id     = "cs-provider-0123456789abcdef"
-  gws_identity_source = "aws-sts"
-  service_account_id  = "csgws-0123abcd456"
+  # The Google Cloud registration that has the Workspace, as given by the CrowdStrike console
+  gcp_registration_id = "0123abcd-4567-89ef-0123-456789abcdef"
 
   # Workspace identity: workspace_role_arn (aws-sts) or workspace_service_account_unique_id (gcp-oidc)
   workspace_role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeWorkspaceReader"

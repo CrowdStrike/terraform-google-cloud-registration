@@ -1,32 +1,12 @@
-# The Workspace registration, as given by CrowdStrike, until the provider has its resource
+# The Google Cloud registration that has the Workspace
 
-variable "gws_registration_id" {
+variable "gcp_registration_id" {
   type        = string
-  description = "ID of the CrowdStrike Google Workspace registration. It is the last part of the WIF principal subject and, for gcp-oidc, the OIDC audience."
+  description = "ID of the CrowdStrike Google Cloud registration that has the Google Workspace registration. Add the Google Workspace to it in the CrowdStrike console first."
 
   validation {
-    condition     = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.gws_registration_id))
-    error_message = "Workspace registration ID must be a lowercase UUID."
-  }
-}
-
-variable "wif_pool_id" {
-  type        = string
-  description = "ID of the Workload Identity Pool, as given by CrowdStrike. Do not make your own value: CrowdStrike authenticates against this ID."
-}
-
-variable "wif_provider_id" {
-  type        = string
-  description = "ID of the Workload Identity Pool Provider, as given by CrowdStrike."
-}
-
-variable "gws_identity_source" {
-  type        = string
-  description = "Identity source of the registration, as given by CrowdStrike: aws-sts or gcp-oidc."
-
-  validation {
-    condition     = contains(["aws-sts", "gcp-oidc"], var.gws_identity_source)
-    error_message = "Workspace identity source must be either 'aws-sts' or 'gcp-oidc'."
+    condition     = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.gcp_registration_id))
+    error_message = "Google Cloud registration ID must be a lowercase UUID."
   }
 }
 
@@ -63,16 +43,6 @@ variable "wif_project_id" {
   validation {
     condition     = length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
-  }
-}
-
-variable "service_account_id" {
-  type        = string
-  description = "Account ID of the Workspace service account, as given by CrowdStrike. The Admin Console role assignment uses the email that this ID gives."
-
-  validation {
-    condition     = can(regex("^[a-z][-a-z0-9]{4,28}[a-z0-9]$", var.service_account_id))
-    error_message = "Service account ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
 

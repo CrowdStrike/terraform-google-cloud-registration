@@ -4,15 +4,17 @@ provider "google" {
   project = var.wif_project_id
 }
 
+provider "crowdstrike" {
+  client_id     = var.falcon_client_id
+  client_secret = var.falcon_client_secret
+  cloud         = var.falcon_cloud
+}
+
 module "crowdstrike_gws_registration" {
   source = "../../workspace"
 
-  # Required: registration values from the CrowdStrike console
-  gws_registration_id = var.gws_registration_id
-  wif_pool_id         = var.wif_pool_id
-  wif_provider_id     = var.wif_provider_id
-  gws_identity_source = var.gws_identity_source
-  service_account_id  = var.service_account_id
+  # Required: the Google Cloud registration that has the Workspace, from the CrowdStrike console
+  gcp_registration_id = var.gcp_registration_id
 
   # Required: the CrowdStrike Workspace identity (provide one based on your CS cloud)
   workspace_role_arn                  = var.workspace_role_arn

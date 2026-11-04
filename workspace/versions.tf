@@ -6,5 +6,9 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 6.22"
     }
+    crowdstrike = {
+      source  = "crowdstrike/crowdstrike"
+      version = ">= 1.3.0"
+    }
   }
 }

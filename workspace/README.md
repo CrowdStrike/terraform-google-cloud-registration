@@ -13,9 +13,15 @@ The module creates these Google Cloud resources:
 - One service account, and one `roles/iam.workloadIdentityUser` binding for the WIF principal
 - By default, one `roles/resourcemanager.organizationViewer` binding on `organization_id` for the service account
 
+It also uses two CrowdStrike resources:
+- `crowdstrike_cloud_gws_registration` reads the Workspace registration of `gcp_registration_id` and gives the pool, provider and service account IDs. `terraform destroy` deletes the Workspace registration in CrowdStrike.
+- `crowdstrike_cloud_gws_registration_settings` sends the `sa_email`, `sa_unique_id`, `wif_principal` and `project_number` outputs to CrowdStrike after the Google Cloud resources exist. CrowdStrike then starts the Workspace health check.
+
 ### Before the apply
 
-The CrowdStrike console gives the Terraform inputs. Do not change `gws_registration_id`, `wif_pool_id`, `wif_provider_id`, `gws_identity_source`, `wif_project_id` or `service_account_id`: CrowdStrike authenticates against these values.
+Add the Google Workspace to the Google Cloud registration in the CrowdStrike console first. The console then gives the Terraform inputs. Do not change `gcp_registration_id` or `wif_project_id`: CrowdStrike authenticates against the resources in this project.
+
+The CrowdStrike provider needs an API client with the **Cloud Security Google Cloud Registration** read and write scope.
 
 The `--enable-workspace` option of `scripts/service-account-setup.sh` prepares the deployer service account. The option takes no scope flag. The deployer needs:
 - `roles/iam.workloadIdentityPoolAdmin`, `roles/iam.serviceAccountAdmin` and `roles/serviceusage.serviceUsageAdmin` on the WIF project
@@ -51,6 +57,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 6.22"
     }
+    crowdstrike = {
+      source  = "crowdstrike/crowdstrike"
+      version = ">= 1.3.0"
+    }
   }
 }
 
@@ -58,15 +68,17 @@ provider "google" {
   project = "your-wif-project"
 }
 
+provider "crowdstrike" {
+  client_id     = "your-falcon-client-id"
+  client_secret = "your-falcon-client-secret"
+  cloud         = "us-2"
+}
+
 module "crowdstrike_gws_registration" {
   source = "CrowdStrike/terraform-google-cloud-registration//workspace"
 
-  # Registration values, as given by the CrowdStrike console
-  gws_registration_id = "0123abcd-4567-89ef-0123-456789abcdef"
-  wif_pool_id         = "cs-fcs-wif-0123456789abcdef"
-  wif_provider_id     = "cs-provider-0123456789abcdef"
-  gws_identity_source = "aws-sts"
-  service_account_id  = "csgws-0123abcd456"
+  # The Google Cloud registration that has the Workspace, as given by the CrowdStrike console
+  gcp_registration_id = "0123abcd-4567-89ef-0123-456789abcdef"
 
   # Workspace identity: workspace_role_arn (aws-sts) or workspace_service_account_unique_id (gcp-oidc)
   workspace_role_arn = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeWorkspaceReader"
@@ -84,29 +96,26 @@ module "crowdstrike_gws_registration" {
 
 | Name | Version |
 |------|---------|
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 1.3.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 6.22 |
-| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 ## Resources
 
 | Name | Type |
 |------|------|
-| [terraform_data.gws_registration](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/resources/data) | resource |
+| [crowdstrike_cloud_gws_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_gws_registration) | resource |
+| [crowdstrike_cloud_gws_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_gws_registration_settings) | resource |
 | [google_organization.link_check](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/organization) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_customer_id"></a> [customer\_id](#input\_customer\_id) | Google Workspace customer ID, for example C01abc23x, with no customers/ prefix. The plan fails when it does not belong to organization\_id. | `string` | n/a | yes |
+| <a name="input_gcp_registration_id"></a> [gcp\_registration\_id](#input\_gcp\_registration\_id) | ID of the CrowdStrike Google Cloud registration that has the Google Workspace registration. Add the Google Workspace to it in the CrowdStrike console first. | `string` | n/a | yes |
 | <a name="input_grant_organization_viewer"></a> [grant\_organization\_viewer](#input\_grant\_organization\_viewer) | Grant roles/resourcemanager.organizationViewer on organization\_id to the Workspace service account. Set to false only when an organization admin makes this grant by hand. | `bool` | `true` | no |
-| <a name="input_gws_identity_source"></a> [gws\_identity\_source](#input\_gws\_identity\_source) | Identity source of the registration, as given by CrowdStrike: aws-sts or gcp-oidc. | `string` | n/a | yes |
-| <a name="input_gws_registration_id"></a> [gws\_registration\_id](#input\_gws\_registration\_id) | ID of the CrowdStrike Google Workspace registration. It is the last part of the WIF principal subject and, for gcp-oidc, the OIDC audience. | `string` | n/a | yes |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | ID of the GCP organization that belongs to the Google Workspace, with no organizations/ prefix. | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to the display names of the WIF pool and provider. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to the display names of the WIF pool and provider. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |
-| <a name="input_service_account_id"></a> [service\_account\_id](#input\_service\_account\_id) | Account ID of the Workspace service account, as given by CrowdStrike. The Admin Console role assignment uses the email that this ID gives. | `string` | n/a | yes |
-| <a name="input_wif_pool_id"></a> [wif\_pool\_id](#input\_wif\_pool\_id) | ID of the Workload Identity Pool, as given by CrowdStrike. Do not make your own value: CrowdStrike authenticates against this ID. | `string` | n/a | yes |
 | <a name="input_wif_project_id"></a> [wif\_project\_id](#input\_wif\_project\_id) | Google Cloud Project ID that holds the Workspace WIF pool and the Workspace service account. It is the WIF project of the Google Cloud registration. | `string` | n/a | yes |
-| <a name="input_wif_provider_id"></a> [wif\_provider\_id](#input\_wif\_provider\_id) | ID of the Workload Identity Pool Provider, as given by CrowdStrike. | `string` | n/a | yes |
 | <a name="input_workspace_role_arn"></a> [workspace\_role\_arn](#input\_workspace\_role\_arn) | AWS Role ARN used by the CrowdStrike Workspace reader for authentication via WIF. Set this or workspace\_service\_account\_unique\_id, not both. | `string` | `null` | no |
 | <a name="input_workspace_service_account_unique_id"></a> [workspace\_service\_account\_unique\_id](#input\_workspace\_service\_account\_unique\_id) | Unique ID of the CrowdStrike Workspace intermediate service account, for gcp-oidc clouds. Set this or workspace\_role\_arn, not both. | `string` | `null` | no |
 ## Outputs
