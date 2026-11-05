@@ -37,7 +37,7 @@ module "crowdstrike_gws_registration" {
   organization_id = var.organization_id
   customer_id     = var.customer_id
 
-  # Optional: the setup script deployer cannot set organization IAM, so the operator grants it after the apply
+  # Optional: the setup script deployer cannot set organization IAM, so an organization admin grants it after the apply
   grant_organization_viewer = var.grant_organization_viewer
 
   # Optional: resource naming customization

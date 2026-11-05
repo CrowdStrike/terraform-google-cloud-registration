@@ -17,11 +17,8 @@ provider "google" {
   project = "your-wif-project"
 }
 
-provider "crowdstrike" {
-  client_id     = "your-falcon-client-id"
-  client_secret = "your-falcon-client-secret"
-  cloud         = "us-2"
-}
+# Set FALCON_CLIENT_ID, FALCON_CLIENT_SECRET and FALCON_CLOUD in the environment
+provider "crowdstrike" {}
 
 module "crowdstrike_gws_registration" {
   source = "CrowdStrike/terraform-google-cloud-registration//workspace"

@@ -83,10 +83,12 @@ module "workspace" {
 # Sends the four values to CrowdStrike, which then starts the Workspace health check
 resource "crowdstrike_cloud_gws_registration_settings" "main" {
   gcp_registration_id = crowdstrike_cloud_gws_registration.main.gcp_registration_id
+  registration_id     = crowdstrike_cloud_gws_registration.main.id
   sa_email            = module.workspace.sa_email
   sa_unique_id        = module.workspace.sa_unique_id
   wif_principal       = module.workload-identity.wif_iam_principal
   project_number      = module.workload-identity.wif_project_number
 
+  # The health check needs the WIF provider, the impersonation binding and the organization grant, and no output refers to them
   depends_on = [module.workload-identity, module.workspace]
 }
