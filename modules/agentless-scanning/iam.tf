@@ -42,12 +42,12 @@ resource "google_service_account" "scanner_sa" {
 
 # Protects scanner_gcs_role against 44-day soft-delete collision
 resource "random_id" "gcs_role_suffix" {
-  for_each    = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each    = local.create_gcs_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "scanner_gcs_role" {
-  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_gcs_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
   project     = each.value
   role_id     = "${local.scanner_gcs_role.id_prefix}_${local.role_suffix}_${random_id.gcs_role_suffix[each.value].hex}"
@@ -60,7 +60,7 @@ resource "google_project_iam_custom_role" "scanner_gcs_role" {
 }
 
 resource "google_project_iam_member" "scanner_gcs_permissions" {
-  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_gcs_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.scanner_gcs_role[each.value].id
@@ -72,12 +72,12 @@ resource "google_project_iam_member" "scanner_gcs_permissions" {
 # =============================================================================
 
 resource "random_id" "dspm_disk_role_suffix" {
-  for_each    = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+  for_each    = local.create_dspm_disk_permissions ? toset(local.host_project_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "scanner_dspm_disk_role" {
-  for_each = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions ? toset(local.host_project_ids) : toset([])
 
   project     = each.value
   role_id     = "DSPMScannerDisk_${local.role_suffix}_${random_id.dspm_disk_role_suffix[each.value].hex}"
@@ -90,7 +90,7 @@ resource "google_project_iam_custom_role" "scanner_dspm_disk_role" {
 }
 
 resource "google_project_iam_member" "scanner_dspm_disk_permissions" {
-  for_each = var.enable_dspm ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions ? toset(local.host_project_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.scanner_dspm_disk_role[each.value].id
@@ -250,12 +250,12 @@ resource "google_project_iam_member" "wif_vulnerability_target_permissions" {
 # cross_targets.tf already covers the host project.
 
 resource "random_id" "dspm_gce_vm_wif_host_role_suffix" {
-  for_each    = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each    = local.create_dspm_disk_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "wif_dspm_gce_vm_target_role" {
-  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
   project     = each.value
   role_id     = "${local.dspm_gce_vm_wif_target_role.id_prefix}_${local.role_suffix}_${random_id.dspm_gce_vm_wif_host_role_suffix[each.value].hex}"
@@ -268,7 +268,7 @@ resource "google_project_iam_custom_role" "wif_dspm_gce_vm_target_role" {
 }
 
 resource "google_project_iam_member" "wif_dspm_gce_vm_target_permissions" {
-  for_each = var.enable_dspm && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  for_each = local.create_dspm_disk_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.wif_dspm_gce_vm_target_role[each.value].id

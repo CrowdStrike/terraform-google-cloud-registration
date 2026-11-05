@@ -139,7 +139,9 @@ module "agentless_scanning" {
 | <a name="input_agentless_scanning_service_account_unique_id"></a> [agentless\_scanning\_service\_account\_unique\_id](#input\_agentless\_scanning\_service\_account\_unique\_id) | Numeric unique ID of CrowdStrike's agentless scanning service account. Required when agentless scanning is enabled and service\_account\_unique\_id is set. | `string` | `null` | no |
 | <a name="input_custom_vpc_configuration"></a> [custom\_vpc\_configuration](#input\_custom\_vpc\_configuration) | Custom VPC configuration for the host project. When set, uses the provided VPC/subnets instead of creating a managed VPC. vpc\_name = VPC name, subnets = {region = subnet\_name}. | <pre>object({<br/>    vpc_name = string<br/>    subnets  = map(string)<br/>  })</pre> | `null` | no |
 | <a name="input_deploy_cloud_nat"></a> [deploy\_cloud\_nat](#input\_deploy\_cloud\_nat) | Deploy Cloud NAT for scanner VMs. true = private IPs + NAT, false = public IPs. | `bool` | `true` | no |
-| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM (GCS scanning) permissions | `bool` | `false` | no |
+| <a name="input_dspm_disk_access"></a> [dspm\_disk\_access](#input\_dspm\_disk\_access) | Apply permissions for DSPM VM scanning | `bool` | `true` | no |
+| <a name="input_dspm_gcs_access"></a> [dspm\_gcs\_access](#input\_dspm\_gcs\_access) | Apply permissions for DSPM GCS bucket scanning | `bool` | `true` | no |
+| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Enable DSPM scanning | `bool` | `false` | no |
 | <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Enable vulnerability scanning (disk snapshot/clone) permissions | `bool` | `false` | no |
 | <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID for scanner authentication | `string` | n/a | yes |
 | <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret for scanner authentication | `string` | n/a | yes |
