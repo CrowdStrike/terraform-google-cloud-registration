@@ -17,7 +17,7 @@ output "host_project_ids" {
 }
 
 output "cross_target_ids" {
-  description = "Target project IDs with cross-project GCS scanning permissions"
+  description = "Target project IDs with cross-project GCS and BigQuery scanning permissions"
   value       = local.cross_target_ids
 }
 
