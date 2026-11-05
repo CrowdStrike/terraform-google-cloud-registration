@@ -19,6 +19,7 @@ provider "crowdstrike" {
   client_id     = var.falcon_client_id
   client_secret = local.falcon_client_secret
   cloud         = var.falcon_cloud
+  host_override = var.falcon_host_override
 }
 
 module "crowdstrike_gws_registration" {

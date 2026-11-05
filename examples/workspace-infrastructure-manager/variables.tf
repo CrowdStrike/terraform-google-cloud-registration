@@ -17,7 +17,7 @@ variable "falcon_client_secret" {
   default     = null
   validation {
     condition     = var.falcon_client_secret == null ? true : (can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)) && length(var.falcon_client_secret) == 40)
-    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    error_message = "falcon_client_secret must be a 40-character alphanumeric string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
@@ -47,6 +47,17 @@ variable "falcon_cloud" {
       "us-gov-1", "us-gov-2"
     ], var.falcon_cloud)
     error_message = "Falcon cloud must be null (for commercial) or one of: us-gov-1, us-gov-2."
+  }
+}
+
+variable "falcon_host_override" {
+  type        = string
+  description = "Host name of the CrowdStrike API, with no scheme or path. Set it only when falcon_cloud cannot select your cloud. When it is set, the provider ignores falcon_cloud."
+  default     = null
+
+  validation {
+    condition     = var.falcon_host_override == null ? true : can(regex("^[a-z0-9.-]+$", var.falcon_host_override))
+    error_message = "falcon_host_override must be a host name such as api.example.com, with no scheme or path."
   }
 }
 
