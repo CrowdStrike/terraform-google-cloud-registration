@@ -58,7 +58,7 @@ variable "folder_ids" {
 
 variable "google_iam_roles" {
   type        = list(string)
-  description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access"
+  description = "List of Google Cloud IAM roles that will be granted to the wif_iam_principal identity for asset inventory access at any registration scope"
   default = [
     "roles/aiplatform.viewer",
     "roles/alloydb.viewer",
@@ -102,6 +102,58 @@ variable "google_iam_roles" {
       for role in var.google_iam_roles : can(regex("^roles/", role))
     ])
     error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "google_iam_roles_org_level" {
+  type        = list(string)
+  description = "IAM roles bound only for organization registration (not folder or project), in addition to google_iam_roles. For org-level resources that are not scanned below the organization; some (e.g. roles/iam.workforcePoolViewer) also fail to apply at folder/project scope. Populated by caf-automation from catalog roles tagged Scope \"org\"."
+  default = [
+    "roles/iam.workforcePoolViewer",
+  ]
+
+  validation {
+    condition = alltrue([
+      for role in var.google_iam_roles_org_level : can(regex("^roles/", role))
+    ])
+    error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "google_iam_roles_project_level" {
+  type        = list(string)
+  description = "IAM roles bound only for project registration (not organization or folder), in addition to google_iam_roles. Empty by default; populated by caf-automation from catalog roles tagged Scope \"project\"."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for role in var.google_iam_roles_project_level : can(regex("^roles/", role))
+    ])
+    error_message = "All IAM roles must start with 'roles/'."
+  }
+}
+
+variable "registration_id" {
+  type        = string
+  description = "Unique registration ID from CrowdStrike backend. Used as suffix for resources with soft-delete lifecycle (custom roles)."
+  default     = ""
+
+  validation {
+    condition     = var.registration_id == "" || can(regex("^[a-z0-9-]+$", var.registration_id))
+    error_message = "Registration ID must contain only lowercase letters, numbers, and hyphens."
+  }
+}
+
+variable "custom_role_permissions" {
+  type        = list(string)
+  description = "Permissions for the CrowdStrike custom IAM role. These are least-privilege permissions not covered by any predefined role."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for perm in var.custom_role_permissions : can(regex("^[a-zA-Z]", perm))
+    ])
+    error_message = "All permissions must start with a letter."
   }
 }
 

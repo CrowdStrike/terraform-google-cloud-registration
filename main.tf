@@ -111,6 +111,7 @@ module "asset-inventory" {
 
   wif_iam_principal       = local.wif_iam_principal
   registration_type       = var.registration_type
+  registration_id         = crowdstrike_cloud_google_registration.main.id
   organization_id         = var.organization_id
   folder_ids              = var.folder_ids
   project_ids             = var.project_ids
