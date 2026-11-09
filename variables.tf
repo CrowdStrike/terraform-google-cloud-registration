@@ -192,6 +192,18 @@ variable "enable_vulnerability_scanning" {
   default     = false
 }
 
+variable "dspm_gcs_access" {
+  type        = bool
+  description = "Apply permissions for DSPM GCS bucket scanning"
+  default     = true
+}
+
+variable "dspm_disk_access" {
+  type        = bool
+  description = "Apply permissions for DSPM VM scanning"
+  default     = true
+}
+
 variable "falcon_client_id" {
   type        = string
   description = "Falcon API client ID."

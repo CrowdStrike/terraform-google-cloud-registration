@@ -245,6 +245,17 @@ variable "enable_vulnerability_scanning" {
   description = "Enable agentless vulnerability scanning for GCP Compute Engine VMs"
   default     = false
 }
+variable "dspm_gcs_access" {
+  type        = bool
+  description = "Apply permissions for DSPM GCS bucket scanning"
+  default     = true
+}
+
+variable "dspm_disk_access" {
+  type        = bool
+  description = "Apply permissions for DSPM VM scanning"
+  default     = true
+}
 
 variable "agentless_scanning_role_arn" {
   type        = string
