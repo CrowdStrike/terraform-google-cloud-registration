@@ -62,6 +62,8 @@ module "workload-identity" {
   wif_project_id            = var.wif_project_id
   wif_pool_id               = crowdstrike_cloud_gws_registration.main.wif_pool_id
   wif_pool_provider_id      = crowdstrike_cloud_gws_registration.main.wif_provider_id
+  wif_pool_display_name     = "CrowdStrikeGWSPool"
+  wif_pool_description      = "CrowdStrike Workload Identity Pool for Google Workspace"
   registration_id           = crowdstrike_cloud_gws_registration.main.id
   identity_source           = local.identity_source
   role_arn                  = var.workspace_role_arn
