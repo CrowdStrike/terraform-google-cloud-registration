@@ -95,7 +95,7 @@ variable "customer_id" {
 
 variable "grant_organization_viewer" {
   type        = bool
-  description = "Grant roles/resourcemanager.organizationViewer on organization_id to the Workspace service account. The deployer of scripts/service-account-setup.sh cannot make this grant, so an organization admin makes it after the apply."
+  description = "Grant roles/resourcemanager.organizationViewer on organization_id to the Workspace service account. The --enable-workspace option of scripts/service-account-setup.sh does not give the deployer the permission for this grant, so an organization admin makes it after the apply."
   default     = false
 }
 

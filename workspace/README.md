@@ -23,14 +23,14 @@ Add the Google Workspace to the Google Cloud registration in the CrowdStrike con
 
 The CrowdStrike provider needs an API client with the **Cloud Security Google Cloud Registration** read and write scope.
 
-The `--enable-workspace` option of `scripts/service-account-setup.sh` prepares the deployer service account. The option takes no scope flag. The deployer needs:
+The `--enable-workspace` option of `scripts/service-account-setup.sh` prepares the deployer service account. To use one deployer for the Google Cloud registration and the Google Workspace, give `--enable-workspace` in the same call as the scope options, or run the script again with the same `--name`. The second run adds roles and removes none. The deployer needs:
 - `roles/iam.workloadIdentityPoolAdmin`, `roles/iam.serviceAccountAdmin` and `roles/serviceusage.serviceUsageAdmin` on the WIF project
 - `resourcemanager.organizations.get` on `organization_id`, for the link check
 - `resourcemanager.organizations.getIamPolicy` and `resourcemanager.organizations.setIamPolicy` on `organization_id`, when `grant_organization_viewer = true`
 
 `roles/iam.serviceAccountAdmin` applies to every service account in the WIF project, so the deployer can act as any of them. If one of them has organization roles, the deployer can get those roles too.
 
-The script gives the first two items, and neither `getIamPolicy` nor `setIamPolicy`. With the script, set `grant_organization_viewer = false`, and after the apply, ask an organization admin to grant `roles/resourcemanager.organizationViewer` on the organization to the `sa_email` output. The setup command from the CrowdStrike console sets this value and makes this grant. A deployer without `resourcemanager.organizations.setIamPolicy` gets a 403 at the first apply when `grant_organization_viewer = true`, after the other resources exist. After the binding is in the state, every plan reads the organization IAM policy, so a later deployer without `resourcemanager.organizations.getIamPolicy` fails at plan.
+The `--enable-workspace` option gives the first two items, and neither `getIamPolicy` nor `setIamPolicy`. With the script, set `grant_organization_viewer = false`, and after the apply, ask an organization admin to grant `roles/resourcemanager.organizationViewer` on the organization to the `sa_email` output. The setup command from the CrowdStrike console sets this value and makes this grant. A deployer without `resourcemanager.organizations.setIamPolicy` gets a 403 at the first apply when `grant_organization_viewer = true`, after the other resources exist. After the binding is in the state, every plan reads the organization IAM policy, so a later deployer without `resourcemanager.organizations.getIamPolicy` fails at plan.
 
 ### The link check
 
