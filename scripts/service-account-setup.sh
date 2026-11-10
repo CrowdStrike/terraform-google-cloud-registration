@@ -13,7 +13,7 @@ usage() {
     echo "  --name                Service account name for Infrastructure Manager"
     echo "  --infra-project-id    GCP project ID where Infrastructure Manager runs"
     echo ""
-    echo "Registration scope (provide exactly one; give none with --enable-workspace):"
+    echo "Registration scope (provide exactly one; optional with --enable-workspace):"
     echo "  --organization-id     Organization ID (for organization registration)"
     echo "  --folder-ids          Comma-separated list of folder IDs (for folder registration)"
     echo "  --project-ids         Comma-separated list of target project IDs (for project registration)"
@@ -24,7 +24,7 @@ usage() {
     echo "  --enable-dspm         Enable DSPM agentless scanning (default: false)"
     echo "  --enable-vulnerability-scanning  Enable agentless vulnerability scanning (default: false)"
     echo "  --agentless-org-id    Organization ID for agentless scanning (required for folder registration with agentless features)"
-    echo "  --enable-workspace    Grant only the roles for a Google Workspace registration. Takes no scope or GCP feature option (default: false)"
+    echo "  --enable-workspace    Also grant the roles for a Google Workspace registration. With no scope, grant only these roles (default: false)"
     echo "  --workspace-org-id    ID of the GCP organization linked to the Google Workspace (required with --enable-workspace)"
     echo "  --location            Infrastructure Manager location (default: us-central1)"
     echo "  --help                Show this help message"
@@ -41,6 +41,11 @@ usage() {
     echo ""
     echo "  # Google Workspace registration"
     echo "  $0 --name my-sa --infra-project-id my-project --wif-project-id my-wif-project --enable-workspace --workspace-org-id 123456789"
+    echo ""
+    echo "  # Organization registration and Google Workspace registration with one service account"
+    echo "  $0 --name my-sa --infra-project-id my-project --organization-id 123456789 --enable-workspace --workspace-org-id 123456789"
+    echo ""
+    echo "To add roles to a service account that exists, run the script again with the same --name. The new run removes no role."
 }
 
 # Default values
@@ -139,15 +144,16 @@ if [[ -z "$INFRA_PROJECT_ID" ]]; then
     exit 1
 fi
 
-# A Google Workspace registration is apart from the GCP registration, so it takes no GCP scope or feature
+# The Workspace roles add to the scope roles; with no scope, the RTV&D and agentless options have nothing to apply to
 if [[ "$ENABLE_WORKSPACE" == true ]]; then
-    if [[ -n "$ORGANIZATION_ID" || -n "$FOLDER_IDS" || -n "$TARGET_PROJECTS" || -n "$AGENTLESS_ORG_ID" || "$ENABLE_RTVD" == true || "$ENABLE_DSPM" == true || "$ENABLE_VULNERABILITY_SCANNING" == true ]]; then
-        echo "Error: --enable-workspace takes no scope parameter and no RTV&D or agentless option"
+    if [[ -z "$WORKSPACE_ORG_ID" ]]; then
+        echo "Error: --workspace-org-id is required with --enable-workspace"
         usage
         exit 1
     fi
-    if [[ -z "$WORKSPACE_ORG_ID" ]]; then
-        echo "Error: --workspace-org-id is required with --enable-workspace"
+    if [[ -z "$ORGANIZATION_ID" && -z "$FOLDER_IDS" && -z "$TARGET_PROJECTS" ]] &&
+        [[ -n "$AGENTLESS_ORG_ID" || "$ENABLE_RTVD" == true || "$ENABLE_DSPM" == true || "$ENABLE_VULNERABILITY_SCANNING" == true ]]; then
+        echo "Error: the RTV&D and agentless options need a scope parameter, also with --enable-workspace"
         usage
         exit 1
     fi
