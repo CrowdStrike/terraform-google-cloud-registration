@@ -147,7 +147,9 @@ variable "registration_id" {
 variable "custom_role_permissions" {
   type        = list(string)
   description = "Permissions for the CrowdStrike custom IAM role. These are least-privilege permissions not covered by any predefined role."
-  default     = []
+  default = [
+    "storage.buckets.getIamPolicy"
+  ]
 
   validation {
     condition = alltrue([
