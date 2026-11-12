@@ -1,0 +1,26 @@
+formatter: markdown table
+recursive:
+  enabled: false
+  path: modules
+sections:
+  hide:
+    - requirements
+settings:
+  lockfile: false
+output:
+  file: README.md
+  mode: inject
+header-from: docs/.header.md
+content: |-
+  {{ .Header }}
+
+  ## Usage
+
+  ```hcl
+  {{ include "docs/.usage.tf" }}
+  ```
+
+  {{ .Providers }}
+  {{ .Resources }}
+  {{ .Inputs }}
+  {{ .Outputs }}

@@ -8,6 +8,28 @@ variable "wif_pool_id" {
   }
 }
 
+variable "wif_pool_display_name" {
+  type        = string
+  description = "Display name of the workload identity pool. The module adds resource_prefix and resource_suffix to it"
+  default     = "CrowdStrikeIDPool"
+
+  validation {
+    condition     = length(var.wif_pool_display_name) > 0 && length(var.wif_pool_display_name) <= 19
+    error_message = "Pool display name must be 1-19 characters, so that the prefix and suffix fit in the 32-character limit of Google Cloud."
+  }
+}
+
+variable "wif_pool_description" {
+  type        = string
+  description = "Description of the workload identity pool"
+  default     = "CrowdStrike Workload Identity Pool"
+
+  validation {
+    condition     = length(var.wif_pool_description) <= 256
+    error_message = "Pool description must be 256 characters or less."
+  }
+}
+
 variable "wif_project_id" {
   type        = string
   description = "Google Cloud Project ID where the CrowdStrike workload identity federation pool resources are deployed"
