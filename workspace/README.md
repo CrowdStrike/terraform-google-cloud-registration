@@ -15,7 +15,7 @@ The module creates these Google Cloud resources:
 
 It also uses two CrowdStrike resources:
 - `crowdstrike_cloud_gws_registration` reads the Workspace registration of `gcp_registration_id` and gives the pool, provider and service account IDs. `terraform destroy` deletes the Workspace registration in CrowdStrike.
-- `crowdstrike_cloud_gws_registration_settings` sends the `sa_email`, `sa_unique_id`, `wif_principal` and `project_number` outputs to CrowdStrike after the Google Cloud resources exist. CrowdStrike then starts the Workspace health check.
+- `crowdstrike_cloud_google_workspace_registration_settings` sends the `sa_email`, `sa_unique_id`, `wif_principal` and `project_number` outputs to CrowdStrike after the Google Cloud resources exist. CrowdStrike then starts the Workspace health check.
 
 ### Before the apply
 
@@ -99,8 +99,8 @@ module "crowdstrike_gws_registration" {
 
 | Name | Type |
 |------|------|
+| [crowdstrike_cloud_google_workspace_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_workspace_registration_settings) | resource |
 | [crowdstrike_cloud_gws_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_gws_registration) | resource |
-| [crowdstrike_cloud_gws_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_gws_registration_settings) | resource |
 | [google_organization.link_check](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/organization) | data source |
 ## Inputs
 
