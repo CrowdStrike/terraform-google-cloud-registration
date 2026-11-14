@@ -62,6 +62,7 @@ variable "google_iam_roles" {
   default = [
     "roles/aiplatform.viewer",
     "roles/alloydb.viewer",
+    "roles/apigateway.viewer",
     "roles/apigee.readOnlyAdmin",
     "roles/appengine.appViewer",
     "roles/artifactregistry.reader",
