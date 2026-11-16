@@ -175,56 +175,176 @@ resource "google_folder_iam_member" "folder_scanner_bigquery_permissions" {
 }
 
 # =============================================================================
-# DSPM: Org and folder mode - org-level Cloud SQL roles bound at org or folder level
+# DSPM: Org mode - org-level Cloud SQL target and clone roles + bindings
 # =============================================================================
 
-resource "random_id" "cloudsql_target_org_role_suffix" {
-  for_each    = local.cloudsql_target_org_role_keys
+resource "random_id" "target_cloudsql_target_role_org_suffix" {
+  count       = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
   byte_length = 4
 }
 
-resource "google_organization_iam_custom_role" "cloudsql_target_role" {
-  for_each = local.cloudsql_target_org_role_keys
+resource "google_organization_iam_custom_role" "target_cloudsql_target_role" {
+  count = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
 
-  org_id      = local.is_org_registration ? var.organization_id : var.folder_org_id
-  role_id     = "${local.cloudsql_target_roles[each.value].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_org_role_suffix[each.value].hex}"
-  title       = local.cloudsql_target_roles[each.value].title
-  description = local.cloudsql_target_roles[each.value].description
+  org_id      = var.organization_id
+  role_id     = "${local.cloudsql_target_role.id_prefix}_${local.role_suffix}_${random_id.target_cloudsql_target_role_org_suffix[0].hex}"
+  title       = local.cloudsql_target_role.title
+  description = local.cloudsql_target_role.description
 
-  permissions = local.cloudsql_target_roles[each.value].permissions
+  permissions = local.cloudsql_target_role.permissions
 }
 
-resource "google_organization_iam_member" "cloudsql_target_permissions" {
-  for_each = local.is_org_registration ? local.cloudsql_target_org_role_keys : toset([])
+resource "google_organization_iam_member" "target_cloudsql_target_permissions" {
+  count = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
 
   org_id = var.organization_id
-  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value].id
+  role   = google_organization_iam_custom_role.target_cloudsql_target_role[0].id
+  member = local.agentless_wif_principal
+}
+
+resource "random_id" "target_cloudsql_clone_role_org_suffix" {
+  count       = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
+  byte_length = 4
+}
+
+resource "google_organization_iam_custom_role" "target_cloudsql_clone_role" {
+  count = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
+
+  org_id      = var.organization_id
+  role_id     = "${local.cloudsql_clone_role.id_prefix}_${local.role_suffix}_${random_id.target_cloudsql_clone_role_org_suffix[0].hex}"
+  title       = local.cloudsql_clone_role.title
+  description = local.cloudsql_clone_role.description
+
+  permissions = local.cloudsql_clone_role.permissions
+}
+
+resource "google_organization_iam_member" "target_cloudsql_clone_permissions" {
+  count = local.create_cloudsql_permissions && local.is_org_registration ? 1 : 0
+
+  org_id = var.organization_id
+  role   = google_organization_iam_custom_role.target_cloudsql_clone_role[0].id
   member = local.agentless_wif_principal
 
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value].condition[*]
-    content {
-      title       = condition.value.title
-      description = condition.value.description
-      expression  = condition.value.expression
-    }
+  condition {
+    title       = local.cloudsql_clone_condition.title
+    description = local.cloudsql_clone_condition.description
+    expression  = local.cloudsql_clone_condition.expression
   }
 }
 
-resource "google_folder_iam_member" "cloudsql_target_permissions" {
-  for_each = local.cloudsql_target_folder_role_pairs
+# =============================================================================
+# DSPM: Multi-project (standalone cross) mode - per-target-project Cloud SQL target and clone roles + bindings
+# =============================================================================
 
-  folder = "folders/${each.value.folder}"
-  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value.role_key].id
+resource "random_id" "target_cloudsql_target_role_suffix" {
+  for_each    = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "target_cloudsql_target_role" {
+  for_each = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+
+  project     = each.value
+  role_id     = "${local.cloudsql_target_role.id_prefix}_${local.role_suffix}_${random_id.target_cloudsql_target_role_suffix[each.value].hex}"
+  title       = local.cloudsql_target_role.title
+  description = local.cloudsql_target_role.description
+
+  permissions = local.cloudsql_target_role.permissions
+}
+
+resource "google_project_iam_member" "target_cloudsql_target_permissions" {
+  for_each = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.target_cloudsql_target_role[each.value].id
+  member  = local.agentless_wif_principal
+}
+
+resource "random_id" "target_cloudsql_clone_role_suffix" {
+  for_each    = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "target_cloudsql_clone_role" {
+  for_each = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+
+  project     = each.value
+  role_id     = "${local.cloudsql_clone_role.id_prefix}_${local.role_suffix}_${random_id.target_cloudsql_clone_role_suffix[each.value].hex}"
+  title       = local.cloudsql_clone_role.title
+  description = local.cloudsql_clone_role.description
+
+  permissions = local.cloudsql_clone_role.permissions
+}
+
+resource "google_project_iam_member" "target_cloudsql_clone_permissions" {
+  for_each = local.create_cloudsql_permissions ? toset(local.cross_target_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.target_cloudsql_clone_role[each.value].id
+  member  = local.agentless_wif_principal
+
+  condition {
+    title       = local.cloudsql_clone_condition.title
+    description = local.cloudsql_clone_condition.description
+    expression  = local.cloudsql_clone_condition.expression
+  }
+}
+
+# =============================================================================
+# DSPM: Folder + cross + org-level Cloud SQL roles - org roles bound at folder level
+# =============================================================================
+
+resource "random_id" "folder_cloudsql_target_org_role_suffix" {
+  count       = local.create_cloudsql_permissions && local.is_folder_registration ? 1 : 0
+  byte_length = 4
+}
+
+resource "google_organization_iam_custom_role" "folder_cloudsql_target_role" {
+  count = local.create_cloudsql_permissions && local.is_folder_registration ? 1 : 0
+
+  org_id      = var.folder_org_id
+  role_id     = "${local.cloudsql_target_role.id_prefix}_${local.role_suffix}_${random_id.folder_cloudsql_target_org_role_suffix[0].hex}"
+  title       = local.cloudsql_target_role.title
+  description = local.cloudsql_target_role.description
+
+  permissions = local.cloudsql_target_role.permissions
+}
+
+resource "google_folder_iam_member" "folder_cloudsql_target_permissions" {
+  for_each = local.create_cloudsql_permissions && local.is_folder_registration ? toset(var.folder_ids) : toset([])
+
+  folder = "folders/${each.value}"
+  role   = google_organization_iam_custom_role.folder_cloudsql_target_role[0].id
+  member = local.agentless_wif_principal
+}
+
+resource "random_id" "folder_cloudsql_clone_org_role_suffix" {
+  count       = local.create_cloudsql_permissions && local.is_folder_registration ? 1 : 0
+  byte_length = 4
+}
+
+resource "google_organization_iam_custom_role" "folder_cloudsql_clone_role" {
+  count = local.create_cloudsql_permissions && local.is_folder_registration ? 1 : 0
+
+  org_id      = var.folder_org_id
+  role_id     = "${local.cloudsql_clone_role.id_prefix}_${local.role_suffix}_${random_id.folder_cloudsql_clone_org_role_suffix[0].hex}"
+  title       = local.cloudsql_clone_role.title
+  description = local.cloudsql_clone_role.description
+
+  permissions = local.cloudsql_clone_role.permissions
+}
+
+resource "google_folder_iam_member" "folder_cloudsql_clone_permissions" {
+  for_each = local.create_cloudsql_permissions && local.is_folder_registration ? toset(var.folder_ids) : toset([])
+
+  folder = "folders/${each.value}"
+  role   = google_organization_iam_custom_role.folder_cloudsql_clone_role[0].id
   member = local.agentless_wif_principal
 
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
-    content {
-      title       = condition.value.title
-      description = condition.value.description
-      expression  = condition.value.expression
-    }
+  condition {
+    title       = local.cloudsql_clone_condition.title
+    description = local.cloudsql_clone_condition.description
+    expression  = local.cloudsql_clone_condition.expression
   }
 }
 

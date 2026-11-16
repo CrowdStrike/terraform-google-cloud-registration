@@ -140,37 +140,37 @@ locals {
     ])
   }
 
+  # Cloud SQL target role — reads and clones the scanned instances and reads their backups.
+  cloudsql_target_role = {
+    id_prefix   = "DSPMCloudSQLTarget"
+    title       = "DSPM Cloud SQL Target"
+    description = "Read and clone Cloud SQL instances and read their backups for DSPM scanning"
+    permissions = [
+      "cloudsql.instances.get",
+      "cloudsql.instances.clone",
+      "cloudsql.instances.create",
+      "cloudsql.backupRuns.list",
+      "cloudsql.backupRuns.get",
+    ]
+  }
+
   # The clone role is separate, because an IAM condition checks the resource type but it can not conditionally grant the permission.
-  cloudsql_target_roles = {
-    target = {
-      id_prefix   = "DSPMCloudSQLTarget"
-      title       = "DSPM Cloud SQL Target"
-      description = "Read and clone Cloud SQL instances and read their backups for DSPM scanning"
-      permissions = [
-        "cloudsql.instances.get",
-        "cloudsql.instances.clone",
-        "cloudsql.instances.create",
-        "cloudsql.backupRuns.list",
-        "cloudsql.backupRuns.get",
-      ]
-      condition = null
-    }
-    clone = {
-      id_prefix   = "DSPMCloudSQLClone"
-      title       = "DSPM Cloud SQL Clone"
-      description = "Update, back up and delete Cloud SQL scanning clones"
-      permissions = [
-        "cloudsql.instances.update",
-        "cloudsql.instances.delete",
-        "cloudsql.backupRuns.create",
-        "cloudsql.backupRuns.delete",
-      ]
-      condition = {
-        title       = "restrict-to-crowdstrike-cloudsql-clones"
-        description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
-        expression  = "(resource.type == \"sqladmin.googleapis.com/Instance\" || resource.type == \"sqladmin.googleapis.com/BackupRun\") && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\""
-      }
-    }
+  cloudsql_clone_role = {
+    id_prefix   = "DSPMCloudSQLClone"
+    title       = "DSPM Cloud SQL Clone"
+    description = "Update, back up and delete Cloud SQL scanning clones"
+    permissions = [
+      "cloudsql.instances.update",
+      "cloudsql.instances.delete",
+      "cloudsql.backupRuns.create",
+      "cloudsql.backupRuns.delete",
+    ]
+  }
+
+  cloudsql_clone_condition = {
+    title       = "restrict-to-crowdstrike-cloudsql-clones"
+    description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
+    expression  = "(resource.type == \"sqladmin.googleapis.com/Instance\" || resource.type == \"sqladmin.googleapis.com/BackupRun\") && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\""
   }
 
   # Vulnerability scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
@@ -263,18 +263,6 @@ locals {
   # Empty with a custom VPC, because project_region_pairs is empty then and s creation of SCPs in Host projects is skipped entirely
   cloudsql_scp_pairs        = local.create_cloudsql_permissions ? local.project_region_pairs : {}
   cloudsql_host_project_ids = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
-
-  cloudsql_target_project_role_pairs = local.create_cloudsql_permissions && local.is_project_registration ? {
-    for pair in setproduct(concat(local.host_project_ids, local.cross_target_ids), keys(local.cloudsql_target_roles)) :
-    "${pair[0]}/${pair[1]}" => { project = pair[0], role_key = pair[1] }
-  } : {}
-
-  cloudsql_target_org_role_keys = local.create_cloudsql_permissions && !local.is_project_registration ? toset(keys(local.cloudsql_target_roles)) : toset([])
-
-  cloudsql_target_folder_role_pairs = local.create_cloudsql_permissions && local.is_folder_registration ? {
-    for pair in setproduct(var.folder_ids, keys(local.cloudsql_target_roles)) :
-    "${pair[0]}/${pair[1]}" => { folder = pair[0], role_key = pair[1] }
-  } : {}
 
   # Viewer roles supported at all levels (project, folder, org)
   viewer_roles_base = [

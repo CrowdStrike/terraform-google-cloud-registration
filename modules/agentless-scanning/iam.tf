@@ -355,37 +355,60 @@ resource "google_project_iam_member" "cloudsql_host_permissions" {
 # In project registration mode, the host project is also a scan target.
 
 resource "random_id" "cloudsql_target_role_suffix" {
-  for_each    = local.cloudsql_target_project_role_pairs
+  for_each    = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "cloudsql_target_role" {
-  for_each = local.cloudsql_target_project_role_pairs
+  for_each = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
-  project     = each.value.project
-  role_id     = "${local.cloudsql_target_roles[each.value.role_key].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_role_suffix[each.key].hex}"
-  title       = local.cloudsql_target_roles[each.value.role_key].title
-  description = local.cloudsql_target_roles[each.value.role_key].description
+  project     = each.value
+  role_id     = "${local.cloudsql_target_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_role_suffix[each.value].hex}"
+  title       = local.cloudsql_target_role.title
+  description = local.cloudsql_target_role.description
 
-  permissions = local.cloudsql_target_roles[each.value.role_key].permissions
+  permissions = local.cloudsql_target_role.permissions
 
   depends_on = [google_project_service.required_apis]
 }
 
 resource "google_project_iam_member" "cloudsql_target_permissions" {
-  for_each = local.cloudsql_target_project_role_pairs
+  for_each = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
 
-  project = each.value.project
-  role    = google_project_iam_custom_role.cloudsql_target_role[each.key].id
+  project = each.value
+  role    = google_project_iam_custom_role.cloudsql_target_role[each.value].id
+  member  = local.agentless_wif_principal
+}
+
+resource "random_id" "cloudsql_clone_role_suffix" {
+  for_each    = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "cloudsql_clone_role" {
+  for_each = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project     = each.value
+  role_id     = "${local.cloudsql_clone_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_clone_role_suffix[each.value].hex}"
+  title       = local.cloudsql_clone_role.title
+  description = local.cloudsql_clone_role.description
+
+  permissions = local.cloudsql_clone_role.permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_project_iam_member" "cloudsql_clone_permissions" {
+  for_each = local.create_cloudsql_permissions && local.is_project_registration ? toset(local.host_project_ids) : toset([])
+
+  project = each.value
+  role    = google_project_iam_custom_role.cloudsql_clone_role[each.value].id
   member  = local.agentless_wif_principal
 
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
-    content {
-      title       = condition.value.title
-      description = condition.value.description
-      expression  = condition.value.expression
-    }
+  condition {
+    title       = local.cloudsql_clone_condition.title
+    description = local.cloudsql_clone_condition.description
+    expression  = local.cloudsql_clone_condition.expression
   }
 }
 
