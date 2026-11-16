@@ -5,9 +5,11 @@ locals {
   identity_source = var.workspace_role_arn != null ? "aws-sts" : "gcp-oidc"
 }
 
-# Adopts the Workspace registration that the console added to the Google Cloud registration
-resource "crowdstrike_cloud_gws_registration" "main" {
-  gcp_registration_id = var.gcp_registration_id
+# Creates the Workspace registration, or adopts the one that the console added to the Google Cloud registration
+resource "crowdstrike_cloud_google_workspace_registration" "main" {
+  registration_id = var.gcp_registration_id
+  customer_id     = var.customer_id
+  organization_id = var.organization_id
 
   lifecycle {
     precondition {
@@ -60,11 +62,11 @@ module "workload-identity" {
   source = "../modules/workload-identity/"
 
   wif_project_id            = var.wif_project_id
-  wif_pool_id               = crowdstrike_cloud_gws_registration.main.wif_pool_id
-  wif_pool_provider_id      = crowdstrike_cloud_gws_registration.main.wif_provider_id
+  wif_pool_id               = crowdstrike_cloud_google_workspace_registration.main.wif_pool_id
+  wif_pool_provider_id      = crowdstrike_cloud_google_workspace_registration.main.wif_provider_id
   wif_pool_display_name     = "CrowdStrikeGWSPool"
   wif_pool_description      = "CrowdStrike Workload Identity Pool for Google Workspace"
-  registration_id           = crowdstrike_cloud_gws_registration.main.id
+  registration_id           = crowdstrike_cloud_google_workspace_registration.main.id
   identity_source           = local.identity_source
   role_arn                  = var.workspace_role_arn
   service_account_unique_id = var.workspace_service_account_unique_id
@@ -76,7 +78,7 @@ module "workspace" {
   source = "../modules/workspace/"
 
   wif_project_id            = var.wif_project_id
-  service_account_id        = crowdstrike_cloud_gws_registration.main.service_account_id
+  service_account_id        = crowdstrike_cloud_google_workspace_registration.main.service_account_id
   workspace_wif_principal   = module.workload-identity.wif_iam_principal
   organization_id           = var.organization_id
   grant_organization_viewer = var.grant_organization_viewer
@@ -84,7 +86,7 @@ module "workspace" {
 
 # Sends the four values to CrowdStrike, which then starts the Workspace health check
 resource "crowdstrike_cloud_google_workspace_registration_settings" "main" {
-  registration_id           = crowdstrike_cloud_gws_registration.main.gcp_registration_id
+  registration_id           = crowdstrike_cloud_google_workspace_registration.main.registration_id
   service_account_email     = module.workspace.sa_email
   service_account_unique_id = module.workspace.sa_unique_id
   wif_principal             = module.workload-identity.wif_iam_principal

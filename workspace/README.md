@@ -14,12 +14,12 @@ The module creates these Google Cloud resources:
 - By default, one `roles/resourcemanager.organizationViewer` binding on `organization_id` for the service account
 
 It also uses two CrowdStrike resources:
-- `crowdstrike_cloud_gws_registration` reads the Workspace registration of `gcp_registration_id` and gives the pool, provider and service account IDs. `terraform destroy` deletes the Workspace registration in CrowdStrike.
+- `crowdstrike_cloud_google_workspace_registration` creates the Workspace registration of `gcp_registration_id` with `customer_id` and `organization_id`, or adopts the one that the CrowdStrike console added. It gives the pool, provider and service account IDs. `terraform destroy` deletes the Workspace registration in CrowdStrike.
 - `crowdstrike_cloud_google_workspace_registration_settings` sends the `sa_email`, `sa_unique_id`, `wif_principal` and `project_number` outputs to CrowdStrike after the Google Cloud resources exist. CrowdStrike then starts the Workspace health check.
 
 ### Before the apply
 
-Add the Google Workspace to the Google Cloud registration in the CrowdStrike console first. The console then gives the Terraform inputs. Do not change `gcp_registration_id` or `wif_project_id` after the apply. A new `gcp_registration_id` stops the plan with an error, because a replacement deletes the Workspace registration in CrowdStrike. CrowdStrike authenticates against the WIF resources in `wif_project_id`, and it refuses a new project number with a 409 error.
+The Google Cloud registration must exist. The root creates its Workspace registration. When you add the Google Workspace in the CrowdStrike console first, the console gives the Terraform inputs, and the root adopts that Workspace registration. Do not change `gcp_registration_id`, `customer_id` or `wif_project_id` after the apply. A new `gcp_registration_id` or `customer_id` replaces the Workspace registration in CrowdStrike, and with it the pool, provider and service account. Then do the manual step again for the new service account. A new `organization_id` changes the Workspace registration in place until its health check passes, and CrowdStrike refuses it after that. CrowdStrike authenticates against the WIF resources in `wif_project_id`, and it refuses a new project number with a 409 error.
 
 The CrowdStrike provider needs an API client with the **Cloud Security Google Cloud Registration** read and write scope.
 
@@ -99,15 +99,15 @@ module "crowdstrike_gws_registration" {
 
 | Name | Type |
 |------|------|
+| [crowdstrike_cloud_google_workspace_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_workspace_registration) | resource |
 | [crowdstrike_cloud_google_workspace_registration_settings.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_google_workspace_registration_settings) | resource |
-| [crowdstrike_cloud_gws_registration.main](https://registry.terraform.io/providers/crowdstrike/crowdstrike/latest/docs/resources/cloud_gws_registration) | resource |
 | [google_organization.link_check](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/organization) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_customer_id"></a> [customer\_id](#input\_customer\_id) | Google Workspace customer ID, for example C01abc23x, with no customers/ prefix. The plan fails when it does not belong to organization\_id. | `string` | n/a | yes |
-| <a name="input_gcp_registration_id"></a> [gcp\_registration\_id](#input\_gcp\_registration\_id) | ID of the CrowdStrike Google Cloud registration that has the Google Workspace registration. Add the Google Workspace to it in the CrowdStrike console first. | `string` | n/a | yes |
+| <a name="input_customer_id"></a> [customer\_id](#input\_customer\_id) | Google Workspace customer ID, for example C01abc23x, with no customers/ prefix. The plan fails when it does not belong to organization\_id. A change replaces the Workspace registration. | `string` | n/a | yes |
+| <a name="input_gcp_registration_id"></a> [gcp\_registration\_id](#input\_gcp\_registration\_id) | ID of the CrowdStrike Google Cloud registration of the Google Workspace registration. The root creates the Workspace registration, or adopts the one that the CrowdStrike console added. A change replaces the Workspace registration. | `string` | n/a | yes |
 | <a name="input_grant_organization_viewer"></a> [grant\_organization\_viewer](#input\_grant\_organization\_viewer) | Grant roles/resourcemanager.organizationViewer on organization\_id to the Workspace service account. Set to false only when an organization admin makes this grant by hand. | `bool` | `true` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | ID of the GCP organization that belongs to the Google Workspace, with no organizations/ prefix. | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to the display names of the WIF pool and provider. Combined length of prefix + suffix must not exceed 13 characters. | `string` | `null` | no |

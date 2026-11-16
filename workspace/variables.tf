@@ -2,7 +2,7 @@
 
 variable "gcp_registration_id" {
   type        = string
-  description = "ID of the CrowdStrike Google Cloud registration that has the Google Workspace registration. Add the Google Workspace to it in the CrowdStrike console first."
+  description = "ID of the CrowdStrike Google Cloud registration of the Google Workspace registration. The root creates the Workspace registration, or adopts the one that the CrowdStrike console added. A change replaces the Workspace registration."
 
   validation {
     condition     = can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", var.gcp_registration_id))
@@ -58,11 +58,11 @@ variable "organization_id" {
 
 variable "customer_id" {
   type        = string
-  description = "Google Workspace customer ID, for example C01abc23x, with no customers/ prefix. The plan fails when it does not belong to organization_id."
+  description = "Google Workspace customer ID, for example C01abc23x, with no customers/ prefix. The plan fails when it does not belong to organization_id. A change replaces the Workspace registration."
 
   validation {
-    condition     = can(regex("^[Cc][A-Za-z0-9]+$", var.customer_id))
-    error_message = "Workspace customer ID must start with C and contain only letters and numbers, with no customers/ prefix."
+    condition     = can(regex("^C[a-z0-9]+$", var.customer_id))
+    error_message = "Workspace customer ID must be an uppercase C followed by lowercase letters and digits, with no customers/ prefix."
   }
 }
 
