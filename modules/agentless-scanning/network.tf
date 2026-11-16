@@ -97,7 +97,7 @@ resource "google_compute_router_nat" "agentless_nat" {
 # =============================================================================
 # Cloud SQL Service Connection Policy (Managed VPC Only)
 # =============================================================================
-# A custom VPC gets no policy, so the customer creates it.
+# A custom VPC gets no policy, since it expected so the user creates provides a VPC with an enabled Service Connection Policy for CloudSQL in the required Subnet(s)
 
 resource "google_network_connectivity_service_connection_policy" "cloudsql" {
   for_each = local.cloudsql_scp_pairs

@@ -140,7 +140,7 @@ locals {
     ])
   }
 
-  # The clone role is separate, because an IAM condition can check the resource but not the permission.
+  # The clone role is separate, because an IAM condition checks the resource type but it can not conditionally grant the permission.
   cloudsql_target_roles = {
     target = {
       id_prefix   = "DSPMCloudSQLTarget"
@@ -260,7 +260,7 @@ locals {
   # Same but only when NAT is enabled
   project_region_nat_pairs = local.is_custom_vpc || !var.deploy_cloud_nat ? {} : local.project_region_pairs
 
-  # Empty with a custom VPC, because project_region_pairs is empty then
+  # Empty with a custom VPC, because project_region_pairs is empty then and s creation of SCPs in Host projects is skipped entirely
   cloudsql_scp_pairs        = local.create_cloudsql_permissions ? local.project_region_pairs : {}
   cloudsql_host_project_ids = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
 
