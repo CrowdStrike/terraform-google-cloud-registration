@@ -175,6 +175,60 @@ resource "google_folder_iam_member" "folder_scanner_bigquery_permissions" {
 }
 
 # =============================================================================
+# DSPM: Org and folder mode - org-level Cloud SQL roles bound at org or folder level
+# =============================================================================
+
+resource "random_id" "cloudsql_target_org_role_suffix" {
+  for_each    = local.cloudsql_target_org_role_keys
+  byte_length = 4
+}
+
+resource "google_organization_iam_custom_role" "cloudsql_target_role" {
+  for_each = local.cloudsql_target_org_role_keys
+
+  org_id      = local.is_org_registration ? var.organization_id : var.folder_org_id
+  role_id     = "${local.cloudsql_target_roles[each.value].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_org_role_suffix[each.value].hex}"
+  title       = local.cloudsql_target_roles[each.value].title
+  description = local.cloudsql_target_roles[each.value].description
+
+  permissions = local.cloudsql_target_roles[each.value].permissions
+}
+
+resource "google_organization_iam_member" "cloudsql_target_permissions" {
+  for_each = local.is_org_registration ? local.cloudsql_target_org_role_keys : toset([])
+
+  org_id = var.organization_id
+  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value].id
+  member = local.agentless_wif_principal
+
+  dynamic "condition" {
+    for_each = local.cloudsql_target_roles[each.value].condition[*]
+    content {
+      title       = condition.value.title
+      description = condition.value.description
+      expression  = condition.value.expression
+    }
+  }
+}
+
+resource "google_folder_iam_member" "cloudsql_target_permissions" {
+  for_each = local.cloudsql_target_folder_role_pairs
+
+  folder = "folders/${each.value.folder}"
+  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value.role_key].id
+  member = local.agentless_wif_principal
+
+  dynamic "condition" {
+    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
+    content {
+      title       = condition.value.title
+      description = condition.value.description
+      expression  = condition.value.expression
+    }
+  }
+}
+
+# =============================================================================
 # DSPM Scanning: Org mode - org-level snapshot orchestrator role
 # =============================================================================
 

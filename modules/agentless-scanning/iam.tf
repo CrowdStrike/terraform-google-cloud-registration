@@ -313,6 +313,83 @@ resource "google_project_iam_member" "wif_dspm_gce_vm_target_permissions" {
 }
 
 # =============================================================================
+# WIF Principal - DSPM Cloud SQL Host Role (per host project)
+# =============================================================================
+
+resource "random_id" "cloudsql_host_role_suffix" {
+  for_each    = local.cloudsql_host_project_ids
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "cloudsql_host_role" {
+  for_each = local.cloudsql_host_project_ids
+
+  project     = each.value
+  role_id     = "${local.cloudsql_host_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_host_role_suffix[each.value].hex}"
+  title       = local.cloudsql_host_role.title
+  description = local.cloudsql_host_role.description
+
+  permissions = local.cloudsql_host_role.permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+# IAM Condition restricts instance mutations to CrowdStrike scanning copies only
+resource "google_project_iam_member" "cloudsql_host_permissions" {
+  for_each = local.cloudsql_host_project_ids
+
+  project = each.value
+  role    = google_project_iam_custom_role.cloudsql_host_role[each.value].id
+  member  = local.agentless_wif_principal
+
+  condition {
+    title       = local.cloudsql_host_condition.title
+    description = local.cloudsql_host_condition.description
+    expression  = local.cloudsql_host_condition.expression
+  }
+}
+
+# =============================================================================
+# WIF Principal - DSPM Cloud SQL Target Roles (project registrations)
+# =============================================================================
+# In project registration mode, the host project is also a scan target.
+
+resource "random_id" "cloudsql_target_role_suffix" {
+  for_each    = local.cloudsql_target_project_role_pairs
+  byte_length = 4
+}
+
+resource "google_project_iam_custom_role" "cloudsql_target_role" {
+  for_each = local.cloudsql_target_project_role_pairs
+
+  project     = each.value.project
+  role_id     = "${local.cloudsql_target_roles[each.value.role_key].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_role_suffix[each.key].hex}"
+  title       = local.cloudsql_target_roles[each.value.role_key].title
+  description = local.cloudsql_target_roles[each.value.role_key].description
+
+  permissions = local.cloudsql_target_roles[each.value.role_key].permissions
+
+  depends_on = [google_project_service.required_apis]
+}
+
+resource "google_project_iam_member" "cloudsql_target_permissions" {
+  for_each = local.cloudsql_target_project_role_pairs
+
+  project = each.value.project
+  role    = google_project_iam_custom_role.cloudsql_target_role[each.key].id
+  member  = local.agentless_wif_principal
+
+  dynamic "condition" {
+    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
+    content {
+      title       = condition.value.title
+      description = condition.value.description
+      expression  = condition.value.expression
+    }
+  }
+}
+
+# =============================================================================
 # WIF Principal - Viewer Roles (Read-Only Ops & Debug)
 # =============================================================================
 

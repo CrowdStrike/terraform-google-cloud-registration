@@ -113,6 +113,7 @@ locals {
     ]
   }
 
+  # Cloud SQL host role — manages the cs-scanning-* copies in each host project.
   cloudsql_host_role = {
     id_prefix   = "DSPMCloudSQLHost"
     title       = "DSPM Cloud SQL Host"
@@ -129,14 +130,17 @@ locals {
     ]
   }
 
+  # Other resource types pass, because cloudsql.users.* and instances.list are not checked on an Instance.
   cloudsql_host_condition = {
-    title = "cs-scanning-only-condition"
+    title       = "restrict-to-crowdstrike-cloudsql-copies"
+    description = "Restrict Cloud SQL instance mutations to cs-scanning-* copies"
     expression = join(" || ", [
       "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
       "(resource.type != \"sqladmin.googleapis.com/Instance\")",
     ])
   }
 
+  # The clone role is separate, because an IAM condition can check the resource but not the permission.
   cloudsql_target_roles = {
     target = {
       id_prefix   = "DSPMCloudSQLTarget"
@@ -162,8 +166,9 @@ locals {
         "cloudsql.backupRuns.delete",
       ]
       condition = {
-        title      = "cs-scanning-only-condition"
-        expression = "(resource.type == \"sqladmin.googleapis.com/Instance\" || resource.type == \"sqladmin.googleapis.com/BackupRun\") && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\""
+        title       = "restrict-to-crowdstrike-cloudsql-clones"
+        description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
+        expression  = "(resource.type == \"sqladmin.googleapis.com/Instance\" || resource.type == \"sqladmin.googleapis.com/BackupRun\") && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\""
       }
     }
   }
@@ -389,150 +394,4 @@ resource "google_project_service" "required_apis" {
   disable_on_destroy         = false
 
   depends_on = [google_project_service.serviceusage]
-}
-
-# =============================================================================
-# DSPM Cloud SQL Scanning - Service Connection Policy
-# =============================================================================
-
-resource "google_network_connectivity_service_connection_policy" "cloudsql" {
-  for_each = local.cloudsql_scp_pairs
-
-  project       = each.value.project
-  name          = "${local.effective_prefix}agentless-cloudsql-${each.value.region}${local.effective_suffix}"
-  location      = each.value.region
-  service_class = "google-cloud-sql"
-  network       = google_compute_network.agentless_vpc[each.value.project].id
-  description   = "PSC auto-connections for CrowdStrike DSPM Cloud SQL scanning copies"
-
-  psc_config {
-    subnetworks = [google_compute_subnetwork.agentless_subnet[each.key].id]
-  }
-
-  depends_on = [google_project_service.required_apis]
-}
-
-# =============================================================================
-# DSPM Cloud SQL Scanning - Host Role (per host project)
-# =============================================================================
-
-resource "random_id" "cloudsql_host_role_suffix" {
-  for_each    = local.cloudsql_host_project_ids
-  byte_length = 4
-}
-
-resource "google_project_iam_custom_role" "cloudsql_host_role" {
-  for_each = local.cloudsql_host_project_ids
-
-  project     = each.value
-  role_id     = "${local.cloudsql_host_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_host_role_suffix[each.value].hex}"
-  title       = local.cloudsql_host_role.title
-  description = local.cloudsql_host_role.description
-
-  permissions = local.cloudsql_host_role.permissions
-
-  depends_on = [google_project_service.required_apis]
-}
-
-resource "google_project_iam_member" "cloudsql_host_permissions" {
-  for_each = local.cloudsql_host_project_ids
-
-  project = each.value
-  role    = google_project_iam_custom_role.cloudsql_host_role[each.value].id
-  member  = local.agentless_wif_principal
-
-  condition {
-    title      = local.cloudsql_host_condition.title
-    expression = local.cloudsql_host_condition.expression
-  }
-}
-
-# =============================================================================
-# DSPM Cloud SQL Scanning - Target Roles: project registration (host + cross targets)
-# =============================================================================
-
-resource "random_id" "cloudsql_target_role_suffix" {
-  for_each    = local.cloudsql_target_project_role_pairs
-  byte_length = 4
-}
-
-resource "google_project_iam_custom_role" "cloudsql_target_role" {
-  for_each = local.cloudsql_target_project_role_pairs
-
-  project     = each.value.project
-  role_id     = "${local.cloudsql_target_roles[each.value.role_key].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_role_suffix[each.key].hex}"
-  title       = local.cloudsql_target_roles[each.value.role_key].title
-  description = local.cloudsql_target_roles[each.value.role_key].description
-
-  permissions = local.cloudsql_target_roles[each.value.role_key].permissions
-
-  depends_on = [google_project_service.required_apis]
-}
-
-resource "google_project_iam_member" "cloudsql_target_permissions" {
-  for_each = local.cloudsql_target_project_role_pairs
-
-  project = each.value.project
-  role    = google_project_iam_custom_role.cloudsql_target_role[each.key].id
-  member  = local.agentless_wif_principal
-
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
-    content {
-      title      = condition.value.title
-      expression = condition.value.expression
-    }
-  }
-}
-
-# =============================================================================
-# DSPM Cloud SQL Scanning - Target Roles: org / folder registration
-# =============================================================================
-
-resource "random_id" "cloudsql_target_org_role_suffix" {
-  for_each    = local.cloudsql_target_org_role_keys
-  byte_length = 4
-}
-
-resource "google_organization_iam_custom_role" "cloudsql_target_role" {
-  for_each = local.cloudsql_target_org_role_keys
-
-  org_id      = local.is_org_registration ? var.organization_id : var.folder_org_id
-  role_id     = "${local.cloudsql_target_roles[each.value].id_prefix}_${local.role_suffix}_${random_id.cloudsql_target_org_role_suffix[each.value].hex}"
-  title       = local.cloudsql_target_roles[each.value].title
-  description = local.cloudsql_target_roles[each.value].description
-
-  permissions = local.cloudsql_target_roles[each.value].permissions
-}
-
-resource "google_organization_iam_member" "cloudsql_target_permissions" {
-  for_each = local.is_org_registration ? local.cloudsql_target_org_role_keys : toset([])
-
-  org_id = var.organization_id
-  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value].id
-  member = local.agentless_wif_principal
-
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value].condition[*]
-    content {
-      title      = condition.value.title
-      expression = condition.value.expression
-    }
-  }
-}
-
-resource "google_folder_iam_member" "cloudsql_target_permissions" {
-  for_each = local.cloudsql_target_folder_role_pairs
-
-  folder = "folders/${each.value.folder}"
-  role   = google_organization_iam_custom_role.cloudsql_target_role[each.value.role_key].id
-  member = local.agentless_wif_principal
-
-  dynamic "condition" {
-    for_each = local.cloudsql_target_roles[each.value.role_key].condition[*]
-    content {
-      title      = condition.value.title
-      expression = condition.value.expression
-    }
-  }
 }

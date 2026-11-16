@@ -93,3 +93,25 @@ resource "google_compute_router_nat" "agentless_nat" {
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 }
+
+# =============================================================================
+# Cloud SQL Service Connection Policy (Managed VPC Only)
+# =============================================================================
+# A custom VPC gets no policy, so the customer creates it.
+
+resource "google_network_connectivity_service_connection_policy" "cloudsql" {
+  for_each = local.cloudsql_scp_pairs
+
+  project       = each.value.project
+  name          = "${local.effective_prefix}agentless-cloudsql-${each.value.region}${local.effective_suffix}"
+  location      = each.value.region
+  service_class = "google-cloud-sql"
+  network       = google_compute_network.agentless_vpc[each.value.project].id
+  description   = "PSC auto-connections for CrowdStrike DSPM Cloud SQL scanning copies"
+
+  psc_config {
+    subnetworks = [google_compute_subnetwork.agentless_subnet[each.key].id]
+  }
+
+  depends_on = [google_project_service.required_apis]
+}
