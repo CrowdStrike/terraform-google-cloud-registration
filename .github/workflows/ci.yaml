@@ -55,6 +55,35 @@ jobs:
         with:
           path: ${{ matrix.path }}
 
+  variable-validation:
+    runs-on: ubuntu-latest
+    name: Variable validation (TF ${{ matrix.terraform }})
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        terraform:
+          - "1.5.7" # Infrastructure Manager default and latest free version
+          - "latest"
+        path:
+          - "examples/infrastructure-manager"
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: ${{ matrix.terraform }}
+          terraform_wrapper: false
+
+      - name: Check variable validation with null inputs
+        run: .github/scripts/check-variable-validation.sh ${{ matrix.path }}
+
   docs:
     runs-on: ubuntu-latest
     name: Check terraform documentation
