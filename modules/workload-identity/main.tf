@@ -32,8 +32,8 @@ resource "google_project_service" "required_apis" {
 
 resource "google_iam_workload_identity_pool" "main" {
   workload_identity_pool_id = var.wif_pool_id
-  display_name              = "${var.resource_prefix}CrowdStrikeIDPool${var.resource_suffix}"
-  description               = "CrowdStrike Workload Identity Pool"
+  display_name              = "${var.resource_prefix}${var.wif_pool_display_name}${var.resource_suffix}"
+  description               = var.wif_pool_description
   project                   = var.wif_project_id
 
   depends_on = [
