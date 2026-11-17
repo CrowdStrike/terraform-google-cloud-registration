@@ -100,7 +100,7 @@ resource "google_compute_router_nat" "agentless_nat" {
 # A custom VPC gets no policy, since it expected so the user creates provides a VPC with an enabled Service Connection Policy for CloudSQL in the required Subnet(s)
 
 resource "google_network_connectivity_service_connection_policy" "cloudsql" {
-  for_each = local.cloudsql_scp_pairs
+  for_each = local.create_cloudsql_permissions ? local.project_region_pairs : {}
 
   project       = each.value.project
   name          = "${local.effective_prefix}agentless-cloudsql-${each.value.region}${local.effective_suffix}"

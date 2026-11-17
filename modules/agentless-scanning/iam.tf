@@ -317,12 +317,12 @@ resource "google_project_iam_member" "wif_dspm_gce_vm_target_permissions" {
 # =============================================================================
 
 resource "random_id" "cloudsql_host_role_suffix" {
-  for_each    = local.cloudsql_host_project_ids
+  for_each    = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
   byte_length = 4
 }
 
 resource "google_project_iam_custom_role" "cloudsql_host_role" {
-  for_each = local.cloudsql_host_project_ids
+  for_each = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
 
   project     = each.value
   role_id     = "${local.cloudsql_host_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_host_role_suffix[each.value].hex}"
@@ -336,7 +336,7 @@ resource "google_project_iam_custom_role" "cloudsql_host_role" {
 
 # IAM Condition restricts instance mutations to CrowdStrike scanning copies only
 resource "google_project_iam_member" "cloudsql_host_permissions" {
-  for_each = local.cloudsql_host_project_ids
+  for_each = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
 
   project = each.value
   role    = google_project_iam_custom_role.cloudsql_host_role[each.value].id

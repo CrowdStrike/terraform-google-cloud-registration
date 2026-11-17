@@ -260,10 +260,6 @@ locals {
   # Same but only when NAT is enabled
   project_region_nat_pairs = local.is_custom_vpc || !var.deploy_cloud_nat ? {} : local.project_region_pairs
 
-  # Empty with a custom VPC, because project_region_pairs is empty then and s creation of SCPs in Host projects is skipped entirely
-  cloudsql_scp_pairs        = local.create_cloudsql_permissions ? local.project_region_pairs : {}
-  cloudsql_host_project_ids = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
-
   # Viewer roles supported at all levels (project, folder, org)
   viewer_roles_base = [
     "roles/iam.securityReviewer",
