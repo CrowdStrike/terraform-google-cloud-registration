@@ -325,16 +325,27 @@ resource "google_project_iam_custom_role" "cloudsql_host_role" {
   for_each = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
 
   project     = each.value
-  role_id     = "${local.cloudsql_host_role.id_prefix}_${local.role_suffix}_${random_id.cloudsql_host_role_suffix[each.value].hex}"
-  title       = local.cloudsql_host_role.title
-  description = local.cloudsql_host_role.description
+  role_id     = "DSPMCloudSQLHost_${local.role_suffix}_${random_id.cloudsql_host_role_suffix[each.value].hex}"
+  title       = "DSPM Cloud SQL Host"
+  description = "Create, restore into and delete Cloud SQL scanning copies in the host project"
 
-  permissions = local.cloudsql_host_role.permissions
+  permissions = [
+    "cloudsql.instances.create",
+    "cloudsql.instances.get",
+    "cloudsql.instances.list",
+    "cloudsql.instances.delete",
+    "cloudsql.instances.restoreBackup",
+    "cloudsql.users.list",
+    "cloudsql.users.create",
+    "cloudsql.users.update",
+  ]
 
   depends_on = [google_project_service.required_apis]
 }
 
-# IAM Condition restricts instance mutations to CrowdStrike scanning copies only
+# IAM Condition restricts instance operations to CrowdStrike scanning copies (cs-scanning-*) only:
+# instances.get, delete and restoreBackup are checked on the Instance. Other resource types pass, because
+# instances.create and instances.list are checked on the project and IAM conditions do not apply to cloudsql.users.*.
 resource "google_project_iam_member" "cloudsql_host_permissions" {
   for_each = local.create_cloudsql_permissions ? toset(local.host_project_ids) : toset([])
 
@@ -343,9 +354,12 @@ resource "google_project_iam_member" "cloudsql_host_permissions" {
   member  = local.agentless_wif_principal
 
   condition {
-    title       = local.cloudsql_host_condition.title
-    description = local.cloudsql_host_condition.description
-    expression  = local.cloudsql_host_condition.expression
+    title       = "restrict-to-crowdstrike-cloudsql-copies"
+    description = "Restrict Cloud SQL instance mutations to cs-scanning-* copies"
+    expression = join(" || ", [
+      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+      "(resource.type != \"sqladmin.googleapis.com/Instance\")",
+    ])
   }
 }
 

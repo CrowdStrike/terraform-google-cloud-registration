@@ -12,8 +12,8 @@
 # Org/Folder registrations are always cross-project (single host project, org-level IAM).
 # Project registrations support both cross and per-project modes.
 #
-# Creates: Scanner SA, VPC, Subnet, optional NAT, GCS IAM, custom roles
-# Does NOT create: Scanner VMs, Cloud SQL, BigQuery, Firestore
+# Creates: Scanner SA, VPC, Subnet, optional NAT, Cloud SQL service connection policy, GCS IAM, custom roles
+# Does NOT create: Scanner VMs, Cloud SQL instances, BigQuery, Firestore
 # =============================================================================
 
 # =============================================================================
@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.2.0"
+  deployment_version = "1.3.0"
 
   # Guard for resources that reject uppercase
   effective_prefix = lower(var.resource_prefix)
@@ -113,33 +113,6 @@ locals {
     ]
   }
 
-  # Cloud SQL host role — manages the cs-scanning-* copies in each host project.
-  cloudsql_host_role = {
-    id_prefix   = "DSPMCloudSQLHost"
-    title       = "DSPM Cloud SQL Host"
-    description = "Create, restore into and delete Cloud SQL scanning copies in the host project"
-    permissions = [
-      "cloudsql.instances.create",
-      "cloudsql.instances.get",
-      "cloudsql.instances.list",
-      "cloudsql.instances.delete",
-      "cloudsql.instances.restoreBackup",
-      "cloudsql.users.list",
-      "cloudsql.users.create",
-      "cloudsql.users.update",
-    ]
-  }
-
-  # Other resource types pass, because cloudsql.users.* and instances.list are not checked on an Instance.
-  cloudsql_host_condition = {
-    title       = "restrict-to-crowdstrike-cloudsql-copies"
-    description = "Restrict Cloud SQL instance mutations to cs-scanning-* copies"
-    expression = join(" || ", [
-      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
-      "(resource.type != \"sqladmin.googleapis.com/Instance\")",
-    ])
-  }
-
   # Cloud SQL target role — reads and clones the scanned instances and reads their backups.
   cloudsql_target_role = {
     id_prefix   = "DSPMCloudSQLTarget"
@@ -170,7 +143,10 @@ locals {
   cloudsql_clone_condition = {
     title       = "restrict-to-crowdstrike-cloudsql-clones"
     description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
-    expression  = "(resource.type == \"sqladmin.googleapis.com/Instance\" || resource.type == \"sqladmin.googleapis.com/BackupRun\") && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\""
+    expression = join(" || ", [
+      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"sqladmin.googleapis.com/BackupRun\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+    ])
   }
 
   # Vulnerability scanning infra role — reused across host project and cross-target roles at project/folder/org scope.

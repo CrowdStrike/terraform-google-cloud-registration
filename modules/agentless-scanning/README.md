@@ -207,7 +207,7 @@ module "agentless_scanning" {
 |------|-------------|
 | <a name="output_agentless_infra"></a> [agentless\_infra](#output\_agentless\_infra) | Per-project infrastructure map for agentless scanning provider settings |
 | <a name="output_agentless_wif_principal"></a> [agentless\_wif\_principal](#output\_agentless\_wif\_principal) | WIF Principal string for agentless scanning IAM bindings |
-| <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS, BigQuery and Cloud SQL scanning permissions |
+| <a name="output_cross_target_ids"></a> [cross\_target\_ids](#output\_cross\_target\_ids) | Target project IDs with cross-project GCS, BigQuery, Cloud SQL, GCE disk and vulnerability scanning permissions |
 | <a name="output_deployment_version"></a> [deployment\_version](#output\_deployment\_version) | Module deployment version for BE tracking |
 | <a name="output_host_project_ids"></a> [host\_project\_ids](#output\_host\_project\_ids) | GCP host project IDs (single project in cross mode, multiple in no-cross) |
 | <a name="output_scanner_sa_emails"></a> [scanner\_sa\_emails](#output\_scanner\_sa\_emails) | Scanner Service Account emails per host project |
