@@ -12,8 +12,8 @@
 # Org/Folder registrations are always cross-project (single host project, org-level IAM).
 # Project registrations support both cross and per-project modes.
 #
-# Creates: Scanner SA, VPC, Subnet, optional NAT, GCS IAM, custom roles
-# Does NOT create: Scanner VMs, Cloud SQL, BigQuery, Firestore
+# Creates: Scanner SA, VPC, Subnet, optional NAT, Cloud SQL service connection policy, GCS IAM, custom roles
+# Does NOT create: Scanner VMs, Cloud SQL instances, BigQuery, Firestore
 # =============================================================================
 
 # =============================================================================
@@ -21,7 +21,7 @@
 # =============================================================================
 
 locals {
-  deployment_version = "1.2.0"
+  deployment_version = "1.3.0"
 
   # Guard for resources that reject uppercase
   effective_prefix = lower(var.resource_prefix)
@@ -67,6 +67,7 @@ locals {
   create_gcs_permissions       = var.enable_dspm && var.dspm_gcs_access
   create_bigquery_permissions  = var.enable_dspm && var.dspm_bigquery_access
   create_dspm_disk_permissions = var.enable_dspm && var.dspm_disk_access
+  create_cloudsql_permissions  = var.enable_dspm && var.dspm_cloudsql_access
 
   # Shared permission sets — single source of truth for permissions used by both DSPM and vulnerability roles.
   scanner_disk_permissions = [
@@ -110,6 +111,42 @@ locals {
       "bigquery.tables.getData",
       "bigquery.jobs.create",
     ]
+  }
+
+  # Cloud SQL target role — reads and clones the scanned instances and reads their backups.
+  cloudsql_target_role = {
+    id_prefix   = "DSPMCloudSQLTarget"
+    title       = "DSPM Cloud SQL Target"
+    description = "Read and clone Cloud SQL instances and read their backups for DSPM scanning"
+    permissions = [
+      "cloudsql.instances.get",
+      "cloudsql.instances.clone",
+      "cloudsql.instances.create",
+      "cloudsql.backupRuns.list",
+      "cloudsql.backupRuns.get",
+    ]
+  }
+
+  # The clone role is separate, because an IAM condition checks the resource type but it can not conditionally grant the permission.
+  cloudsql_clone_role = {
+    id_prefix   = "DSPMCloudSQLClone"
+    title       = "DSPM Cloud SQL Clone"
+    description = "Update, back up and delete Cloud SQL scanning clones"
+    permissions = [
+      "cloudsql.instances.update",
+      "cloudsql.instances.delete",
+      "cloudsql.backupRuns.create",
+      "cloudsql.backupRuns.delete",
+    ]
+  }
+
+  cloudsql_clone_condition = {
+    title       = "restrict-to-crowdstrike-cloudsql-clones"
+    description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
+    expression = join(" || ", [
+      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"sqladmin.googleapis.com/BackupRun\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+    ])
   }
 
   # Vulnerability scanning infra role — reused across host project and cross-target roles at project/folder/org scope.
@@ -183,6 +220,8 @@ locals {
     "bigquery.googleapis.com",
     "secretmanager.googleapis.com",
     "cloudasset.googleapis.com",
+    "sqladmin.googleapis.com",
+    "networkconnectivity.googleapis.com",
   ])
 
   project_api_pairs = { for pair in setproduct(local.host_project_ids, local.api_list) :

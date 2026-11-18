@@ -173,6 +173,12 @@ variable "dspm_bigquery_access" {
   default     = true
 }
 
+variable "dspm_cloudsql_access" {
+  type        = bool
+  description = "Apply permissions for DSPM Cloud SQL instance scanning"
+  default     = true
+}
+
 variable "dspm_disk_access" {
   type        = bool
   description = "Apply permissions for DSPM VM scanning"

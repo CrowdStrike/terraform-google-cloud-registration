@@ -183,6 +183,7 @@ module "agentless_scanning" {
   # Per-service DSPM permissions
   dspm_gcs_access      = var.dspm_gcs_access
   dspm_bigquery_access = var.dspm_bigquery_access
+  dspm_cloudsql_access = var.dspm_cloudsql_access
   dspm_disk_access     = var.dspm_disk_access
 
   # Common vars from root

@@ -159,6 +159,7 @@ module "agentless_scanning" {
 
   dspm_gcs_access      = var.dspm_gcs_access
   dspm_bigquery_access = var.dspm_bigquery_access
+  dspm_cloudsql_access = var.dspm_cloudsql_access
   dspm_disk_access     = var.dspm_disk_access
 
   falcon_client_id     = var.falcon_client_id
