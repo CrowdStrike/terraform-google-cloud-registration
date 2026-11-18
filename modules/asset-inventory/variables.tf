@@ -62,6 +62,7 @@ variable "google_iam_roles" {
   default = [
     "roles/aiplatform.viewer",
     "roles/alloydb.viewer",
+    "roles/apigateway.viewer",
     "roles/apigee.readOnlyAdmin",
     "roles/appengine.appViewer",
     "roles/artifactregistry.reader",
@@ -88,13 +89,14 @@ variable "google_iam_roles" {
     "roles/firebasehosting.viewer",
     "roles/firebasestorage.viewer",
     "roles/iam.securityReviewer",
+    "roles/monitoring.viewer",
     "roles/notebooks.viewer",
     "roles/osconfig.viewer",
     "roles/recommender.iamViewer",
     "roles/recommender.iampolicychangeriskViewer",
     "roles/secretmanager.viewer",
     "roles/securitycenter.adminViewer",
-    "roles/storage.bucketViewer"
+    "roles/storage.bucketViewer",
   ]
 
   validation {
@@ -148,7 +150,7 @@ variable "custom_role_permissions" {
   type        = list(string)
   description = "Permissions for the CrowdStrike custom IAM role. These are least-privilege permissions not covered by any predefined role."
   default = [
-    "storage.buckets.getIamPolicy"
+    "storage.buckets.getIamPolicy",
   ]
 
   validation {
