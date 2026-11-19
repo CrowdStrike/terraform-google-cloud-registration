@@ -357,7 +357,7 @@ resource "google_project_iam_member" "cloudsql_host_permissions" {
     title       = "restrict-to-crowdstrike-cloudsql-copies"
     description = "Restrict Cloud SQL instance mutations to cs-scanning-* copies"
     expression = join(" || ", [
-      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
       "(resource.type != \"sqladmin.googleapis.com/Instance\")",
     ])
   }

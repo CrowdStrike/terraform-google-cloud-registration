@@ -144,8 +144,8 @@ locals {
     title       = "restrict-to-crowdstrike-cloudsql-clones"
     description = "Restrict Cloud SQL instance and backup mutations to cs-scanning-* clones"
     expression = join(" || ", [
-      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
-      "(resource.type == \"sqladmin.googleapis.com/BackupRun\" && resource.name.extract(\"/instances/cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"sqladmin.googleapis.com/Instance\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
+      "(resource.type == \"sqladmin.googleapis.com/BackupRun\" && resource.name.extract(\"cs-scanning-{id}\") != \"\")",
     ])
   }
 
