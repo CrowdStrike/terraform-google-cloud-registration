@@ -16,16 +16,14 @@ cat > ci-validation.auto.tfvars <<'EOF'
 registration_name             = "ci-validation"
 registration_type             = "organization"
 organization_id               = "123456789012"
-wif_project_id                = "ci-test-project"
 infra_project_id              = "ci-test-project"
 infrastructure_manager_region = "us-central1"
 deployment_method             = "infrastructure-manager"
 role_arn                      = "arn:aws:sts::111111111111:assumed-role/CrowdStrikeCSPMConnector"
-# resource_prefix / resource_suffix are intentionally unset -> null.
-# Infrastructure Manager submits empty console fields as unset, and Terraform
-# 1.5.7 (the IM default) does not short-circuit `||`, so their validations
-# must not call length() on a possibly-null value. wif_project_id is always
-# set by the Falcon-generated inputs and is expected never to be empty.
+# Optional inputs (wif_project_id, resource_prefix, resource_suffix) are
+# intentionally unset -> null. Infrastructure Manager submits empty console
+# fields as unset, and Terraform 1.5.7 (the IM default) does not short-circuit
+# `||`, so validations must not call length() on a possibly-null value.
 EOF
 
 # falcon_client_id must be 32 hex characters. Build a placeholder at runtime
