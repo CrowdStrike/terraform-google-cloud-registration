@@ -65,24 +65,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        terraform:
-          - "1.5.7" # Infrastructure Manager default and latest free version
-          - "latest"
-        path:
-          - "examples/infrastructure-manager"
+        include:
+          - terraform: "1.5.7" # Infrastructure Manager default and latest free version
+            sha256: c0ed7bc32ee52ae255af9982c8c88a7a4c610485cf1d55feeb037eab75fa082c
+            path: examples/infrastructure-manager
+          - terraform: "1.14.9"
+            sha256: 2e5cffc20a0b48a67a76268723bd5a10b8666f69b2aa4f04906e206726bedd63
+            path: examples/infrastructure-manager
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
-        with:
-          terraform_version: ${{ matrix.terraform }}
-          terraform_wrapper: false
+      # Installed from the HashiCorp release instead of a setup action, which the
+      # enterprise action allowlist does not include. The checksum pins the binary.
+      - name: Install Terraform ${{ matrix.terraform }}
+        env:
+          TF_VERSION: ${{ matrix.terraform }}
+          TF_SHA256: ${{ matrix.sha256 }}
+        run: |
+          zip="terraform_${TF_VERSION}_linux_amd64.zip"
+          curl -fsSLo "$RUNNER_TEMP/$zip" "https://releases.hashicorp.com/terraform/${TF_VERSION}/${zip}"
+          echo "${TF_SHA256}  $RUNNER_TEMP/$zip" | sha256sum -c -
+          unzip -q -d "$RUNNER_TEMP/terraform" "$RUNNER_TEMP/$zip"
+          echo "$RUNNER_TEMP/terraform" >> "$GITHUB_PATH"
 
       - name: Check variable validation with null inputs
-        run: .github/scripts/check-variable-validation.sh ${{ matrix.path }}
+        run: |
+          terraform version
+          .github/scripts/check-variable-validation.sh ${{ matrix.path }}
 
   docs:
     runs-on: ubuntu-latest
