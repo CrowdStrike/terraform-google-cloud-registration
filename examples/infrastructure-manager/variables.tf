@@ -42,7 +42,7 @@ variable "wif_project_id" {
   default     = null
 
   validation {
-    condition     = var.wif_project_id == null || (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
+    condition     = var.wif_project_id == null ? true : (length(var.wif_project_id) >= 6 && length(var.wif_project_id) <= 30 && can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.wif_project_id)))
     error_message = "Project ID must be 6-30 characters, start with a lowercase letter, contain only lowercase letters, numbers, and hyphens, and not end with a hyphen."
   }
 }
@@ -172,7 +172,7 @@ variable "resource_prefix" {
   type        = string
 
   validation {
-    condition     = var.resource_prefix == null || var.resource_prefix == "" || (can(regex("^[A-Za-z][A-Za-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13)
+    condition     = var.resource_prefix == null ? true : (var.resource_prefix == "" || (can(regex("^[A-Za-z][A-Za-z0-9-]*$", var.resource_prefix)) && length(var.resource_prefix) <= 13))
     error_message = "Resource prefix must start with a letter and contain only letters, numbers, and hyphens, and be 13 characters or less."
   }
 }
@@ -183,7 +183,7 @@ variable "resource_suffix" {
   default     = null
 
   validation {
-    condition     = var.resource_suffix == null || var.resource_suffix == "" || (can(regex("^[A-Za-z0-9-]*[A-Za-z0-9]$", var.resource_suffix)) && length(var.resource_suffix) <= 13)
+    condition     = var.resource_suffix == null ? true : (var.resource_suffix == "" || (can(regex("^[A-Za-z0-9-]*[A-Za-z0-9]$", var.resource_suffix)) && length(var.resource_suffix) <= 13))
     error_message = "Resource suffix must end with a letter or number, contain only letters, numbers, and hyphens, and be 13 characters or less."
   }
 }
