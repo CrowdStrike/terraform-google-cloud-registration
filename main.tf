@@ -240,6 +240,14 @@ resource "crowdstrike_cloud_google_registration_settings" "main" {
     } : null
 
     infra = module.agentless_scanning[0].agentless_infra
+
+    # DSPM-only, as the customer set them
+    dspm_settings = var.enable_dspm ? {
+      gcs_access      = var.dspm_gcs_access
+      bigquery_access = var.dspm_bigquery_access
+      cloudsql_access = var.dspm_cloudsql_access
+      disk_access     = var.dspm_disk_access
+    } : null
   } : null
 
   depends_on = [
